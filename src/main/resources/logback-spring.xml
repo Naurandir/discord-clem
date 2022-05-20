@@ -36,7 +36,7 @@
     </root>
  
     <!-- LOG "at.naurandir.discord*" at DEBUG level -->
-    <logger name="at.naurandir.discord" level="debug" additivity="false">
+    <logger name="at.naurandir.discord*" level="debug" additivity="false">
         <appender-ref ref="RollingFile" />
         <appender-ref ref="Console" />
     </logger>
