@@ -1,22 +1,11 @@
 package at.naurandir.discord.clem.bot;
 
-import at.naurandir.discord.clem.bot.command.Command;
-import at.naurandir.discord.clem.bot.command.CommandGenerator;
+import at.naurandir.discord.clem.bot.command.CommandService;
 import discord4j.core.DiscordClient;
-import discord4j.core.DiscordClientBuilder;
 import discord4j.core.GatewayDiscordClient;
-import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
-import discord4j.core.event.domain.lifecycle.ReadyEvent;
 import discord4j.core.event.domain.message.MessageCreateEvent;
-import discord4j.core.object.entity.Message;
-import discord4j.core.object.entity.User;
-import discord4j.core.object.presence.Activity;
 import discord4j.core.object.presence.ClientActivity;
 import discord4j.core.object.presence.ClientPresence;
-import discord4j.core.object.presence.Presence;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.TimeZone;
 import java.util.concurrent.ExecutionException;
 import javax.annotation.PostConstruct;
@@ -43,7 +32,7 @@ public class ClemBot {
     private String prefix;
     
     @Autowired
-    private List<CommandGenerator> commandGenerators;
+    private CommandService commandService;
     
     private GatewayDiscordClient client;
     
@@ -65,11 +54,11 @@ public class ClemBot {
     
     private Mono<Void> handleCommand(MessageCreateEvent event) {
         log.debug("handleCommand: received message create event [{}]", event.getMessage().getContent());
-        return Flux.fromIterable(commandGenerators)
-            .filter(commandGenerator -> event.getMessage().getContent().startsWith(
-                        prefix + " " + commandGenerator.getCommand().getCommandWord()))
+        return Flux.fromIterable(commandService.getAllCommands())
+            .filter(command -> event.getMessage().getContent().startsWith(
+                        prefix + " " + command.getCommandWord()))
             .next()
-            .flatMap(command -> command.getCommand().execute(event));
+            .flatMap(command -> command.execute(event));
     }
     
     @PreDestroy
@@ -79,8 +68,9 @@ public class ClemBot {
         log.info("destroy: destroying bot done");
     }
     
-    @Scheduled(fixedRate = 15_000)
-    public void updateStatusForSilvester() throws InterruptedException, ExecutionException {
+    @Scheduled(fixedRate = 1_000 * 60)
+    public void updateStatus() throws InterruptedException, ExecutionException {
         client.updatePresence(ClientPresence.online(ClientActivity.listening(prefix)));
+        commandService.updateWorldState(client);
     }
 }
