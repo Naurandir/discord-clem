@@ -4,6 +4,8 @@ import at.naurandir.discord.clem.bot.command.Command;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Message;
 import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.rest.util.Color;
+import java.time.Instant;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
@@ -20,8 +22,10 @@ public class CommandTest implements Command {
     public Mono<Void> execute(MessageCreateEvent event) {
         log.info("execute: received message [id:{}, guildId:{}, channelId:{}, content:{}]", 
                 event.getMessage().getId(), event.getGuildId(), event.getMessage().getChannelId(), event.getMessage().getContent());
+        Message message = event.getMessage();
+        
         return event.getMessage().getChannel()
-                .flatMap(channel -> channel.createEmbed(spec -> generateEmbed(spec, event.getMessage())))
+                .flatMap(channel -> channel.createMessage(generateEmbed(message)))
                 .then();
     }
 
@@ -30,8 +34,7 @@ public class CommandTest implements Command {
         return "test";
     }
     
-    private void generateEmbed(EmbedCreateSpec spec, Message message) { 
-        
+    private EmbedCreateSpec generateEmbed(Message message) { 
         String id;
         String user;
         try {
@@ -43,9 +46,25 @@ public class CommandTest implements Command {
             id = message.getAuthor().get().getUsername();
         }
         
-        spec.setTitle("Testmessage");
-        spec.setDescription("Content of test message");
+        EmbedCreateSpec embed = EmbedCreateSpec.builder()
+                .color(Color.BLUE)
+                .title("Title")
+                .url("https://discord4j.com")
+                .author("Some Name", "https://discord4j.com", "https://i.imgur.com/F9BhEoz.png")
+                .description("a description")
+                .thumbnail("https://i.imgur.com/F9BhEoz.png")
+                .addField("field title", "value", false)
+                .addField("\u200B", "\u200B", false)
+                .addField("inline field", "value", true)
+                .addField("inline field", "value", true)
+                .addField("inline field", "value", true)
+                .image("https://i.imgur.com/F9BhEoz.png")
+                .timestamp(Instant.now())
+                .footer("footer", "https://i.imgur.com/F9BhEoz.png")
+                .build();
         
         log.info("generateEmbed: generated [test for {} - {}]", user, id);
+        
+        return embed;
     }
 }
