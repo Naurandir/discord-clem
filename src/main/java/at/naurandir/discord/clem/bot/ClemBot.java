@@ -70,7 +70,9 @@ public class ClemBot {
     
     @Scheduled(fixedRate = 1_000 * 60)
     public void updateStatus() throws InterruptedException, ExecutionException {
+        log.info("updateStatus: updating current status...");
         client.updatePresence(ClientPresence.online(ClientActivity.listening(prefix)));
         commandService.updateWorldState(client);
+        log.info("updateStatus: updating current status finished.");
     }
 }
