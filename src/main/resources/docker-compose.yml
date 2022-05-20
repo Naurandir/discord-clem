@@ -1,17 +1,21 @@
 version: "3.7"
 
 services:
-    naurandir-discord-bot:
-        image: naurandir/discord-bot-java:latest
-        container_name: naurandir-discord-bot
+    naurandir-discord-clem:
+        image: naurandir/discord-clem:latest
+        container_name: naurandir-discord-clem
         volumes:
-            - ./log:/tmp/log
-        ports:
-            - 7090:7090
+            - ./log:/home/appuser/log
         networks:
-            - database_default
+            - naurandir_bridge
+        deploy:
+            resources:
+                limits:
+                    memory: 400M
+                reservations:
+                    memory: 300M
 
 networks:
-  database_default:
+  naurandir_bridge:
     external:
-      name: database_default
+      name: naurandir_bridge

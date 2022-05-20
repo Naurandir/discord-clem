@@ -1,8 +1,8 @@
 echo "stopping possible old docker images..."
-sudo docker stop naurandir-discord-bot
-sudo docker rm naurandir-discord-bot
-sudo docker rmi naurandir/discord-bot-java
+docker stop naurandir-discord-clem
+docker rm naurandir-discord-clem
+docker rmi naurandir/discord-clem
 
 echo "building new docker image..."
-sudo docker build -t naurandir/discord-bot-java .
-sudo docker-compose up -d
+docker build -t naurandir/discord-clem .
+docker-compose --compatibility up -d

@@ -1,8 +1,18 @@
-FROM openjdk:11.0.5-slim
+FROM arm32v7/openjdk:11.0-jdk
 
-COPY Naurandir-Discord-Bot-0.0.1-SNAPSHOT.jar /tmp/app.jar
-COPY config/bleigiessen.json /tmp/bleigiessen.json
-COPY config/official-server.p12 /tmp/official-server.p12
-COPY config/application.properties /tmp/application.properties
+RUN groupadd -g 999 appuser
+RUN useradd appuser -u 999 -g appuser
 
-CMD ["java", "-jar", "/tmp/app.jar", "-Dloader.main=com.discord.bot.WebApplication org.springframework.boot.loader.PropertiesLauncher", "--spring.config.location=/tmp/application.properties"]
+COPY Clem-1.0-SNAPSHOT.jar /home/appuser/app.jar
+COPY config/official-server.p12 /home/appuser/official-server.p12
+COPY config/application.properties /home/appuser/application.properties
+
+RUN mkdir /home/appuser/log
+
+RUN chown -R appuser:appuser /home/appuser
+
+RUN rm /home/appuser/log/*.log; exit 0
+
+USER appuser
+
+CMD ["java", "-jar", "/home/appuser/app.jar", "-Dloader.main=at.naurandir.discord.clem.WebApplication org.springframework.boot.loader.PropertiesLauncher", "--spring.config.location=/home/appuser/application.properties"]
