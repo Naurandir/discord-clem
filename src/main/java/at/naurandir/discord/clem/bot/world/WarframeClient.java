@@ -24,7 +24,7 @@ public class WarframeClient {
             
             try (CloseableHttpResponse response = httpclient.execute(httpGet)) {
                 log.info("getCurrentWorldState: received http status [{}]", response.getStatusLine());
-                String jsonString = EntityUtils.toString(response.getEntity(), Charset.forName("UTF_8"));
+                String jsonString = EntityUtils.toString(response.getEntity(), Charset.forName("UTF-8"));
                 
             }
         } catch (IOException ex) {
