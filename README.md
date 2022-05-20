@@ -1,2 +1,2 @@
-# discord-clem
-Warframe Bot for Discord
+# discord-bot
+a bot for discord
