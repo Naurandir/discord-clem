@@ -13,7 +13,7 @@
  
     <appender name="RollingFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>
-            ${LOGS}/discord-bot-webapp.log
+            ${LOGS}/discord-bot-clem.log
         </file>
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
             <Pattern>
@@ -24,7 +24,7 @@
         <rollingPolicy  class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!-- daily rollover -->
             <fileNamePattern>
-                ${LOGS}/discord-bot-webapp.%d{yyyy-MM-dd}.log
+                ${LOGS}/discord-bot-clem.%d{yyyy-MM-dd}.log
             </fileNamePattern>
         </rollingPolicy>
     </appender>
@@ -35,8 +35,8 @@
         <appender-ref ref="Console" />
     </root>
  
-    <!-- LOG "com.rpg*" at DEBUG level -->
-    <logger name="com.rpg" level="debug" additivity="false">
+    <!-- LOG "at.naurandir.discord*" at DEBUG level -->
+    <logger name="at.naurandir.discord" level="debug" additivity="false">
         <appender-ref ref="RollingFile" />
         <appender-ref ref="Console" />
     </logger>
