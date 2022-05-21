@@ -1,11 +1,16 @@
 package at.naurandir.discord.clem.bot;
 
-import at.naurandir.discord.clem.bot.command.CommandService;
+import at.naurandir.discord.clem.bot.service.WarframeService;
+import at.naurandir.discord.clem.bot.service.command.Command;
+import discord4j.common.util.Snowflake;
 import discord4j.core.DiscordClient;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.message.MessageCreateEvent;
+import discord4j.core.object.entity.channel.Channel.Type;
+import discord4j.core.object.entity.channel.TextChannel;
 import discord4j.core.object.presence.ClientActivity;
 import discord4j.core.object.presence.ClientPresence;
+import java.util.List;
 import java.util.TimeZone;
 import java.util.concurrent.ExecutionException;
 import javax.annotation.PostConstruct;
@@ -32,7 +37,10 @@ public class ClemBot {
     private String prefix;
     
     @Autowired
-    private CommandService commandService;
+    private WarframeService warframeService;
+    
+    @Autowired
+    private List<Command> commands;
     
     private GatewayDiscordClient client;
     
@@ -54,7 +62,7 @@ public class ClemBot {
     
     private Mono<Void> handleCommand(MessageCreateEvent event) {
         log.debug("handleCommand: received message create event [{}]", event.getMessage().getContent());
-        return Flux.fromIterable(commandService.getAllCommands())
+        return Flux.fromIterable(commands)
             .filter(command -> event.getMessage().getContent().startsWith(
                         prefix + " " + command.getCommandWord()))
             .next()
@@ -68,11 +76,16 @@ public class ClemBot {
         log.info("destroy: destroying bot done");
     }
     
-    @Scheduled(fixedRate = 1_000 * 60)
+    @Scheduled(fixedRate = 5 * 60 * 1_000)
     public void updateStatus() throws InterruptedException, ExecutionException {
         log.info("updateStatus: updating current status...");
         client.updatePresence(ClientPresence.online(ClientActivity.listening(prefix)));
-        commandService.updateWorldState(client);
+        warframeService.updateWorldState(client);
         log.info("updateStatus: updating current status finished.");
+        
+        client.getChannelById(Snowflake.of("977443949352472626"))
+                .filter(channel -> channel.getType().equals(Type.GUILD_TEXT))
+                .flatMap(channel -> ((TextChannel) channel).createMessage("updated"))
+                .then();
     }
 }

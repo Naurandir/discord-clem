@@ -1,4 +1,4 @@
-package at.naurandir.discord.clem.bot.command;
+package at.naurandir.discord.clem.bot.service.command;
 
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import reactor.core.publisher.Mono;
@@ -9,6 +9,5 @@ import reactor.core.publisher.Mono;
  */
 public interface Command {
     Mono<Void> execute(MessageCreateEvent event);
-    // push method
     String getCommandWord();
 }

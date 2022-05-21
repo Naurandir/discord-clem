@@ -1,5 +1,7 @@
-package at.naurandir.discord.clem.bot.world;
+package at.naurandir.discord.clem.bot.service.client;
 
+import at.naurandir.discord.clem.bot.service.client.dto.WorldStateDTO;
+import com.google.gson.Gson;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import lombok.extern.slf4j.Slf4j;
@@ -16,8 +18,9 @@ import org.apache.http.util.EntityUtils;
 @Slf4j
 public class WarframeClient {
     
-    public void getCurrentWorldState() {
-        
+    Gson gson = new Gson();
+    
+    public WorldStateDTO getCurrentWorldState() throws IOException {
         try (CloseableHttpClient httpclient = HttpClients.createDefault()) {
             HttpGet httpGet = new HttpGet("https://api.warframestat.us/pc");
             httpGet.addHeader("Accept-Language", "en");
@@ -25,10 +28,8 @@ public class WarframeClient {
             try (CloseableHttpResponse response = httpclient.execute(httpGet)) {
                 log.info("getCurrentWorldState: received http status [{}]", response.getStatusLine());
                 String jsonString = EntityUtils.toString(response.getEntity(), Charset.forName("UTF-8"));
-                
+                return gson.fromJson(jsonString, WorldStateDTO.class);
             }
-        } catch (IOException ex) {
-            log.info("getCurrentWorldState: exception happened: ", ex);
         }
     }
 }

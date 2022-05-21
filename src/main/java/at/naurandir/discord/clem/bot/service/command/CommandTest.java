@@ -1,13 +1,12 @@
-package at.naurandir.discord.clem.bot.command.impl;
+package at.naurandir.discord.clem.bot.service.command;
 
-import at.naurandir.discord.clem.bot.command.Command;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Message;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.util.Color;
 import java.time.Instant;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 /**
@@ -15,7 +14,7 @@ import reactor.core.publisher.Mono;
  * @author Naurandir
  */
 @Slf4j
-@Setter
+@Service
 public class CommandTest implements Command {
 
     @Override
