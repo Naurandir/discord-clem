@@ -30,7 +30,10 @@ public abstract class Push {
         Snowflake lastMessageId = channelLastMessageMapping.get(channelId);
         if (channelLastMessageMapping.get(channelId) != null) {
             log.info("handleOwnEvent: found an existing message [{}], deleting", lastMessageId);
-            client.getRestClient().getMessageById(channelId, channelLastMessageMapping.get(channelId)).delete("replace with newer information");
+            client.getRestClient()
+                    .getMessageById(channelId, channelLastMessageMapping.get(channelId))
+                    .delete("replace with newer information")
+                    .subscribe();
         } else {
             log.info("handleOwnEvent: no lastMessageId found for channel [{}]", channelId);
         }
