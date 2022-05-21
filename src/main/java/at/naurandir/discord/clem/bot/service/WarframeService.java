@@ -35,9 +35,12 @@ public class WarframeService {
     private WarframeState warframeState;
     
     @PostConstruct
-    public void init() {
+    public void init() throws IOException {
         client = new WarframeClient();
         warframeState = new WarframeState();
+        
+        WorldStateDTO newWorldState = client.getCurrentWorldState();
+        warframeState.setCetusCycle(newWorldState.getCetusCycleDTO());
     }
     
     public List<Command> getCommands() {
