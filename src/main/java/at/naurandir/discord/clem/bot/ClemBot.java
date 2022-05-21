@@ -4,6 +4,7 @@ import at.naurandir.discord.clem.bot.service.WarframeService;
 import discord4j.core.DiscordClient;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.message.MessageCreateEvent;
+import discord4j.core.object.entity.Message.Type;
 import discord4j.core.object.presence.ClientActivity;
 import discord4j.core.object.presence.ClientPresence;
 import java.util.TimeZone;
@@ -56,11 +57,23 @@ public class ClemBot {
     
     private Mono<Void> handleMessage(MessageCreateEvent event) {
         log.debug("handleCommand: received message create event [{}]", event.getMessage());
-        if (event.getMember().isPresent() && event.getMember().get().getId().asString().equals(id)) {
+        if (isOwnBot(event) && isMessageToDelete(event)) {
+            event.getMessage()
+                    .delete("not required message, like pin status message, can be deleted")
+                    .subscribe();
+        }else if (isOwnBot(event)) {
             warframeService.handleOwnEvent(event, client);
         }
         
         return warframeService.handleEvent(event, prefix);
+    }
+
+    private boolean isOwnBot(MessageCreateEvent event) {
+        return event.getMember().isPresent() && event.getMember().get().getId().asString().equals(id);
+    }
+    
+    private boolean isMessageToDelete(MessageCreateEvent event) {
+        return event.getMessage().getType().equals(Type.CHANNEL_PINNED_MESSAGE);
     }
     
     @PreDestroy
