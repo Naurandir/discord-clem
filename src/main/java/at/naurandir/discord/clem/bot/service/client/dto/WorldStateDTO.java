@@ -1,6 +1,6 @@
 package at.naurandir.discord.clem.bot.service.client.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.gson.annotations.SerializedName;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -13,6 +13,7 @@ import lombok.ToString;
 @Setter
 @ToString
 public class WorldStateDTO {
-    @JsonProperty("cetusCycle")
+    
+    @SerializedName("cetusCycle")
     private CetusCycleDTO cetusCycleDTO;
 }
