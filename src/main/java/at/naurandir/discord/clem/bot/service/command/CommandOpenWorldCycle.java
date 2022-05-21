@@ -43,9 +43,9 @@ public class CommandOpenWorldCycle implements Command {
                         HANDLE_MESSAGE
                                 .replace("{stateCetus}", warframeState.getCetusCycle().getState())
                                 .replace("{hoursCetus}", String.valueOf(cetusDiffTime.getHour()))
-                                .replace("{minutesCetus}", String.valueOf(cetusDiffTime.getMinute())
+                                .replace("{minutesCetus}", String.valueOf(cetusDiffTime.getMinute()))
                                 .replace("{stateVallis}", warframeState.getVallisCycle().getState())
-                                .replace("{hoursVallis}", String.valueOf(vallisDiffTime.getHour())))
+                                .replace("{hoursVallis}", String.valueOf(vallisDiffTime.getHour()))
                                 .replace("{minutesVallis}", String.valueOf(vallisDiffTime.getMinute()))))
                 .then();
     }
