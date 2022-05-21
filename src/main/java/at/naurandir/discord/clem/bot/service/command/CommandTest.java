@@ -1,12 +1,15 @@
 package at.naurandir.discord.clem.bot.service.command;
 
+import at.naurandir.discord.clem.bot.service.WarframeState;
+import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Message;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.util.Color;
 import java.time.Instant;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 /**
@@ -14,11 +17,11 @@ import reactor.core.publisher.Mono;
  * @author Naurandir
  */
 @Slf4j
-@Service
+@Component
 public class CommandTest implements Command {
 
     @Override
-    public Mono<Void> execute(MessageCreateEvent event) {
+    public Mono<Void> handle(MessageCreateEvent event, WarframeState warframeState) {
         log.info("execute: received message [id:{}, guildId:{}, channelId:{}, content:{}]", 
                 event.getMessage().getId(), event.getGuildId(), event.getMessage().getChannelId(), event.getMessage().getContent());
         Message message = event.getMessage();
@@ -65,5 +68,10 @@ public class CommandTest implements Command {
         log.info("generateEmbed: generated [test for {} - {}]", user, id);
         
         return embed;
+    }
+
+    @Override
+    public void push(GatewayDiscordClient client, WarframeState warframeState) {
+        return; // no push logic required for this command
     }
 }

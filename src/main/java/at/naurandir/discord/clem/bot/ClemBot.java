@@ -1,16 +1,11 @@
 package at.naurandir.discord.clem.bot;
 
 import at.naurandir.discord.clem.bot.service.WarframeService;
-import at.naurandir.discord.clem.bot.service.command.Command;
-import discord4j.common.util.Snowflake;
 import discord4j.core.DiscordClient;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.message.MessageCreateEvent;
-import discord4j.core.object.entity.channel.Channel.Type;
-import discord4j.core.object.entity.channel.TextChannel;
 import discord4j.core.object.presence.ClientActivity;
 import discord4j.core.object.presence.ClientPresence;
-import java.util.List;
 import java.util.TimeZone;
 import java.util.concurrent.ExecutionException;
 import javax.annotation.PostConstruct;
@@ -39,9 +34,6 @@ public class ClemBot {
     @Autowired
     private WarframeService warframeService;
     
-    @Autowired
-    private List<Command> commands;
-    
     private GatewayDiscordClient client;
     
     @PostConstruct
@@ -62,11 +54,11 @@ public class ClemBot {
     
     private Mono<Void> handleCommand(MessageCreateEvent event) {
         log.debug("handleCommand: received message create event [{}]", event.getMessage().getContent());
-        return Flux.fromIterable(commands)
+        return Flux.fromIterable(warframeService.getCommands())
             .filter(command -> event.getMessage().getContent().startsWith(
                         prefix + " " + command.getCommandWord()))
             .next()
-            .flatMap(command -> command.execute(event));
+            .flatMap(command -> warframeService.handle(command, event));
     }
     
     @PreDestroy
@@ -79,14 +71,7 @@ public class ClemBot {
     @Scheduled(fixedRate = 5 * 60 * 1_000)
     public void updateStatus() throws InterruptedException, ExecutionException {
         log.info("updateStatus: updating current status...");
-        client.updatePresence(ClientPresence.online(ClientActivity.listening(prefix)));
-        warframeService.updateWorldState(client);
+        warframeService.refreshWarframe(client);
         log.info("updateStatus: updating current status finished.");
-        
-        client.rest().getChannelById(Snowflake.of(977443949352472626L)).createMessage("updated2").subscribe();
-        
-        client.getChannelById(Snowflake.of(977443949352472626L))
-                //.filter(channel -> channel.getType().equals(Type.GUILD_TEXT))
-                .flatMap(channel -> ((TextChannel) channel).createMessage("updated")).subscribe();
     }
 }
