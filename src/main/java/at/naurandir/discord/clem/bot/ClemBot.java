@@ -55,7 +55,7 @@ public class ClemBot {
     }
     
     private Mono<Void> handleMessage(MessageCreateEvent event) {
-        log.debug("handleCommand: received message create event [{}]", event.getMessage().getContent());
+        log.debug("handleCommand: received message create event [{}]", event.getMessage());
         if (event.getMember().isPresent() && event.getMember().get().getId().asString().equals(id)) {
             warframeService.handleOwnEvent(event, client);
         }
