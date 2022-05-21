@@ -6,11 +6,13 @@ import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import java.util.HashMap;
 import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  *
  * @author Naurandir
  */
+@Slf4j
 public abstract class Push {
     
     private final Map<Snowflake, Snowflake> channelLastMessageMapping = new HashMap<>();
@@ -24,14 +26,19 @@ public abstract class Push {
             return;
         }
         
+        Snowflake channelId = event.getMessage().getChannelId();
+        Snowflake lastMessageId = channelLastMessageMapping.get(channelId);
+        if (channelLastMessageMapping.get(channelId) != null) {
+            log.info("handleOwnEvent: found an existing message [{}], deleting", lastMessageId);
+            client.getRestClient().getMessageById(channelId, channelLastMessageMapping.get(channelId)).delete("replace with newer information");
+        } else {
+            log.info("handleOwnEvent: no lastMessageId found for channel [{}]", channelId);
+        }
+        
+        channelLastMessageMapping.put(channelId, event.getMessage().getId());
+        
         if (isSticky()) {
             event.getMessage().pin().subscribe();
         }
-        
-        Snowflake channelId = event.getMessage().getChannelId();
-        if (channelLastMessageMapping.get(channelId) != null) {
-            client.getRestClient().getMessageById(channelId, channelLastMessageMapping.get(channelId)).delete("replace with newer information");
-        }
-        channelLastMessageMapping.put(channelId, event.getMessage().getId());
     }
 }
