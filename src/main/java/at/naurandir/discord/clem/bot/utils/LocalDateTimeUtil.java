@@ -30,17 +30,22 @@ public class LocalDateTimeUtil {
         return getDiffTime(LocalDateTime.parse(time1, formatter), LocalDateTime.parse(time2, formatter));
     }
     
+    /**
+     * time2 - time1 is calculated, if time2 is before time1 the zero value is returned
+     * @param time1
+     * @param time2
+     * @return 
+     */
     public static LocalDateTime getDiffTime(LocalDateTime time1, LocalDateTime time2) {
+        if (time2.isBefore(time1)) {
+            return LocalDateTime.of(0, Month.JANUARY, 0, 0, 0);
+        }
+        
         Timestamp timestamp1 = Timestamp.valueOf(time1);
         Timestamp timestamp2 = Timestamp.valueOf(time2);
         
         long diffTime = timestamp2.getTime() - timestamp1.getTime();
         
-        LocalDateTime diff = (new Timestamp(diffTime)).toLocalDateTime();
-        if (diff.getYear() < 0) {
-            diff = LocalDateTime.of(0, Month.JANUARY, 0, 0, 0);
-        }
-        
-        return diff;
+        return (new Timestamp(diffTime)).toLocalDateTime();
     }
 }
