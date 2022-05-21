@@ -73,7 +73,7 @@ public class ClemBot {
         log.info("destroy: destroying bot done");
     }
     
-    @Scheduled(fixedRate = 5 * 60 * 1_000)
+    @Scheduled(fixedRate = 1 * 60 * 1_000)
     public void updateStatus() throws InterruptedException, ExecutionException {
         log.info("updateStatus: updating current status...");
         warframeService.refreshWarframe(client);

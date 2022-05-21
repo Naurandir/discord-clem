@@ -3,6 +3,7 @@ package at.naurandir.discord.clem.bot.utils;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.time.Month;
 import java.time.format.DateTimeFormatter;
 
 /**
@@ -35,6 +36,11 @@ public class LocalDateTimeUtil {
         
         long diffTime = timestamp2.getTime() - timestamp1.getTime();
         
-        return (new Timestamp(diffTime)).toLocalDateTime();
+        LocalDateTime diff = (new Timestamp(diffTime)).toLocalDateTime();
+        if (diff.getYear() < 0) {
+            diff = LocalDateTime.of(0, Month.JANUARY, 0, 0, 0);
+        }
+        
+        return diff;
     }
 }
