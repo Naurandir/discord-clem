@@ -74,8 +74,8 @@ public class WarframeService {
                 .flatMap(command -> command.handle(event, warframeState));
     }
     
-    public void handleOwnEvent(MessageCreateEvent event, GatewayDiscordClient client) {
-        pushes.forEach(push -> push.handleOwnEvent(event, client));
+    public void handleOwnEvent(MessageCreateEvent event) {
+        pushes.forEach(push -> push.handleOwnEvent(event));
     }
     
     /**

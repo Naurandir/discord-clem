@@ -61,8 +61,8 @@ public class ClemBot {
             event.getMessage()
                     .delete("not required message, like pin status message, can be deleted")
                     .subscribe();
-        }else if (isOwnBot(event)) {
-            warframeService.handleOwnEvent(event, client);
+        } else if (isOwnBot(event)) {
+            warframeService.handleOwnEvent(event);
         }
         
         return warframeService.handleEvent(event, prefix);

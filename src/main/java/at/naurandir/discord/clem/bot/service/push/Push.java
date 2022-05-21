@@ -5,6 +5,7 @@ import discord4j.common.util.Snowflake;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 
@@ -15,33 +16,39 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public abstract class Push {
     
-    private final Map<Snowflake, Snowflake> channelLastMessageMapping = new HashMap<>();
+    private final Map<Snowflake, Snowflake> channelMessageMapping = new HashMap<>();
     
-    public abstract void push(GatewayDiscordClient client, WarframeState warframeState);
-    public abstract boolean isOwnMessage(MessageCreateEvent event);
-    public abstract boolean isSticky();
+    abstract void doNewPush(GatewayDiscordClient client, WarframeState warframeState, Snowflake channelId);
+    abstract void doUpdatePush(GatewayDiscordClient client, WarframeState warframeState, Snowflake channelId, Snowflake messageId);
+    abstract List<String> getInterestingChannels();
+    abstract boolean isOwnMessage(MessageCreateEvent event);
+    abstract boolean isSticky();
     
-    public void handleOwnEvent(MessageCreateEvent event, GatewayDiscordClient client) {
-        if (!isOwnMessage(event)) {
-            return;
+    public void handleOwnEvent(MessageCreateEvent event) {
+        if (!isSticky()) {
+            return; // nothing to do as onw message can be ignored
         }
         
         Snowflake channelId = event.getMessage().getChannelId();
-        Snowflake lastMessageId = channelLastMessageMapping.get(channelId);
-        if (channelLastMessageMapping.get(channelId) != null) {
-            log.info("handleOwnEvent: found an existing message [{}], deleting", lastMessageId);
-            client.getRestClient()
-                    .getMessageById(channelId, channelLastMessageMapping.get(channelId))
-                    .delete("replace with newer information")
-                    .subscribe();
-        } else {
-            log.info("handleOwnEvent: no lastMessageId found for channel [{}]", channelId);
+        Snowflake messageId = event.getMessage().getId();
+        channelMessageMapping.putIfAbsent(channelId, messageId);
+        
+        if (!channelMessageMapping.get(channelId).equals(messageId)) {
+            log.warn("handleOwnEvent: current messageId [{}] not the same as in mapping [{}]",
+                    messageId, channelMessageMapping.get(channelId));
         }
-        
-        channelLastMessageMapping.put(channelId, event.getMessage().getId());
-        
-        if (isSticky()) {
-            event.getMessage().pin().subscribe();
+    }
+    
+    public void push(GatewayDiscordClient client, WarframeState warframeState) {
+        for (String channelId : getInterestingChannels()) {
+            Snowflake channelSnowflake = Snowflake.of(channelId);
+            if (!isSticky()) {
+                doNewPush(client, warframeState, channelSnowflake);
+            } else if(channelMessageMapping.get(channelSnowflake) == null) {
+                doNewPush(client, warframeState, channelSnowflake);
+            } else {
+                doUpdatePush(client, warframeState, channelSnowflake, channelMessageMapping.get(channelSnowflake));
+            }
         }
     }
 }
