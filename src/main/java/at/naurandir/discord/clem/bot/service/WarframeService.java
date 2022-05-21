@@ -41,6 +41,7 @@ public class WarframeService {
         
         WorldStateDTO newWorldState = client.getCurrentWorldState();
         warframeState.setCetusCycle(newWorldState.getCetusCycleDTO());
+        warframeState.setVallisCycle(newWorldState.getVallisCycleDTO());
     }
     
     public List<Command> getCommands() {
@@ -86,7 +87,10 @@ public class WarframeService {
         warframeState.setCetusCycle(newWorldState.getCetusCycleDTO());
         
         // fortuna
-        
+        boolean isVallisCycleChanged = !Objects.equals(newWorldState.getVallisCycleDTO().getIsWarm(),
+                warframeState.getVallisCycle().getIsWarm());
+        warframeState.setVallisCycleChanged(isVallisCycleChanged);
+        warframeState.setVallisCycle(newWorldState.getVallisCycleDTO());
     }
     
     
