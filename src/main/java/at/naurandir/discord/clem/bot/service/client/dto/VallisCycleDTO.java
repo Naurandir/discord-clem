@@ -11,15 +11,14 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class CetusCycleDTO {
+public class VallisCycleDTO {
     
     private String id;
     private String expiry;
-    private String activation;
-    private Boolean isDay;
+    private Boolean isWarm;
     private String state;
+    private String activation;
     private String timeLeft;
-    private Boolean isCetus;
     private String shortString;
     
 }

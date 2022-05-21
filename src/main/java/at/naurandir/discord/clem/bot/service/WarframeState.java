@@ -1,6 +1,7 @@
 package at.naurandir.discord.clem.bot.service;
 
 import at.naurandir.discord.clem.bot.service.client.dto.CetusCycleDTO;
+import at.naurandir.discord.clem.bot.service.client.dto.VallisCycleDTO;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,4 +14,7 @@ import lombok.Setter;
 public class WarframeState {
     private CetusCycleDTO cetusCycle;
     private boolean isCetusCycleChanged;
+    
+    private VallisCycleDTO vallisCycle;
+    private boolean isVallisCycleChanged;
 }

@@ -16,4 +16,7 @@ public class WorldStateDTO {
     
     @SerializedName("cetusCycle")
     private CetusCycleDTO cetusCycleDTO;
+    
+    @SerializedName("vallisCycle")
+    private VallisCycleDTO vallisCycleDTO;
 }
