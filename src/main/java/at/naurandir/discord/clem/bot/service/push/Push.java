@@ -26,7 +26,7 @@ public abstract class Push {
     
     public void handleOwnEvent(MessageCreateEvent event) {
         if (!isSticky()) {
-            return; // nothing to do as onw message can be ignored
+            return; // nothing to do as own message can be ignored
         }
         
         Snowflake channelId = event.getMessage().getChannelId();
@@ -37,6 +37,8 @@ public abstract class Push {
             log.warn("handleOwnEvent: current messageId [{}] not the same as in mapping [{}]",
                     messageId, channelMessageMapping.get(channelId));
         }
+        
+        event.getMessage().pin().subscribe();
     }
     
     public void push(GatewayDiscordClient client, WarframeState warframeState) {
