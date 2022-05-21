@@ -15,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 /**
  *
@@ -27,6 +26,9 @@ public class ClemBot {
     
     @Value( "${discord.clem.token}" )
     private String discordToken;
+    
+    @Value( "${discord.clem.id}" )
+    private String id;
     
     @Value( "${discord.clem.command.prefix}" )
     private String prefix;
@@ -47,23 +49,18 @@ public class ClemBot {
                 .login()
                 .block();
         
-        client.on(MessageCreateEvent.class, this::handleCommand).subscribe();
+        client.on(MessageCreateEvent.class, this::handleMessage).subscribe();
         
         log.info("init: starting up bot done, listening on: {}", prefix);
     }
     
-    private Mono<Void> handleCommand(MessageCreateEvent event) {
-        if (event.getMember().isPresent() && event.getMember().get().isBot()) {
-            return Flux.empty().then();
+    private Mono<Void> handleMessage(MessageCreateEvent event) {
+        log.debug("handleCommand: received message create event [{}]", event.getMessage().getContent());
+        if (event.getMember().isPresent() && event.getMember().get().getId().asString().equals(id)) {
+            warframeService.handleOwnEvent(event, client);
         }
         
-        log.debug("handleCommand: received message create event [{}]", event.getMessage().getContent());
-        return Flux.fromIterable(warframeService.getCommands())
-            .filter(command -> event.getMember().isEmpty() || !event.getMember().get().isBot())
-            .filter(command -> event.getMessage().getContent().startsWith(
-                        prefix + " " + command.getCommandWord()))
-            .next()
-            .flatMap(command -> warframeService.handle(command, event));
+        return warframeService.handleEvent(event, prefix);
     }
     
     @PreDestroy

@@ -13,8 +13,5 @@ import lombok.Setter;
 @Setter
 public class WarframeState {
     private CetusCycleDTO cetusCycle;
-    private boolean isCetusCycleChanged;
-    
     private VallisCycleDTO vallisCycle;
-    private boolean isVallisCycleChanged;
 }

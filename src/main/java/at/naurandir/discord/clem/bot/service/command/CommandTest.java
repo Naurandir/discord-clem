@@ -1,7 +1,6 @@
 package at.naurandir.discord.clem.bot.service.command;
 
 import at.naurandir.discord.clem.bot.service.WarframeState;
-import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Message;
 import discord4j.core.spec.EmbedCreateSpec;
@@ -67,10 +66,5 @@ public class CommandTest implements Command {
         log.info("generateEmbed: generated [test for {} - {}]", user, id);
         
         return embed;
-    }
-
-    @Override
-    public void push(GatewayDiscordClient client, WarframeState warframeState) {
-        return; // no push logic required for this command
     }
 }

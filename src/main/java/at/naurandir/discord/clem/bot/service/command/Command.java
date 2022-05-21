@@ -13,5 +13,4 @@ public interface Command {
     
     String getCommandWord();
     Mono<Void> handle(MessageCreateEvent event, WarframeState warframeState);
-    void push(GatewayDiscordClient client, WarframeState warframeState);
 }
