@@ -20,7 +20,7 @@ import reactor.core.publisher.Mono;
 @Component
 public class CommandOpenWorldCycle implements Command {
     
-    @Value("#{'${${discord.clem.channels.worldcycle}'.split(',')}")
+    @Value("#{'${discord.clem.channels.worldcycle}'.split(',')}")
     private List<String> interestingChannels;
     
     private final String pushCetusChanged = "Cetus cycle changed: {newState} - {minutes}m.";
