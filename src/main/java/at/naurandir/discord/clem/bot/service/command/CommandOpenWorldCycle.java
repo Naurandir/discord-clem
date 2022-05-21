@@ -38,15 +38,16 @@ public class CommandOpenWorldCycle implements Command {
         LocalDateTime cetusDiffTime = LocalDateTimeUtil.getDiffTime(now, warframeState.getCetusCycle().getExpiry());
         LocalDateTime vallisDiffTime = LocalDateTimeUtil.getDiffTime(now, warframeState.getVallisCycle().getExpiry());
         
+        String message = HANDLE_MESSAGE
+                .replace("{stateCetus}", warframeState.getCetusCycle().getState())
+                .replace("{hoursCetus}", String.valueOf(cetusDiffTime.getHour()))
+                .replace("{minutesCetus}", String.valueOf(cetusDiffTime.getMinute()))
+                .replace("{stateVallis}", warframeState.getVallisCycle().getState())
+                .replace("{hoursVallis}", String.valueOf(vallisDiffTime.getHour()))
+                .replace("{minutesVallis}", String.valueOf(vallisDiffTime.getMinute()));
+        
         return event.getMessage().getChannel()
-                .flatMap(channel -> channel.createMessage(
-                        HANDLE_MESSAGE
-                                .replace("{stateCetus}", warframeState.getCetusCycle().getState())
-                                .replace("{hoursCetus}", String.valueOf(cetusDiffTime.getHour()))
-                                .replace("{minutesCetus}", String.valueOf(cetusDiffTime.getMinute()))
-                                .replace("{stateVallis}", warframeState.getVallisCycle().getState())
-                                .replace("{hoursVallis}", String.valueOf(vallisDiffTime.getHour()))
-                                .replace("{minutesVallis}", String.valueOf(vallisDiffTime.getMinute()))))
+                .flatMap(channel -> channel.createMessage(message))
                 .then();
     }
 

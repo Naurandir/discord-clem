@@ -53,8 +53,13 @@ public class ClemBot {
     }
     
     private Mono<Void> handleCommand(MessageCreateEvent event) {
+        if (event.getMember().isPresent() && event.getMember().get().isBot()) {
+            return Flux.empty().then();
+        }
+        
         log.debug("handleCommand: received message create event [{}]", event.getMessage().getContent());
         return Flux.fromIterable(warframeService.getCommands())
+            .filter(command -> event.getMember().isEmpty() || !event.getMember().get().isBot())
             .filter(command -> event.getMessage().getContent().startsWith(
                         prefix + " " + command.getCommandWord()))
             .next()
