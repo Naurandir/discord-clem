@@ -83,7 +83,7 @@ public class ClemBot {
         warframeService.updateWorldState(client);
         log.info("updateStatus: updating current status finished.");
         
-        client.rest().getChannelById(Snowflake.of(977443949352472626L)).createMessage("updated2");
+        client.rest().getChannelById(Snowflake.of(977443949352472626L)).createMessage("updated2").subscribe();
         
         client.getChannelById(Snowflake.of(977443949352472626L))
                 //.filter(channel -> channel.getType().equals(Type.GUILD_TEXT))
