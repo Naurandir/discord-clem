@@ -51,6 +51,10 @@ public class WarframeService {
         return pushes;
     }
     
+    public void initPushes(GatewayDiscordClient client) {
+        pushes.forEach(push -> push.init(client));
+    }
+    
     /**
      * enrich the handle command with the current state from warframe
      * @param command

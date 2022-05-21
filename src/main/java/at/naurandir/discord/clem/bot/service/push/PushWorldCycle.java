@@ -5,6 +5,8 @@ import at.naurandir.discord.clem.bot.utils.LocalDateTimeUtil;
 import discord4j.common.util.Snowflake;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.message.MessageCreateEvent;
+import discord4j.core.object.entity.Message;
+import discord4j.discordjson.json.MessageData;
 import discord4j.discordjson.json.MessageEditRequest;
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -54,9 +56,17 @@ public class PushWorldCycle extends Push {
     }
     
     @Override
-    public boolean isOwnMessage(MessageCreateEvent event) {
-        return event.getMessage().getContent().startsWith("Cetus:") &&
-                event.getMessage().getContent().contains("Vallis:");
+    public boolean isOwnMessage(Message message, MessageData messageData) {
+        if (message != null) {
+            return message.getContent().startsWith("Cetus:") &&
+                   message.getContent().contains("Vallis:");
+        }
+        
+        if (messageData != null) {
+            return messageData.content().startsWith("Cetus:") &&
+                   messageData.content().contains("Vallis:");
+        }
+        return false;
     }
 
     @Override

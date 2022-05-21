@@ -28,9 +28,6 @@ public class ClemBot {
     @Value( "${discord.clem.token}" )
     private String discordToken;
     
-    @Value( "${discord.clem.id}" )
-    private String id;
-    
     @Value( "${discord.clem.command.prefix}" )
     private String prefix;
     
@@ -51,6 +48,7 @@ public class ClemBot {
                 .block();
         
         client.on(MessageCreateEvent.class, this::handleMessage).subscribe();
+        warframeService.initPushes(client);
         
         log.info("init: starting up bot done, listening on: {}", prefix);
     }
@@ -69,7 +67,8 @@ public class ClemBot {
     }
 
     private boolean isOwnBot(MessageCreateEvent event) {
-        return event.getMember().isPresent() && event.getMember().get().getId().asString().equals(id);
+        return event.getMember().isPresent() && 
+               event.getMember().get().getId().equals(client.getSelfId());
     }
     
     private boolean isMessageToDelete(MessageCreateEvent event) {
