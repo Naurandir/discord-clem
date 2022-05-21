@@ -2,9 +2,11 @@
 package at.naurandir.discord.clem.bot.utils;
 
 import java.sql.Timestamp;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 
 /**
  *
@@ -18,15 +20,15 @@ public class LocalDateTimeUtil {
     
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
     
-    public static LocalDateTime getDiffTime(String time1, LocalDateTime time2) {
+    public static Duration getDiffTime(String time1, LocalDateTime time2) {
         return getDiffTime(LocalDateTime.parse(time1, formatter), time2);
     }
     
-    public static LocalDateTime getDiffTime(LocalDateTime time1, String time2) {
+    public static Duration getDiffTime(LocalDateTime time1, String time2) {
         return getDiffTime(time1, LocalDateTime.parse(time2, formatter));
     }
     
-    public static LocalDateTime getDiffTime(String time1, String time2) {
+    public static Duration getDiffTime(String time1, String time2) {
         return getDiffTime(LocalDateTime.parse(time1, formatter), LocalDateTime.parse(time2, formatter));
     }
     
@@ -36,16 +38,14 @@ public class LocalDateTimeUtil {
      * @param time2
      * @return 
      */
-    public static LocalDateTime getDiffTime(LocalDateTime time1, LocalDateTime time2) {
+    public static Duration getDiffTime(LocalDateTime time1, LocalDateTime time2) {
         if (time2.isBefore(time1)) {
-            return LocalDateTime.of(0, Month.JANUARY, 0, 0, 0);
+            return Duration.ZERO;
         }
         
         Timestamp timestamp1 = Timestamp.valueOf(time1);
         Timestamp timestamp2 = Timestamp.valueOf(time2);
         
-        long diffTime = timestamp2.getTime() - timestamp1.getTime();
-        
-        return (new Timestamp(diffTime)).toLocalDateTime();
+        return Duration.of(timestamp2.getTime()-timestamp1.getTime(), ChronoUnit.MILLIS);
     }
 }
