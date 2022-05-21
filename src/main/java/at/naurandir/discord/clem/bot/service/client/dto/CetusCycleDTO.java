@@ -18,7 +18,7 @@ public class CetusCycleDTO {
     private String activation;
     private Boolean isDay;
     private String state;
-    private String timeleft;
+    private String timeLeft;
     private Boolean isCetus;
     private String shortString;
 }
