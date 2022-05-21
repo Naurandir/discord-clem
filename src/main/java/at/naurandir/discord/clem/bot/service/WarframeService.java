@@ -37,6 +37,7 @@ public class WarframeService {
     @PostConstruct
     public void init() {
         client = new WarframeClient();
+        warframeState = new WarframeState();
     }
     
     public List<Command> getCommands() {
