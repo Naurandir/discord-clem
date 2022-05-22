@@ -67,9 +67,7 @@ public class PusVoidTrader extends Push {
         return messageData.embeds() != null &&
                 messageData.embeds().size() > 0 &&
                 !messageData.embeds().get(0).title().isAbsent() &&
-                messageData.embeds().get(0).title().get().equals(TITLE) &&
-                !messageData.embeds().get(0).description().isAbsent() &&
-                messageData.embeds().get(0).description().get().equals("Baro Ki'Teer is currently");
+                messageData.embeds().get(0).title().get().equals(TITLE);
     }
 
     @Override
