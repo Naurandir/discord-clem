@@ -5,7 +5,6 @@ import discord4j.common.util.Snowflake;
 
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.message.MessageCreateEvent;
-import discord4j.core.object.entity.Message;
 import discord4j.discordjson.json.MessageData;
 import java.util.HashMap;
 import java.util.List;
@@ -67,15 +66,19 @@ public abstract class Push {
     }
     
     public void push(GatewayDiscordClient client, WarframeState warframeState) {
-        for (String channelId : getInterestingChannels()) {
-            Snowflake channelSnowflake = Snowflake.of(channelId);
-            if (!isSticky()) {
-                doNewPush(client, warframeState, channelSnowflake);
-            } else if(channelMessageMapping.get(channelSnowflake) == null) {
-                doNewPush(client, warframeState, channelSnowflake);
-            } else {
-                doUpdatePush(client, warframeState, channelSnowflake, channelMessageMapping.get(channelSnowflake));
+        try {
+            for (String channelId : getInterestingChannels()) {
+                Snowflake channelSnowflake = Snowflake.of(channelId);
+                if (!isSticky()) {
+                    doNewPush(client, warframeState, channelSnowflake);
+                } else if (channelMessageMapping.get(channelSnowflake) == null) {
+                    doNewPush(client, warframeState, channelSnowflake);
+                } else {
+                    doUpdatePush(client, warframeState, channelSnowflake, channelMessageMapping.get(channelSnowflake));
+                }
             }
+        } catch (Exception ex) {
+            log.error("push: something at push went wrong: ", ex);
         }
     }
 }
