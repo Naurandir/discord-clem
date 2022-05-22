@@ -14,6 +14,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -90,7 +91,7 @@ public class PushAlerts extends Push {
             
             embedBuilder.addField(alert.getMission().getNode(), 
                     ALERT_DESCRIPTION.replace("{type}", alert.getMission().getType())
-                                     .replace("{rewardType}", alert.getRewardType())
+                                     .replace("{rewardType}", StringUtils.join(alert.getRewardTypes(), ", "))
                                      .replace("{days}", String.valueOf(diffTime.toDays()))
                                      .replace("{hours}", String.valueOf(diffTime.toHoursPart()))
                                      .replace("{minutes}", String.valueOf(diffTime.toMinutesPart())), 

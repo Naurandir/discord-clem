@@ -1,5 +1,6 @@
 package at.naurandir.discord.clem.bot.service.client.dto;
 
+import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -19,6 +20,6 @@ public class AlertDTO {
         private String id;
         private String expiry;
         private String activation;
-        private String rewardType;
+        private List<String> rewardTypes;
         
 }

@@ -65,11 +65,15 @@
             <version>1.1.49</version>
         </dependency>
         
-        <!-- Getter/Setter Helper -->
+        <!-- Helper -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
         </dependency>
         
         <!-- Junit Test -->
