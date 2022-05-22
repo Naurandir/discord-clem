@@ -8,6 +8,7 @@ import discord4j.core.GatewayDiscordClient;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.core.spec.EmbedCreateSpec.Builder;
 import discord4j.discordjson.json.MessageData;
+import discord4j.discordjson.json.MessageEditRequest;
 import discord4j.rest.util.Color;
 import java.time.Duration;
 import java.time.Instant;
@@ -47,7 +48,12 @@ public class PushAlerts extends Push {
 
     @Override
     void doUpdatePush(GatewayDiscordClient client, WarframeState warframeState, Snowflake channelId, Snowflake messageId) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        log.info("doUpdatePush: update push message for alerts on channel [{}] ...", channelId);
+        MessageEditRequest editRequest = MessageEditRequest.builder()
+                .embedOrNull(generateEmbed(warframeState).asRequest())
+                .build();
+        client.getRestClient().getMessageById(channelId, messageId).edit(editRequest).subscribe();
+        log.info("doUpdatePush: update push message for alerts on channel [{}] done", channelId);
     }
 
     @Override
