@@ -28,7 +28,8 @@ public abstract class Push {
     abstract boolean isSticky();
     
     public void init(GatewayDiscordClient client) {
-        for (String channelId : getInterestingChannels()) { 
+        try {
+          for (String channelId : getInterestingChannels()) { 
             Snowflake channelSnowflakeId = Snowflake.of(channelId);
             List<MessageData> messageDataList = client.getRestClient()
                     .getChannelById(channelSnowflakeId).getPinnedMessages()
@@ -41,6 +42,9 @@ public abstract class Push {
                         messageData.id().asString());
                 channelMessageMapping.put(channelSnowflakeId, Snowflake.of(messageData.id().asString()));
             }
+        }  
+        } catch (Exception ex) {
+            log.error("init: push [{}] throwed exception: ", this.getClass(), ex);
         }
     }
     

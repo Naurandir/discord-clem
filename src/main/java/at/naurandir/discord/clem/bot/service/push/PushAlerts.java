@@ -80,12 +80,10 @@ public class PushAlerts extends Push {
         Builder embedBuilder = EmbedCreateSpec.builder()
                 .color(Color.RED)
                 .title(TITLE)
-                .author("Clem Bot", "https://naurandir.net", "https://cutewallpaper.org/21/warframe-desktop-icon/Warframe-Alerts-7.2.1-Download-APK-for-Android-Aptoide.png")
                 .description(DESCRIPTION)
                 .thumbnail("https://cutewallpaper.org/21/warframe-desktop-icon/Warframe-Alerts-7.2.1-Download-APK-for-Android-Aptoide.png")
                 //.image("https://i.imgur.com/F9BhEoz.png")
-                .timestamp(Instant.now())
-                .footer("footer", "https://cutewallpaper.org/21/warframe-desktop-icon/Warframe-Alerts-7.2.1-Download-APK-for-Android-Aptoide.png");
+                .timestamp(Instant.now());
         
         for (AlertDTO alert : warframeState.getAlerts()) {
             
