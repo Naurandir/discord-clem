@@ -91,10 +91,11 @@ public class WarframeService {
     public void refreshWarframe(GatewayDiscordClient discordClient) {
         try {
             WorldStateDTO newWorldState = warframeClient.getCurrentWorldState();
-            log.info("getCurrentWorldState: received dto [{}]", newWorldState);
+            log.debug("getCurrentWorldState: received dto.");
             
             updateAlerts(newWorldState);
             updateWorldCycles(newWorldState);
+            updateVoidTrader(newWorldState);
             
             // push notifications for diff
             pushes.forEach(push -> push.push(discordClient, warframeState));
@@ -111,6 +112,10 @@ public class WarframeService {
 
     private void updateAlerts(WorldStateDTO newWorldState) {
         warframeState.setAlerts(newWorldState.getAlertsDTO());
+    }
+
+    private void updateVoidTrader(WorldStateDTO newWorldState) {
+        warframeState.setVoidTraderDTO(newWorldState.getVoidTraderDTO());
     }
     
 }
