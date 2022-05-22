@@ -63,7 +63,8 @@ public class PushAlerts extends Push {
 
     @Override
     boolean isOwnMessage(MessageData messageData) {
-        return messageData.embeds() != null && 
+        return messageData.embeds() != null &&
+                messageData.embeds().size() > 0 &&
                 !messageData.embeds().get(0).title().isAbsent() &&
                 messageData.embeds().get(0).title().get().equals(TITLE) &&
                 !messageData.embeds().get(0).description().isAbsent() &&
