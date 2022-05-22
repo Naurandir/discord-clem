@@ -1,5 +1,6 @@
 package at.naurandir.discord.clem.bot.service.client.dto;
 
+import com.google.gson.annotations.SerializedName;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -14,10 +15,15 @@ import lombok.ToString;
 public class MissionDTO {
     
     private String node;
+    private String faction;
     private Integer minEnemyLevel;
     private Integer maxEenemyLevel;
     private String type;
     private String enemySpec;
     private String levelOverride;
     private String description;
+    
+    @SerializedName("reward")
+    private RewardDTO rewartDTO;
+    
 }

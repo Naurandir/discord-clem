@@ -32,7 +32,10 @@ public class PushAlerts extends Push {
     
     private static final String TITLE = "Current Alerts";
     private static final String DESCRIPTION = "Currently active alerts are presented here.";
-    private static final String ALERT_DESCRIPTION = " type: {type}\n reward: {rewardType}\n expires in: {days}d {hours}h {minutes}m";
+    private static final String ALERT_DESCRIPTION = " *type:* {type}\n"
+            + " *enemies:* {enemyType} ({minLevel} - {maxLevel}])\n"
+            + " *reward:* {reward}\n"
+            + " *expires in:* {days}d {hours}h {minutes}m";
 
     @Override
     void doNewPush(GatewayDiscordClient client, WarframeState warframeState, Snowflake channelId) {
@@ -96,7 +99,10 @@ public class PushAlerts extends Push {
             
             embedBuilder.addField(alert.getMission().getNode(), 
                     ALERT_DESCRIPTION.replace("{type}", alert.getMission().getType())
-                                     .replace("{rewardType}", StringUtils.join(alert.getRewardTypes(), ", "))
+                                     .replace("{reward}", StringUtils.join(alert.getMission().getRewartDTO().getAsString(), ", "))
+                                     .replace("{enemyType}", alert.getMission().getFaction())
+                                     .replace("{minLevel}", String.valueOf(alert.getMission().getMinEnemyLevel()))
+                                     .replace("{maxLevel}", String.valueOf(alert.getMission().getMaxEenemyLevel()))
                                      .replace("{days}", String.valueOf(diffTime.toDays()))
                                      .replace("{hours}", String.valueOf(diffTime.toHoursPart()))
                                      .replace("{minutes}", String.valueOf(diffTime.toMinutesPart())), 
