@@ -93,6 +93,7 @@ public class WarframeService {
             WorldStateDTO newWorldState = warframeClient.getCurrentWorldState();
             log.info("getCurrentWorldState: received dto [{}]", newWorldState);
             
+            updateAlerts(newWorldState);
             updateWorldCycles(newWorldState);
             
             // push notifications for diff
@@ -107,5 +108,9 @@ public class WarframeService {
         warframeState.setCetusCycle(newWorldState.getCetusCycleDTO());
         warframeState.setVallisCycle(newWorldState.getVallisCycleDTO());
     }   
+
+    private void updateAlerts(WorldStateDTO newWorldState) {
+        warframeState.setAlerts(newWorldState.getAlertsDTO());
+    }
     
 }
