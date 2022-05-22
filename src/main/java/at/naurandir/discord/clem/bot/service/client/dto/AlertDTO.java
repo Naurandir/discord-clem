@@ -19,6 +19,6 @@ public class AlertDTO {
         private String id;
         private String expiry;
         private String activation;
-        private String rewartType;
+        private String rewardType;
         
 }

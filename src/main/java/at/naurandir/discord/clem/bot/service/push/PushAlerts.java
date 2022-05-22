@@ -90,7 +90,7 @@ public class PushAlerts extends Push {
             
             embedBuilder.addField(alert.getMission().getNode(), 
                     ALERT_DESCRIPTION.replace("{type}", alert.getMission().getType())
-                                     .replace("{rewardType}", alert.getRewartType())
+                                     .replace("{rewardType}", alert.getRewardType())
                                      .replace("{days}", String.valueOf(diffTime.toDays()))
                                      .replace("{hours}", String.valueOf(diffTime.toHoursPart()))
                                      .replace("{minutes}", String.valueOf(diffTime.toMinutesPart())), 
