@@ -54,7 +54,9 @@ public class ClemBot {
     }
     
     private Mono<Void> handleMessage(MessageCreateEvent event) {
-        log.debug("handleCommand: received message create event [{}]", event.getMessage());
+        log.debug("handleCommand: received message create event [{} - {}]", 
+                event.getMessage().getContent(), event.getMessage().getEmbeds());
+        
         if (isOwnBot(event) && isMessageToDelete(event)) {
             event.getMessage()
                     .delete("not required message, like pin status message, can be deleted")

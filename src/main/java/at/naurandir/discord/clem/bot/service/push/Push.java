@@ -25,7 +25,7 @@ public abstract class Push {
     abstract void doNewPush(GatewayDiscordClient client, WarframeState warframeState, Snowflake channelId);
     abstract void doUpdatePush(GatewayDiscordClient client, WarframeState warframeState, Snowflake channelId, Snowflake messageId);
     abstract List<String> getInterestingChannels();
-    abstract boolean isOwnMessage(Message message, MessageData messageData);
+    abstract boolean isOwnMessage(MessageData messageData);
     abstract boolean isSticky();
     
     public void init(GatewayDiscordClient client) {
@@ -34,7 +34,7 @@ public abstract class Push {
             List<MessageData> messageDataList = client.getRestClient()
                     .getChannelById(channelSnowflakeId).getPinnedMessages()
                     .toStream()
-                    .filter(message -> isOwnMessage(null, message))
+                    .filter(message -> isOwnMessage(message))
                     .collect(Collectors.toList());
             
             for (MessageData messageData : messageDataList) {
@@ -50,7 +50,7 @@ public abstract class Push {
             return; // nothing to do as own message can be ignored
         }
         
-        if (!isOwnMessage(event.getMessage(), null)) {
+        if (!isOwnMessage(event.getMessage().getData())) {
             return; // not part of given push impl, can be ignored
         }
         

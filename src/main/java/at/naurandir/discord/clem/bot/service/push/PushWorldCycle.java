@@ -32,7 +32,7 @@ public class PushWorldCycle extends Push {
     @Override
     public void doNewPush(GatewayDiscordClient client, WarframeState warframeState, Snowflake channelId) {
         log.info("doNewPush: adding push message for world cycle to channel [{}] ...", channelId);
-        String message = getUpdatedMessage(warframeState);
+        String message = getMessage(warframeState);
 
         client.rest().getChannelById(channelId)
                     .createMessage(message)
@@ -40,11 +40,12 @@ public class PushWorldCycle extends Push {
         
         log.info("doNewPush: adding push message for world cycle to channel [{}] done", channelId);
     }
+    
     @Override
     void doUpdatePush(GatewayDiscordClient client, WarframeState warframeState, Snowflake channelId, Snowflake messageId) {
         log.info("doUpdatePush: update push message for world cycle on channel [{}] ...", channelId);
         MessageEditRequest editRequest = MessageEditRequest.builder()
-                .contentOrNull(getUpdatedMessage(warframeState))
+                .contentOrNull(getMessage(warframeState))
                 .build();
         client.getRestClient().getMessageById(channelId, messageId).edit(editRequest).subscribe();
         log.info("doUpdatePush: update push message for world cycle on channel [{}] done", channelId);
@@ -56,12 +57,7 @@ public class PushWorldCycle extends Push {
     }
     
     @Override
-    public boolean isOwnMessage(Message message, MessageData messageData) {
-        if (message != null) {
-            return message.getContent().startsWith("Cetus:") &&
-                   message.getContent().contains("Vallis:");
-        }
-        
+    public boolean isOwnMessage(MessageData messageData) {
         if (messageData != null) {
             return messageData.content().startsWith("Cetus:") &&
                    messageData.content().contains("Vallis:");
@@ -74,7 +70,7 @@ public class PushWorldCycle extends Push {
         return true;
     }
     
-    private String getUpdatedMessage(WarframeState warframeState) {
+    private String getMessage(WarframeState warframeState) {
         Duration cetusDiffTime = LocalDateTimeUtil.getDiffTime(LocalDateTime.now(), warframeState.getCetusCycle().getExpiry());
         Duration vallisDiffTime = LocalDateTimeUtil.getDiffTime(LocalDateTime.now(), warframeState.getVallisCycle().getExpiry());
         return MESSAGE
