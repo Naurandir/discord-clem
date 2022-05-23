@@ -63,8 +63,9 @@ public abstract class Push {
         channelMessageMapping.putIfAbsent(channelId, messageId);
         
         if (!channelMessageMapping.get(channelId).equals(messageId)) {
-            log.warn("handleOwnEvent: current messageId [{}] not the same as in mapping [{}]",
+            log.warn("handleOwnEvent: current messageId [{}] not the same as in mapping [{}], using now as new one",
                     messageId, channelMessageMapping.get(channelId));
+            channelMessageMapping.put(channelId, messageId);
         }
         
         event.getMessage().pin().subscribe();
@@ -79,7 +80,7 @@ public abstract class Push {
                     doNewPush(client, warframeState, channelSnowflake);
                 } else if (channelMessageMapping.get(channelSnowflake) == null) {
                     log.info("push: execute new push in channel [{}] as [{}] is sticky but no message was found", 
-                            channelId, this.getClass());
+                            channelId, this.getClass().getSimpleName());
                     doNewPush(client, warframeState, channelSnowflake);
                 } else {
                     RestMessage message = getMessageById(client, channelSnowflake, channelMessageMapping.get(channelSnowflake));
@@ -104,7 +105,7 @@ public abstract class Push {
             client.getRestClient().getMessageById(channelId, messageId).getData().block();
             return client.getRestClient().getMessageById(channelId, messageId);
         } catch (Exception ex) {
-            log.error("getMessageById: could not obtain message, error: ", ex);
+            log.warn("getMessageById: could not obtain message, error: ", ex.getMessage());
         }
         return null;
     }
