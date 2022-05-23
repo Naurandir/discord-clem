@@ -28,7 +28,7 @@ public class PushWorldCycle extends Push {
     private List<String> interestingChannels;
     
     private static final String TITLE = "Current World Cycles";
-    private static final String STATE_MESSAGE = "***State:*** {state} for {hours}h {minutes}m.";
+    private static final String STATE_MESSAGE = "{state} for {hours}h {minutes}m.";
 
     @Override
     public void doNewPush(GatewayDiscordClient client, WarframeState warframeState, Snowflake channelId) {
