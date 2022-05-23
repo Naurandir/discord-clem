@@ -9,6 +9,7 @@ import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 import javax.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -99,7 +100,6 @@ public class WarframeService {
             
             // push notifications for diff
             pushes.forEach(push -> push.push(discordClient, warframeState));
-            
         } catch (Exception ex) {
             log.error("getCurrentWorldState: update throwed exception: ", ex);
         }
@@ -112,10 +112,12 @@ public class WarframeService {
     }   
 
     private void updateAlerts(WorldStateDTO newWorldState) {
+        warframeState.setAlertsStateChanged(warframeState.getAlerts().size() != newWorldState.getAlertsDTO().size());
         warframeState.setAlerts(newWorldState.getAlertsDTO());
     }
 
     private void updateVoidTrader(WorldStateDTO newWorldState) {
+        warframeState.setVoidTraderStateChanged(!Objects.equals(warframeState.getVoidTraderDTO().getActive(), newWorldState.getVoidTraderDTO().getActive()));
         warframeState.setVoidTraderDTO(newWorldState.getVoidTraderDTO());
     }
     

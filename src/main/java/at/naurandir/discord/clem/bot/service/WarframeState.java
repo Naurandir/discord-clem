@@ -20,7 +20,10 @@ public class WarframeState {
     private CetusCycleDTO cetusCycle;
     private VallisCycleDTO vallisCycle;
     private CambionCycleDTO cambionCycle;
+    
     private VoidTraderDTO voidTraderDTO;
+    private boolean isVoidTraderStateChanged;
     
     private List<AlertDTO> alerts;
+    private boolean isAlertsStateChanged;
 }
