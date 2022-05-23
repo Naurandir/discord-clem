@@ -112,7 +112,9 @@ public class WarframeService {
     }   
 
     private void updateAlerts(WorldStateDTO newWorldState) {
-        warframeState.setAlertsStateChanged(warframeState.getAlerts().size() != newWorldState.getAlertsDTO().size());
+        warframeState.setAlertsStateChanged((warframeState.getAlerts() == null && newWorldState.getAlertsDTO() != null) ||
+                                            (warframeState.getAlerts() != null && newWorldState.getAlertsDTO() == null) ||
+                                            warframeState.getAlerts().size() != newWorldState.getAlertsDTO().size());
         warframeState.setAlerts(newWorldState.getAlertsDTO());
     }
 
