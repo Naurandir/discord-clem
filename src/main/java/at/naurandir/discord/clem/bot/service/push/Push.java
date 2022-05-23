@@ -6,6 +6,7 @@ import discord4j.common.util.Snowflake;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.discordjson.json.MessageData;
+import discord4j.rest.entity.RestMessage;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,7 +23,7 @@ public abstract class Push {
     private final Map<Snowflake, Snowflake> channelMessageMapping = new HashMap<>();
     
     abstract void doNewPush(GatewayDiscordClient client, WarframeState warframeState, Snowflake channelId);
-    abstract void doUpdatePush(GatewayDiscordClient client, WarframeState warframeState, Snowflake channelId, Snowflake messageId);
+    abstract void doUpdatePush(RestMessage message, WarframeState warframeState);
     abstract List<String> getInterestingChannels();
     abstract boolean isOwnMessage(MessageData messageData);
     abstract boolean isSticky();
@@ -78,11 +79,25 @@ public abstract class Push {
                 } else if (channelMessageMapping.get(channelSnowflake) == null) {
                     doNewPush(client, warframeState, channelSnowflake);
                 } else {
-                    doUpdatePush(client, warframeState, channelSnowflake, channelMessageMapping.get(channelSnowflake));
+                    RestMessage message = getMessageById(client, channelSnowflake, channelMessageMapping.get(channelSnowflake));
+                    if (message == null) {
+                        doNewPush(client, warframeState, channelSnowflake);
+                    } else {
+                        doUpdatePush(message, warframeState);
+                    }
                 }
             }
         } catch (Exception ex) {
             log.error("push: something at push went wrong: ", ex);
         }
+    }
+
+    private RestMessage getMessageById(GatewayDiscordClient client, Snowflake channelId, Snowflake messageId) {
+        try {
+            return client.getRestClient().getMessageById(channelId, messageId);
+        } catch (Exception ex) {
+            log.error("getMessageById: could not obtain message, error: ", ex);
+        }
+        return null;
     }
 }

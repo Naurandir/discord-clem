@@ -4,6 +4,7 @@ import at.naurandir.discord.clem.bot.service.WarframeState;
 import discord4j.common.util.Snowflake;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.discordjson.json.MessageData;
+import discord4j.rest.entity.RestMessage;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -24,10 +25,10 @@ public class PushUpdatePipeline extends Push {
         
         // alerts
     }
-
+    
     @Override
-    void doUpdatePush(GatewayDiscordClient client, WarframeState warframeState, Snowflake channelId, Snowflake messageId) {
-        throw new UnsupportedOperationException("This operation does not need update logic!");
+    void doUpdatePush(RestMessage message, WarframeState warframeState) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
