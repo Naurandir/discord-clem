@@ -108,6 +108,7 @@ public class WarframeService {
     private void updateWorldCycles(WorldStateDTO newWorldState) {
         warframeState.setCetusCycle(newWorldState.getCetusCycleDTO());
         warframeState.setVallisCycle(newWorldState.getVallisCycleDTO());
+        warframeState.setCambionCycle(newWorldState.getCambionCycleDTO());
     }   
 
     private void updateAlerts(WorldStateDTO newWorldState) {

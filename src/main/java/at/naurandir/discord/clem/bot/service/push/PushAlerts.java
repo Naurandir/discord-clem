@@ -31,7 +31,8 @@ public class PushAlerts extends Push {
     private List<String> interestingChannels;
     
     private static final String TITLE = "Current Alerts";
-    private static final String DESCRIPTION = "Currently active alerts are presented here.";
+    private static final String DESCRIPTION = "Currently active alerts.";
+    private static final String DESCRIPTION_NO_ALERTS = "Currently no active alerts in Warframe.";
     private static final String ALERT_DESCRIPTION = " *type:* {type}\n"
             + " *enemies:* {enemyType} ({minLevel} - {maxLevel})\n"
             + " *reward:* {reward}\n"
@@ -71,7 +72,8 @@ public class PushAlerts extends Push {
                 !messageData.embeds().get(0).title().isAbsent() &&
                 messageData.embeds().get(0).title().get().equals(TITLE) &&
                 !messageData.embeds().get(0).description().isAbsent() &&
-                messageData.embeds().get(0).description().get().equals(DESCRIPTION);
+                (messageData.embeds().get(0).description().get().equals(DESCRIPTION) ||
+                 messageData.embeds().get(0).description().get().equals(DESCRIPTION_NO_ALERTS));
     }
 
     @Override
@@ -79,13 +81,14 @@ public class PushAlerts extends Push {
         return true;
     }
     
-    private EmbedCreateSpec generateEmbed(WarframeState warframeState) {         
+    private EmbedCreateSpec generateEmbed(WarframeState warframeState) {  
+        String description = warframeState.getAlerts().stream().anyMatch(alert -> alert.getActive()) ? DESCRIPTION : DESCRIPTION_NO_ALERTS;
+        
         Builder embedBuilder = EmbedCreateSpec.builder()
                 .color(Color.RED)
                 .title(TITLE)
-                .description(DESCRIPTION)
+                .description(description)
                 .thumbnail("https://cutewallpaper.org/21/warframe-desktop-icon/Warframe-Alerts-7.2.1-Download-APK-for-Android-Aptoide.png")
-                //.image("https://i.imgur.com/F9BhEoz.png")
                 .timestamp(Instant.now());
         
         for (AlertDTO alert : warframeState.getAlerts()) {
