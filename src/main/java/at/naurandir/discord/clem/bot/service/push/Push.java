@@ -75,14 +75,21 @@ public abstract class Push {
             for (String channelId : getInterestingChannels()) {
                 Snowflake channelSnowflake = Snowflake.of(channelId);
                 if (!isSticky()) {
+                    log.info("push: execute new push as [{}] is not sticky.", this.getClass());
                     doNewPush(client, warframeState, channelSnowflake);
                 } else if (channelMessageMapping.get(channelSnowflake) == null) {
+                    log.info("push: execute new push in channel [{}] as [{}] is sticky but no message was found", 
+                            channelId, this.getClass());
                     doNewPush(client, warframeState, channelSnowflake);
                 } else {
                     RestMessage message = getMessageById(client, channelSnowflake, channelMessageMapping.get(channelSnowflake));
                     if (message == null) {
+                        log.warn("push: execute new push in channel [{}] as [{}] is sticky but expected older message was not found", 
+                                channelId, this.getClass());
                         doNewPush(client, warframeState, channelSnowflake);
                     } else {
+                        log.warn("push: execute update in channel [{}] as [{}] is sticky and expected older message [{}] was found", 
+                                channelId, this.getClass(), message.getId());
                         doUpdatePush(message, warframeState);
                     }
                 }

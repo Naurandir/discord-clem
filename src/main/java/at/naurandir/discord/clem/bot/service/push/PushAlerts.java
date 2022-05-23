@@ -41,26 +41,20 @@ public class PushAlerts extends Push {
 
     @Override
     void doNewPush(GatewayDiscordClient client, WarframeState warframeState, Snowflake channelId) {
-        log.info("doNewPush: adding push message for alerts to channel [{}] ...", channelId);
         EmbedCreateSpec embed = generateEmbed(warframeState);
 
         client.rest().getChannelById(channelId)
                     .createMessage(embed.asRequest())
                     .subscribe();
-        
-        log.info("doNewPush: adding push message for alerts to channel [{}] done", channelId);
     }
 
     @Override
     void doUpdatePush(RestMessage message, WarframeState warframeState) {
-        log.info("doUpdatePush: update push message for alerts on channel [{}] ...", message.getChannelId());
         MessageEditRequest editRequest = MessageEditRequest.builder()
                 .embedOrNull(generateEmbed(warframeState).asRequest())
                 .build();
         
         message.edit(editRequest).subscribe();
-        
-        log.info("doUpdatePush: update push message for alerts on channel [{}] done", message.getChannelId());
     }
 
     @Override

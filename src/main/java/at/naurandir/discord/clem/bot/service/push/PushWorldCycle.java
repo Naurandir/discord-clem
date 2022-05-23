@@ -33,24 +33,19 @@ public class PushWorldCycle extends Push {
 
     @Override
     public void doNewPush(GatewayDiscordClient client, WarframeState warframeState, Snowflake channelId) {
-        log.info("doNewPush: adding push message for world cycle to channel [{}] ...", channelId);
         EmbedCreateSpec embed = generateEmbed(warframeState);
 
         client.rest().getChannelById(channelId)
                     .createMessage(embed.asRequest())
                     .subscribe();
-        
-        log.info("doNewPush: adding push message for world cycle to channel [{}] done", channelId);
     }
     
     @Override
     void doUpdatePush(RestMessage message, WarframeState warframeState) {
-        log.info("doUpdatePush: update push message for world cycle on channel [{}] ...", message.getChannelId());
         MessageEditRequest editRequest = MessageEditRequest.builder()
                 .embedOrNull(generateEmbed(warframeState).asRequest())
                 .build();
         message.edit(editRequest).subscribe();
-        log.info("doUpdatePush: update push message for world cycle on channel [{}] done", message.getChannelId());
     }
     
     @Override
