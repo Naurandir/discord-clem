@@ -101,6 +101,7 @@ public abstract class Push {
 
     private RestMessage getMessageById(GatewayDiscordClient client, Snowflake channelId, Snowflake messageId) {
         try {
+            client.getRestClient().getMessageById(channelId, messageId).getData().block();
             return client.getRestClient().getMessageById(channelId, messageId);
         } catch (Exception ex) {
             log.error("getMessageById: could not obtain message, error: ", ex);
