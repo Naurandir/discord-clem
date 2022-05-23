@@ -17,7 +17,7 @@ public class MissionDTO {
     private String node;
     private String faction;
     private Integer minEnemyLevel;
-    private Integer maxEenemyLevel;
+    private Integer maxEnemyLevel;
     private String type;
     private String enemySpec;
     private String levelOverride;

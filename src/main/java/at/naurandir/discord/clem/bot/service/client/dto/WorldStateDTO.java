@@ -24,6 +24,9 @@ public class WorldStateDTO {
     @SerializedName("vallisCycle")
     private VallisCycleDTO vallisCycleDTO;
     
+    @SerializedName("cambionCycle")
+    private CambionCycleDTO cambionCycleDTO;
+    
     @SerializedName("voidTrader")
     private VoidTraderDTO voidTraderDTO;
 }

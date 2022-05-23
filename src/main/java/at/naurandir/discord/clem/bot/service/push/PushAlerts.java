@@ -33,7 +33,7 @@ public class PushAlerts extends Push {
     private static final String TITLE = "Current Alerts";
     private static final String DESCRIPTION = "Currently active alerts are presented here.";
     private static final String ALERT_DESCRIPTION = " *type:* {type}\n"
-            + " *enemies:* {enemyType} ({minLevel} - {maxLevel}])\n"
+            + " *enemies:* {enemyType} ({minLevel} - {maxLevel})\n"
             + " *reward:* {reward}\n"
             + " *expires in:* {days}d {hours}h {minutes}m";
 
@@ -96,13 +96,15 @@ public class PushAlerts extends Push {
             }
             
             Duration diffTime = LocalDateTimeUtil.getDiffTime(LocalDateTime.now(), alert.getExpiry());
+            Integer minLevel = alert.getMission().getMinEnemyLevel() == null ? 1 : alert.getMission().getMinEnemyLevel();
+            Integer maxLevel = alert.getMission().getMaxEnemyLevel() == null ? 999 : alert.getMission().getMaxEnemyLevel();
             
             embedBuilder.addField(alert.getMission().getNode(), 
                     ALERT_DESCRIPTION.replace("{type}", alert.getMission().getType())
                                      .replace("{reward}", StringUtils.join(alert.getMission().getRewartDTO().getAsString(), ", "))
                                      .replace("{enemyType}", alert.getMission().getFaction())
-                                     .replace("{minLevel}", String.valueOf(alert.getMission().getMinEnemyLevel()))
-                                     .replace("{maxLevel}", String.valueOf(alert.getMission().getMaxEenemyLevel()))
+                                     .replace("{minLevel}", String.valueOf(minLevel))
+                                     .replace("{maxLevel}", String.valueOf(maxLevel))
                                      .replace("{days}", String.valueOf(diffTime.toDays()))
                                      .replace("{hours}", String.valueOf(diffTime.toHoursPart()))
                                      .replace("{minutes}", String.valueOf(diffTime.toMinutesPart())), 

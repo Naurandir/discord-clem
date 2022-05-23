@@ -1,6 +1,7 @@
 package at.naurandir.discord.clem.bot.service;
 
 import at.naurandir.discord.clem.bot.service.client.dto.AlertDTO;
+import at.naurandir.discord.clem.bot.service.client.dto.CambionCycleDTO;
 import at.naurandir.discord.clem.bot.service.client.dto.CetusCycleDTO;
 import at.naurandir.discord.clem.bot.service.client.dto.VallisCycleDTO;
 import at.naurandir.discord.clem.bot.service.client.dto.VoidTraderDTO;
@@ -18,7 +19,7 @@ public class WarframeState {
     
     private CetusCycleDTO cetusCycle;
     private VallisCycleDTO vallisCycle;
-    
+    private CambionCycleDTO cambionCycle;
     private VoidTraderDTO voidTraderDTO;
     
     private List<AlertDTO> alerts;

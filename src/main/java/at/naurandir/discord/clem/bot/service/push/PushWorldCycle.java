@@ -4,11 +4,12 @@ import at.naurandir.discord.clem.bot.service.WarframeState;
 import at.naurandir.discord.clem.bot.utils.LocalDateTimeUtil;
 import discord4j.common.util.Snowflake;
 import discord4j.core.GatewayDiscordClient;
-import discord4j.core.event.domain.message.MessageCreateEvent;
-import discord4j.core.object.entity.Message;
+import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.discordjson.json.MessageData;
 import discord4j.discordjson.json.MessageEditRequest;
+import discord4j.rest.util.Color;
 import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
@@ -26,16 +27,16 @@ public class PushWorldCycle extends Push {
     @Value("#{'${discord.clem.push.channels.worldcycle}'.split(',')}")
     private List<String> interestingChannels;
     
-    private static final String MESSAGE = "Cetus: {stateCetus} for {hoursCetus}h {minutesCetus}m.\n"
-                                               + "Vallis: {stateVallis} for {hoursVallis}h {minutesVallis}m.";
+    private static final String TITLE = "Current World Cycles";
+    private static final String STATE_MESSAGE = "***State:*** {state} for {hours}h {minutes}m.";
 
     @Override
     public void doNewPush(GatewayDiscordClient client, WarframeState warframeState, Snowflake channelId) {
         log.info("doNewPush: adding push message for world cycle to channel [{}] ...", channelId);
-        String message = getMessage(warframeState);
+        EmbedCreateSpec embed = generateEmbed(warframeState);
 
         client.rest().getChannelById(channelId)
-                    .createMessage(message)
+                    .createMessage(embed.asRequest())
                     .subscribe();
         
         log.info("doNewPush: adding push message for world cycle to channel [{}] done", channelId);
@@ -45,7 +46,7 @@ public class PushWorldCycle extends Push {
     void doUpdatePush(GatewayDiscordClient client, WarframeState warframeState, Snowflake channelId, Snowflake messageId) {
         log.info("doUpdatePush: update push message for world cycle on channel [{}] ...", channelId);
         MessageEditRequest editRequest = MessageEditRequest.builder()
-                .contentOrNull(getMessage(warframeState))
+                .embedOrNull(generateEmbed(warframeState).asRequest())
                 .build();
         client.getRestClient().getMessageById(channelId, messageId).edit(editRequest).subscribe();
         log.info("doUpdatePush: update push message for world cycle on channel [{}] done", channelId);
@@ -58,11 +59,10 @@ public class PushWorldCycle extends Push {
     
     @Override
     public boolean isOwnMessage(MessageData messageData) {
-        if (messageData != null) {
-            return messageData.content().startsWith("Cetus:") &&
-                   messageData.content().contains("Vallis:");
-        }
-        return false;
+        return messageData.embeds() != null &&
+                messageData.embeds().size() > 0 &&
+                !messageData.embeds().get(0).title().isAbsent() &&
+                messageData.embeds().get(0).title().get().equals(TITLE);
     }
 
     @Override
@@ -70,16 +70,41 @@ public class PushWorldCycle extends Push {
         return true;
     }
     
-    private String getMessage(WarframeState warframeState) {
-        Duration cetusDiffTime = LocalDateTimeUtil.getDiffTime(LocalDateTime.now(), warframeState.getCetusCycle().getExpiry());
-        Duration vallisDiffTime = LocalDateTimeUtil.getDiffTime(LocalDateTime.now(), warframeState.getVallisCycle().getExpiry());
-        return MESSAGE
-                .replace("{stateCetus}", warframeState.getCetusCycle().getState())
-                .replace("{hoursCetus}", String.valueOf(cetusDiffTime.toHours()))
-                .replace("{minutesCetus}", String.valueOf(cetusDiffTime.toMinutesPart()))
-                .replace("{stateVallis}", warframeState.getVallisCycle().getState())
-                .replace("{hoursVallis}", String.valueOf(vallisDiffTime.toHours()))
-                .replace("{minutesVallis}", String.valueOf(vallisDiffTime.toMinutesPart()));
+    private EmbedCreateSpec generateEmbed(WarframeState warframeState) {         
+        EmbedCreateSpec.Builder embedBuilder = EmbedCreateSpec.builder()
+                .color(Color.DEEP_SEA)
+                .title(TITLE)
+                .thumbnail("https://content.invisioncic.com/Mwarframe/pages_media/1_CherryTreeGlyph.png")
+                .timestamp(Instant.now());
+        
+        LocalDateTime now = LocalDateTime.now();
+        
+        // earth
+        
+        // cetus
+        Duration diffTime = LocalDateTimeUtil.getDiffTime(now, warframeState.getCetusCycle().getExpiry());
+        embedBuilder.addField("Cetus",
+                STATE_MESSAGE.replace("{state}", warframeState.getCetusCycle().getState())
+                             .replace("{hours}", String.valueOf(diffTime.toHours()))
+                             .replace("{minutes}", String.valueOf(diffTime.toMinutesPart())),
+                true);
+        
+        // vallis
+        diffTime = LocalDateTimeUtil.getDiffTime(now, warframeState.getVallisCycle().getExpiry());
+        embedBuilder.addField("Vallis",
+                STATE_MESSAGE.replace("{state}", warframeState.getVallisCycle().getState())
+                             .replace("{hours}", String.valueOf(diffTime.toHours()))
+                             .replace("{minutes}", String.valueOf(diffTime.toMinutesPart())),
+                true);
+        
+        // cambion
+        diffTime = LocalDateTimeUtil.getDiffTime(now, warframeState.getCambionCycle().getExpiry());
+        embedBuilder.addField("Cambion",
+                STATE_MESSAGE.replace("{state}", warframeState.getCambionCycle().getActive())
+                             .replace("{hours}", String.valueOf(diffTime.toHours()))
+                             .replace("{minutes}", String.valueOf(diffTime.toMinutesPart())),
+                true);
+        
+        return embedBuilder.build();
     }
-    
 }
