@@ -35,13 +35,17 @@ public class PushUpdatePipeline extends Push {
     @Override
     void doNewPush(GatewayDiscordClient client, WarframeState warframeState, Snowflake channelId) {
         
-        // void trader
+        voidTraderChangeNotify(warframeState, client, channelId);
+        alertsChangeNotify(warframeState, client, channelId);
+    }
+    
+    private void voidTraderChangeNotify(WarframeState warframeState, GatewayDiscordClient client, Snowflake channelId) {
         if (warframeState.isVoidTraderStateChanged() && warframeState.getVoidTraderDTO().getActive()) {
             Duration diffTimeExpiry = LocalDateTimeUtil.getDiffTime(LocalDateTime.now(), warframeState.getVoidTraderDTO().getExpiry());
             String message = VOID_TRADER_HERE.replace("{location}", warframeState.getVoidTraderDTO().getLocation())
-                                             .replace("{days}", String.valueOf(diffTimeExpiry.toDays()))
-                                             .replace("{hours}", String.valueOf(diffTimeExpiry.toHoursPart()))
-                                             .replace("{minutes}", String.valueOf(diffTimeExpiry.toMinutesPart()));
+                    .replace("{days}", String.valueOf(diffTimeExpiry.toDays()))
+                    .replace("{hours}", String.valueOf(diffTimeExpiry.toHoursPart()))
+                    .replace("{minutes}", String.valueOf(diffTimeExpiry.toMinutesPart()));
             
             client.rest().getChannelById(channelId)
                     .createMessage(message)
@@ -49,16 +53,17 @@ public class PushUpdatePipeline extends Push {
         } else if (warframeState.isVoidTraderStateChanged()) {
             Duration diffTimeActivation = LocalDateTimeUtil.getDiffTime(LocalDateTime.now(), warframeState.getVoidTraderDTO().getActivation());
             String message = VOID_TRADER_GONE.replace("{days}", String.valueOf(diffTimeActivation.toDays()))
-                                             .replace("{hours}", String.valueOf(diffTimeActivation.toHoursPart()))
-                                             .replace("{minutes}", String.valueOf(diffTimeActivation.toMinutesPart()));
+                    .replace("{hours}", String.valueOf(diffTimeActivation.toHoursPart()))
+                    .replace("{minutes}", String.valueOf(diffTimeActivation.toMinutesPart()));
             
             client.rest().getChannelById(channelId)
                     .createMessage(message)
                     .subscribe();
         }
-        
-        // alerts
-        if (warframeState.isAlertsStateChanged() && warframeState.getAlerts().size() > 0) {
+    }
+
+    private void alertsChangeNotify(WarframeState warframeState, GatewayDiscordClient client, Snowflake channelId) {
+        if (warframeState.isAlertsStateChanged() && warframeState.getAlerts() != null && warframeState.getAlerts().size() > 0) {
             String message = ALERTS_EXISTING;
             String alerts = "";
             

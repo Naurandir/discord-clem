@@ -42,6 +42,11 @@ public class WarframeService {
         WorldStateDTO newWorldState = warframeClient.getCurrentWorldState();
         warframeState.setCetusCycle(newWorldState.getCetusCycleDTO());
         warframeState.setVallisCycle(newWorldState.getVallisCycleDTO());
+        warframeState.setAlerts(newWorldState.getAlertsDTO());
+        warframeState.setVoidTraderDTO(newWorldState.getVoidTraderDTO());
+        
+        warframeState.setVoidTraderStateChanged(false);
+        warframeState.setAlertsStateChanged(false);
     }
     
     public List<Command> getCommands() {
