@@ -40,11 +40,7 @@ public class WarframeService {
         warframeState = new WarframeState();
         
         WorldStateDTO newWorldState = warframeClient.getCurrentWorldState();
-        warframeState.setCetusCycle(newWorldState.getCetusCycleDTO());
-        warframeState.setVallisCycle(newWorldState.getVallisCycleDTO());
-        warframeState.setAlerts(newWorldState.getAlertsDTO());
-        warframeState.setVoidTraderDTO(newWorldState.getVoidTraderDTO());
-        
+        warframeState.updateByWorldState(newWorldState);        
         warframeState.setVoidTraderStateChanged(false);
         warframeState.setAlertsStateChanged(false);
     }
@@ -77,7 +73,6 @@ public class WarframeService {
         }
         
         return Flux.fromIterable(commands)
-                .filter(command -> event.getMember().isEmpty() || !event.getMember().get().isBot())
                 .filter(command -> event.getMessage().getContent().startsWith(
                         prefix + " " + command.getCommandWord()))
                 .next()
@@ -99,33 +94,28 @@ public class WarframeService {
             WorldStateDTO newWorldState = warframeClient.getCurrentWorldState();
             log.debug("getCurrentWorldState: received dto.");
             
-            updateAlerts(newWorldState);
-            updateWorldCycles(newWorldState);
-            updateVoidTrader(newWorldState);
+            // state change check
+            checkAlertsChanged(newWorldState);
+            checkVoidTraderChanged(newWorldState);
+            
+            // set new state
+            warframeState.updateByWorldState(newWorldState);
             
             // push notifications for diff
             pushes.forEach(push -> push.push(discordClient, warframeState));
         } catch (Exception ex) {
             log.error("getCurrentWorldState: update throwed exception: ", ex);
         }
-    }
+    }  
 
-    private void updateWorldCycles(WorldStateDTO newWorldState) {
-        warframeState.setCetusCycle(newWorldState.getCetusCycleDTO());
-        warframeState.setVallisCycle(newWorldState.getVallisCycleDTO());
-        warframeState.setCambionCycle(newWorldState.getCambionCycleDTO());
-    }   
-
-    private void updateAlerts(WorldStateDTO newWorldState) {
+    private void checkAlertsChanged(WorldStateDTO newWorldState) {
         warframeState.setAlertsStateChanged((warframeState.getAlerts() == null && newWorldState.getAlertsDTO() != null) ||
                                             (warframeState.getAlerts() != null && newWorldState.getAlertsDTO() == null) ||
                                             warframeState.getAlerts().size() != newWorldState.getAlertsDTO().size());
-        warframeState.setAlerts(newWorldState.getAlertsDTO());
     }
 
-    private void updateVoidTrader(WorldStateDTO newWorldState) {
-        warframeState.setVoidTraderStateChanged(!Objects.equals(warframeState.getVoidTraderDTO().getActive(), newWorldState.getVoidTraderDTO().getActive()));
-        warframeState.setVoidTraderDTO(newWorldState.getVoidTraderDTO());
+    private void checkVoidTraderChanged(WorldStateDTO newWorldState) {
+        warframeState.setVoidTraderStateChanged(!Objects.equals(warframeState.getVoidTrader().getActive(), newWorldState.getVoidTraderDTO().getActive()));
     }
     
 }
