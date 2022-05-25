@@ -1,6 +1,6 @@
 package at.naurandir.discord.clem.bot.service.push;
 
-import at.naurandir.discord.clem.bot.service.WarframeState;
+import at.naurandir.discord.clem.bot.model.WarframeState;
 import at.naurandir.discord.clem.bot.service.client.dto.VoidTraderDTO;
 import at.naurandir.discord.clem.bot.service.client.dto.VoidTraderDTO.VoidTraderInventoryDTO;
 import at.naurandir.discord.clem.bot.utils.LocalDateTimeUtil;

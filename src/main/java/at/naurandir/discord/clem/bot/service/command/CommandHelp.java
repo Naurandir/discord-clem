@@ -1,6 +1,6 @@
 package at.naurandir.discord.clem.bot.service.command;
 
-import at.naurandir.discord.clem.bot.service.WarframeState;
+import at.naurandir.discord.clem.bot.model.WarframeState;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;

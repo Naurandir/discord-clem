@@ -1,6 +1,6 @@
 package at.naurandir.discord.clem.bot.service.push;
 
-import at.naurandir.discord.clem.bot.service.WarframeState;
+import at.naurandir.discord.clem.bot.model.WarframeState;
 import discord4j.common.util.Snowflake;
 
 import discord4j.core.GatewayDiscordClient;

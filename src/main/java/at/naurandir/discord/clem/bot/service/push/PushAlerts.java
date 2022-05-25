@@ -1,6 +1,6 @@
 package at.naurandir.discord.clem.bot.service.push;
 
-import at.naurandir.discord.clem.bot.service.WarframeState;
+import at.naurandir.discord.clem.bot.model.WarframeState;
 import at.naurandir.discord.clem.bot.service.client.dto.AlertDTO;
 import at.naurandir.discord.clem.bot.utils.LocalDateTimeUtil;
 import discord4j.common.util.Snowflake;

@@ -1,4 +1,4 @@
-package at.naurandir.discord.clem.bot.service;
+package at.naurandir.discord.clem.bot.model;
 
 import at.naurandir.discord.clem.bot.service.client.dto.AlertDTO;
 import at.naurandir.discord.clem.bot.service.client.dto.CambionCycleDTO;
