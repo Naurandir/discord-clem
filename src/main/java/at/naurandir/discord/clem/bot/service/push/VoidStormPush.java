@@ -1,3 +1,4 @@
+
 package at.naurandir.discord.clem.bot.service.push;
 
 import at.naurandir.discord.clem.bot.model.WarframeState;
@@ -6,7 +7,6 @@ import at.naurandir.discord.clem.bot.utils.LocalDateTimeUtil;
 import discord4j.common.util.Snowflake;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.spec.EmbedCreateSpec;
-import discord4j.core.spec.EmbedCreateSpec.Builder;
 import discord4j.discordjson.json.MessageData;
 import discord4j.discordjson.json.MessageEditRequest;
 import discord4j.rest.entity.RestMessage;
@@ -15,23 +15,19 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 
 /**
  *
- * @author aspiel
+ * @author Naurandir
  */
-@Slf4j
-@Component
-public class VoidFissuresPush extends Push {
+public class VoidStormPush extends Push {
     @Value("#{'${discord.clem.push.channels.fissures}'.split(',')}")
     private List<String> interestingChannels;
 
-    private static final String TITLE = "Current Fissures";
-    private static final String DESCRIPTION = "Currently active fissures.";
-    private static final String FISSURE_DESCRIPTION = " *Tier:* {tier}\n"
+    private static final String TITLE = "Current Void Storms";
+    private static final String DESCRIPTION = "Currently active void storms.";
+    private static final String STORM_DESCRIPTION = " *Tier:* {tier}\n"
             + " {missionType} ({enemyType})\n"
             + " *expire:* {hours}h {minutes}m";
 
@@ -74,8 +70,8 @@ public class VoidFissuresPush extends Push {
     }
 
     private EmbedCreateSpec generateEmbed(WarframeState warframeState) {  
-        Builder embedBuilder = EmbedCreateSpec.builder()
-                .color(Color.TAHITI_GOLD)
+        EmbedCreateSpec.Builder embedBuilder = EmbedCreateSpec.builder()
+                .color(Color.YELLOW)
                 .title(TITLE)
                 .description(DESCRIPTION)
                 .thumbnail("https://static.wikia.nocookie.net/warframe/images/0/0e/VoidProjectionsGoldD.png/revision/latest?cb=20160709035734")
@@ -83,14 +79,14 @@ public class VoidFissuresPush extends Push {
 
         for (VoidFissureDTO fissure : warframeState.getFissures()) {
 
-            if (fissure.getExpired() || fissure.getIsStorm()) {
+            if (fissure.getExpired() || !fissure.getIsStorm()) {
                 continue;
             }
 
             Duration diffTime = LocalDateTimeUtil.getDiffTime(LocalDateTime.now(), fissure.getExpiry());
 
             embedBuilder.addField(fissure.getNode(), 
-                    FISSURE_DESCRIPTION.replace("{tier}", fissure.getTier())
+                    STORM_DESCRIPTION.replace("{tier}", fissure.getTier())
                                      .replace("{enemyType}", fissure.getEnemy())
                                      .replace("{missionType}", fissure.getMissionType())
                                      .replace("{hours}", String.valueOf(diffTime.toHours()))

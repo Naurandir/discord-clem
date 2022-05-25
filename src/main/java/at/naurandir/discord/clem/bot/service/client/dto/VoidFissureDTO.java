@@ -21,4 +21,5 @@ public class VoidFissureDTO {
     private String enemy;
     private String activation;
     private String expiry;
+    private Boolean isStorm;
 }
