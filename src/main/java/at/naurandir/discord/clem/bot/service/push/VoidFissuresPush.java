@@ -32,8 +32,8 @@ public class VoidFissuresPush extends Push {
     private static final String TITLE = "Current Fissures";
     private static final String DESCRIPTION = "Currently active fissures.";
     private static final String FISSURE_DESCRIPTION = " *Tier:* {tier}\n"
-            + " *Node:* {node} - {enemyType} ({missionType})\n"
-            + " *expires in:* {days}d {hours}h {minutes}m";
+            + " {missionType} ({enemyType})\n"
+            + " *expire:* {days}d {hours}h {minutes}m";
 
     @Override
     void doNewPush(GatewayDiscordClient client, WarframeState warframeState, Snowflake channelId) {
@@ -92,7 +92,6 @@ public class VoidFissuresPush extends Push {
 
             embedBuilder.addField(fissure.getNode(), 
                     FISSURE_DESCRIPTION.replace("{tier}", fissure.getTier())
-                                     .replace("{node}", fissure.getNode())
                                      .replace("{enemyType}", fissure.getEnemy())
                                      .replace("{missionType}", fissure.getMissionType())
                                      .replace("{days}", String.valueOf(diffTime.toDays()))
