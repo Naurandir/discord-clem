@@ -120,13 +120,12 @@ public class BotService {
      * refresh all information required from warframe every minute,
      * analyse the difference and push the difference into the channels
      * save the new state
-     * @param discordClient 
      */
     @Scheduled(fixedRate = 60 * 1_000)
-    public void refreshWarframe(GatewayDiscordClient discordClient) {
+    public void refreshWarframe() {
         try {
             worldStateService.refreshWarframe();
-            pushes.forEach(push -> push.push(discordClient, worldStateService.getWarframeState()));
+            pushes.forEach(push -> push.push(client, worldStateService.getWarframeState()));
         } catch (Exception ex) {
             log.error("refreshWarframe: update throwed exception: ", ex);
         }
