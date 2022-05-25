@@ -75,7 +75,7 @@ public class VoidFissuresPush extends Push {
 
     private EmbedCreateSpec generateEmbed(WarframeState warframeState) {  
         Builder embedBuilder = EmbedCreateSpec.builder()
-                .color(Color.RED)
+                .color(Color.TAHITI_GOLD)
                 .title(TITLE)
                 .description(DESCRIPTION)
                 .thumbnail("https://static.wikia.nocookie.net/warframe/images/0/0e/VoidProjectionsGoldD.png/revision/latest?cb=20160709035734")
