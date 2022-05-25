@@ -26,11 +26,12 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 public class VoidFissuresPush extends Push {
+    
     @Value("#{'${discord.clem.push.channels.fissures}'.split(',')}")
     private List<String> interestingChannels;
 
-    private static final String TITLE = "Current Fissures";
-    private static final String DESCRIPTION = "Currently active fissures.";
+    private static final String TITLE = "Current Void Fissures";
+    private static final String DESCRIPTION = "Currently active void fissures.";
     private static final String FISSURE_DESCRIPTION = " *Tier:* {tier}\n"
             + " {missionType} ({enemyType})\n"
             + " *expire:* {hours}h {minutes}m";
