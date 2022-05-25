@@ -72,7 +72,7 @@ public class PusVoidTrader extends Push {
     }
     
     private EmbedCreateSpec generateEmbed(WarframeState warframeState) {
-        VoidTraderDTO voidTrader = warframeState.getVoidTrader();
+        VoidTraderDTO voidTrader = warframeState.getVoidTraderDTO();
         
         String description;
         if (voidTrader.getActive()) {

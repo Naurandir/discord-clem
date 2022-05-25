@@ -40,9 +40,9 @@ public class PushUpdatePipeline extends Push {
     }
     
     private void voidTraderChangeNotify(WarframeState warframeState, GatewayDiscordClient client, Snowflake channelId) {
-        if (warframeState.isVoidTraderStateChanged() && warframeState.getVoidTrader().getActive()) {
-            Duration diffTimeExpiry = LocalDateTimeUtil.getDiffTime(LocalDateTime.now(), warframeState.getVoidTrader().getExpiry());
-            String message = VOID_TRADER_HERE.replace("{location}", warframeState.getVoidTrader().getLocation())
+        if (warframeState.isVoidTraderStateChanged() && warframeState.getVoidTraderDTO().getActive()) {
+            Duration diffTimeExpiry = LocalDateTimeUtil.getDiffTime(LocalDateTime.now(), warframeState.getVoidTraderDTO().getExpiry());
+            String message = VOID_TRADER_HERE.replace("{location}", warframeState.getVoidTraderDTO().getLocation())
                     .replace("{days}", String.valueOf(diffTimeExpiry.toDays()))
                     .replace("{hours}", String.valueOf(diffTimeExpiry.toHoursPart()))
                     .replace("{minutes}", String.valueOf(diffTimeExpiry.toMinutesPart()));
@@ -51,7 +51,7 @@ public class PushUpdatePipeline extends Push {
                     .createMessage(message)
                     .subscribe();
         } else if (warframeState.isVoidTraderStateChanged()) {
-            Duration diffTimeActivation = LocalDateTimeUtil.getDiffTime(LocalDateTime.now(), warframeState.getVoidTrader().getActivation());
+            Duration diffTimeActivation = LocalDateTimeUtil.getDiffTime(LocalDateTime.now(), warframeState.getVoidTraderDTO().getActivation());
             String message = VOID_TRADER_GONE.replace("{days}", String.valueOf(diffTimeActivation.toDays()))
                     .replace("{hours}", String.valueOf(diffTimeActivation.toHoursPart()))
                     .replace("{minutes}", String.valueOf(diffTimeActivation.toMinutesPart()));

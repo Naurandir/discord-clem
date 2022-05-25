@@ -18,9 +18,6 @@ public class WorldStateDTO {
     @SerializedName("alerts")
     private List<AlertDTO> alertsDTO;
     
-    @SerializedName("fissures")
-    private List<VoidFissureDTO> fissuresDTO;
-    
     @SerializedName("cetusCycle")
     private CetusCycleDTO cetusCycleDTO;
     
