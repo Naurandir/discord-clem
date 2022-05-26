@@ -4,9 +4,11 @@ import at.naurandir.discord.clem.bot.service.client.dto.droptable.MissionDropDTO
 import at.naurandir.discord.clem.bot.service.client.dto.droptable.RelicDropDTO;
 import java.util.List;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 /**
  *
@@ -14,6 +16,8 @@ import lombok.Setter;
  */
 @Getter
 @Setter
+@ToString
+@EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
 public class DropTableDTO {

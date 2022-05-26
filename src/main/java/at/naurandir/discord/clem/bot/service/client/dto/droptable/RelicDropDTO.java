@@ -1,8 +1,10 @@
 package at.naurandir.discord.clem.bot.service.client.dto.droptable;
 
 import java.util.List;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 /**
  *
@@ -10,10 +12,12 @@ import lombok.Setter;
  */
 @Getter
 @Setter
+@ToString
+@EqualsAndHashCode
 public class RelicDropDTO {
     
-    String tier;
-    String relicName;
-    String state;
+    private String tier;
+    private String relicName;
+    private String state;
     private List<RewardDropDTO> rewards;
 }

@@ -1,5 +1,6 @@
 package at.naurandir.discord.clem.bot.model.enums;
 
+import com.google.gson.annotations.SerializedName;
 import lombok.AllArgsConstructor;
 
 /**
@@ -8,19 +9,12 @@ import lombok.AllArgsConstructor;
  */
 @AllArgsConstructor
 public enum Rarity {
-    COMMON("Common"),
-    UNCOMMON("Uncommon"),
-    RARE("Rare");
     
-    private String value;
+    @SerializedName("Common")
+    COMMON,
+    @SerializedName("Uncommon")
+    UNCOMMON,
+    @SerializedName("Rare")
+    RARE;
     
-    public Rarity getRarityByEnum(String input) {
-        for (Rarity rarity : Rarity.values()) {
-            if (rarity.value.equals(input)) {
-                return rarity;
-            }
-        }
-        
-        throw new IllegalArgumentException("Given input ["+input+"] is not a valid enum!");
-    }
 }

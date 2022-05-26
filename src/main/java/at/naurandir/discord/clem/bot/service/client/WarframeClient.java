@@ -27,13 +27,13 @@ public class WarframeClient {
     Gson gson = new Gson();
     
     public WorldStateDTO getCurrentWorldState() throws IOException {
-        try (CloseableHttpClient httpclient = HttpClients.createDefault()) {
+        try (CloseableHttpClient httpClient = getClient()) {
             HttpGet httpGet = new HttpGet("https://api.warframestat.us/pc");
             httpGet.addHeader("Accept-Language", "en");
             
-            try (CloseableHttpResponse response = httpclient.execute(httpGet)) {
+            try (CloseableHttpResponse response = httpClient.execute(httpGet)) {
                 log.info("getCurrentWorldState: received http status [{}]", response.getStatusLine());
-                String jsonString = EntityUtils.toString(response.getEntity(), Charset.forName("UTF-8"));
+                String jsonString = getHttpContent(response);
                 return gson.fromJson(jsonString, WorldStateDTO.class);
             }
         }
@@ -50,12 +50,12 @@ public class WarframeClient {
     }
 
     private DropTableDTO getDropTableWithRelics() throws JsonSyntaxException, ParseException, IOException {
-        try (CloseableHttpClient httpclient = HttpClients.createDefault()) {
+        try (CloseableHttpClient httpClient = getClient()) {
             HttpGet httpGet = new HttpGet("https://warframe.fandom.com/wiki/Module:DropTables/JSON/Relics");
             
-            try (CloseableHttpResponse response = httpclient.execute(httpGet)) {
+            try (CloseableHttpResponse response = httpClient.execute(httpGet)) {
                 log.info("getDropTableWithRelics: received http status [{}]", response.getStatusLine());
-                String htmlString = EntityUtils.toString(response.getEntity(), Charset.forName("UTF-8"));
+                String htmlString = getHttpContent(response);
                 
                 Document html = Jsoup.parse(htmlString);
                 Elements elements = html.getElementsByClass("mw-code");
@@ -70,12 +70,12 @@ public class WarframeClient {
     }
     
     private DropTableDTO getDropTableWithMissions() throws JsonSyntaxException, ParseException, IOException {
-        try (CloseableHttpClient httpclient = HttpClients.createDefault()) {
+        try (CloseableHttpClient httpClient = getClient()) {
             HttpGet httpGet = new HttpGet("https://warframe.fandom.com/wiki/Module:DropTables/JSON/Missions");
             
-            try (CloseableHttpResponse response = httpclient.execute(httpGet)) {
+            try (CloseableHttpResponse response = httpClient.execute(httpGet)) {
                 log.info("getDropTableWithMissions: received http status [{}]", response.getStatusLine());
-                String htmlString = EntityUtils.toString(response.getEntity(), Charset.forName("UTF-8"));
+                String htmlString = getHttpContent(response);
                 
                 Document html = Jsoup.parse(htmlString);
                 Elements elements = html.getElementsByClass("mw-code");
@@ -88,5 +88,13 @@ public class WarframeClient {
                 return gson.fromJson(jsonString, DropTableDTO.class);
             }
         }
+    }
+    
+    CloseableHttpClient getClient() {
+        return HttpClients.createDefault();
+    }
+    
+    String getHttpContent(CloseableHttpResponse response) throws IOException {
+        return EntityUtils.toString(response.getEntity(), Charset.forName("UTF-8"));
     }
 }
