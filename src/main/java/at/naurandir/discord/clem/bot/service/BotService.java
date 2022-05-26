@@ -122,12 +122,24 @@ public class BotService {
      * save the new state
      */
     @Scheduled(fixedRate = 60 * 1_000)
-    public void refreshWarframe() {
+    public void refreshWorldState() {
         try {
-            worldStateService.refreshWarframe();
+            worldStateService.refreshWorldState();
             pushes.forEach(push -> push.push(client, worldStateService.getWarframeState()));
         } catch (Exception ex) {
-            log.error("refreshWarframe: update throwed exception: ", ex);
+            log.error("refreshWorldState: update throwed exception: ", ex);
+        }
+    }
+    
+    /**
+     * once per hour we refresh the drop tables
+     */
+    @Scheduled(fixedRate = 60 * 60 * 1_000)
+    public void refreshDropTables() {
+        try {
+            worldStateService.refreshDropTable();
+        } catch (Exception ex) {
+            log.error("refreshDropTables: update throwed exception: ", ex);
         }
     }
     

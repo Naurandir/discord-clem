@@ -24,7 +24,7 @@ public class WorldStateService {
     public void init() throws IOException {
         warframeClient = new WarframeClient();
         WorldStateDTO newWorldState = warframeClient.getCurrentWorldState();
-        DropTableDTO newDropTable = warframeClient.getCurrentDropTables();
+        DropTableDTO newDropTable = warframeClient.getCurrentDropTable();
         
         warframeState = new WarframeState(newWorldState, newDropTable);
     }
@@ -33,13 +33,23 @@ public class WorldStateService {
         return warframeState;
     }
     
-    public void refreshWarframe() {
+    public void refreshWorldState() {
         try {
             WorldStateDTO newWorldState = warframeClient.getCurrentWorldState();
-            log.debug("getCurrentWorldState: received dto.");
+            log.debug("refreshWorldState: received dto.");
             warframeState.updateByWorldState(newWorldState);
         } catch (Exception ex) {
-            log.error("getCurrentWorldState: update throwed exception: ", ex);
+            log.error("refreshWorldState: update throwed exception: ", ex);
+        }
+    }
+    
+    public void refreshDropTable() {
+        try {
+            DropTableDTO dropTable = warframeClient.getCurrentDropTable();
+            log.debug("refreshDropTable: received dto.");
+            warframeState.updateDropTableData(dropTable);
+        } catch (Exception ex) {
+            log.error("refreshDropTable: update throwed exception: ", ex);
         }
     }
 }

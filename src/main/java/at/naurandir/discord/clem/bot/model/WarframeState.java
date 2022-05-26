@@ -46,6 +46,7 @@ public class WarframeState {
 
     public WarframeState(WorldStateDTO newWorldState, DropTableDTO dropTable) {
         updateWorldStateData(newWorldState);
+        updateDropTableData(dropTable);
     }
 
     public void updateByWorldState(WorldStateDTO newWorldState) {
@@ -74,7 +75,7 @@ public class WarframeState {
                 newWorldState.getVoidTraderDTO().getActive()));
     }
     
-    private void updateDropTableData(DropTableDTO dropTable) {
+    public void updateDropTableData(DropTableDTO dropTable) {
         relics = dropTable.getRelics();
         missions = dropTable.getMissions();
     }

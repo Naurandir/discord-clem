@@ -41,7 +41,7 @@ public class WarframeClient {
     // https://warframe.fandom.com/wiki/Module:DropTables/JSON/Relics
     // https://warframe.fandom.com/wiki/Module:DropTables/JSON/Missions
     
-    public DropTableDTO getCurrentDropTables() throws IOException {
+    public DropTableDTO getCurrentDropTable() throws IOException {
         DropTableDTO dropTableDtoWithRelicsOnly = getDropTableWithRelics();
         DropTableDTO dropTableDtoWithMissionsOnly = null;
         
@@ -57,9 +57,9 @@ public class WarframeClient {
                 String htmlString = EntityUtils.toString(response.getEntity(), Charset.forName("UTF-8"));
                 
                 Document html = Jsoup.parse(htmlString);
-                Elements elements = html.select("pre");
+                Elements elements = html.getElementsByClass("mw-code");
                 
-                String jsonString = elements.first().data();
+                String jsonString = elements.first().text();
                 log.debug("getDropTables: found element: [{}]", jsonString);
                 
                 // json conform
