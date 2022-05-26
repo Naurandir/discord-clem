@@ -13,6 +13,7 @@ import at.naurandir.discord.clem.bot.service.client.dto.droptable.RelicDropDTO;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import lombok.Getter;
 import lombok.Setter;
@@ -40,7 +41,7 @@ public class WarframeState {
     
     // drop table
     private List<RelicDropDTO> relics;  
-    private List<MissionDropDTO> missions;
+    private Map<String,Map<String,MissionDropDTO>> missions;
     
     private Comparator<VoidFissureDTO> voidFissureComparator = Comparator.comparing(VoidFissureDTO::getTierNum);
 
@@ -77,6 +78,6 @@ public class WarframeState {
     
     public void updateDropTableData(DropTableDTO dropTable) {
         relics = dropTable.getRelics();
-        missions = dropTable.getMissions();
+        missions = dropTable.getMissionRewards();
     }
 }

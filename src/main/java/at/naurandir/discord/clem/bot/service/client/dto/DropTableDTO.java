@@ -3,6 +3,7 @@ package at.naurandir.discord.clem.bot.service.client.dto;
 import at.naurandir.discord.clem.bot.service.client.dto.droptable.MissionDropDTO;
 import at.naurandir.discord.clem.bot.service.client.dto.droptable.RelicDropDTO;
 import java.util.List;
+import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -23,6 +24,6 @@ import lombok.ToString;
 public class DropTableDTO {
     
     private List<RelicDropDTO> relics;  
-    private List<MissionDropDTO> missions;
+    private Map<String,Map<String,MissionDropDTO>> missionRewards;
     
 }

@@ -39,17 +39,13 @@ public class WarframeClient {
         }
     }
     
-    // https://warframe.fandom.com/wiki/Module:DropTables/JSON/Relics
-    // https://warframe.fandom.com/wiki/Module:DropTables/JSON/Missions
-    
     public DropTableDTO getCurrentDropTable() throws IOException {
         DropTableDTO dropTableDtoWithRelicsOnly = getDropTableWithRelics();
-        DropTableDTO dropTableDtoWithMissionsOnly = null;
-        
-        return new DropTableDTO(dropTableDtoWithRelicsOnly.getRelics(), null);
+        DropTableDTO dropTableDtoWithMissionsOnly = getDropTableWithMissions();
+        return new DropTableDTO(dropTableDtoWithRelicsOnly.getRelics(), dropTableDtoWithMissionsOnly.getMissionRewards());
     }
 
-    private DropTableDTO getDropTableWithRelics() throws JsonSyntaxException, ParseException, IOException {
+    DropTableDTO getDropTableWithRelics() throws JsonSyntaxException, ParseException, IOException {
         try (CloseableHttpClient httpClient = getClient()) {
             HttpGet httpGet = new HttpGet("https://warframe.fandom.com/wiki/Module:DropTables/JSON/Relics");
             
@@ -69,7 +65,7 @@ public class WarframeClient {
         }
     }
     
-    private DropTableDTO getDropTableWithMissions() throws JsonSyntaxException, ParseException, IOException {
+    DropTableDTO getDropTableWithMissions() throws JsonSyntaxException, ParseException, IOException {
         try (CloseableHttpClient httpClient = getClient()) {
             HttpGet httpGet = new HttpGet("https://warframe.fandom.com/wiki/Module:DropTables/JSON/Missions");
             
@@ -81,9 +77,8 @@ public class WarframeClient {
                 Elements elements = html.getElementsByClass("mw-code");
                 
                 String jsonString = elements.first().text();
-                jsonString = jsonString.replace("return'", "").replace("&quot;", "\"");
+                jsonString = jsonString.replace("return[[", "");
                 jsonString = jsonString.substring(0, jsonString.length() - 2);
-                log.debug("getDropTableWithMissions: json to parse: [{}]", jsonString);
                 
                 return gson.fromJson(jsonString, DropTableDTO.class);
             }

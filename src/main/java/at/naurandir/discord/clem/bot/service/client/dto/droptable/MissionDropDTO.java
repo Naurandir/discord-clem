@@ -1,8 +1,11 @@
 package at.naurandir.discord.clem.bot.service.client.dto.droptable;
 
 import java.util.List;
+import java.util.Map;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 /**
  *
@@ -10,12 +13,12 @@ import lombok.Setter;
  */
 @Getter
 @Setter
+@ToString
+@EqualsAndHashCode
 public class MissionDropDTO {
-    
-    private String node;
-    private String missionType;
+
+    private String gameMode;
     private Boolean isEvent;
-    private List<RewardDropDTO> rewardsRotationA;
-    private List<RewardDropDTO> rewardsRotationB;
-    private List<RewardDropDTO> rewardsRotationC;
+    private Map<String, List<RewardDropDTO>> rewards;
+    
 }
