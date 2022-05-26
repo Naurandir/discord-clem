@@ -39,7 +39,7 @@ public abstract class Push {
                     .collect(Collectors.toList());
             
             for (MessageData messageData : messageDataList) {
-                log.info("init: found message with id [{}] as existing pinned message from bot, adding to mapping",
+                log.info("init: found message id [{}] as existing pinned message from bot, adding to mapping",
                         messageData.id().asString());
                 channelMessageMapping.put(channelSnowflakeId, Snowflake.of(messageData.id().asString()));
             }
@@ -76,20 +76,20 @@ public abstract class Push {
             for (String channelId : getInterestingChannels()) {
                 Snowflake channelSnowflake = Snowflake.of(channelId);
                 if (!isSticky()) {
-                    log.info("push: execute new push as [{}] is not sticky.", this.getClass().getSimpleName());
+                    log.debug("push: new push as [{}] is not sticky.", this.getClass().getSimpleName());
                     doNewPush(client, warframeState, channelSnowflake);
                 } else if (channelMessageMapping.get(channelSnowflake) == null) {
-                    log.info("push: execute new push in channel [{}] as [{}] is sticky but no message was found", 
+                    log.info("push: new push in channel [{}] as [{}] is sticky and no message found", 
                             channelId, this.getClass().getSimpleName());
                     doNewPush(client, warframeState, channelSnowflake);
                 } else {
                     RestMessage message = getMessageById(client, channelSnowflake, channelMessageMapping.get(channelSnowflake));
                     if (message == null) {
-                        log.warn("push: execute new push in channel [{}] as [{}] is sticky but expected older message was not found", 
+                        log.warn("push: new push in channel [{}] as [{}] is sticky but expected older message was not found", 
                                 channelId, this.getClass().getSimpleName());
                         doNewPush(client, warframeState, channelSnowflake);
                     } else {
-                        log.info("push: execute update in channel [{}] as [{}] is sticky and expected older message [{}] was found", 
+                        log.info("push: update in channel [{}] as [{}] is sticky and expected older message [{}] was found", 
                                 channelId, this.getClass().getSimpleName(), message.getId());
                         doUpdatePush(message, warframeState);
                     }

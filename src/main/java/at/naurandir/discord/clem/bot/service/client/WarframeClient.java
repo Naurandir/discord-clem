@@ -41,8 +41,8 @@ public class WarframeClient {
     
     public DropTableDTO getCurrentDropTable() throws IOException {
         DropTableDTO dropTableDtoWithRelicsOnly = getDropTableWithRelics();
-        DropTableDTO dropTableDtoWithMissionsOnly = getDropTableWithMissions();
-        return new DropTableDTO(dropTableDtoWithRelicsOnly.getRelics(), dropTableDtoWithMissionsOnly.getMissionRewards());
+        //DropTableDTO dropTableDtoWithMissionsOnly = getDropTableWithMissions();
+        return new DropTableDTO(dropTableDtoWithRelicsOnly.getRelics(), null);
     }
 
     DropTableDTO getDropTableWithRelics() throws JsonSyntaxException, ParseException, IOException {
