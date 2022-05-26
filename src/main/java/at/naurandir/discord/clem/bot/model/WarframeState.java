@@ -1,12 +1,15 @@
 package at.naurandir.discord.clem.bot.model;
 
-import at.naurandir.discord.clem.bot.service.client.dto.AlertDTO;
-import at.naurandir.discord.clem.bot.service.client.dto.CambionCycleDTO;
-import at.naurandir.discord.clem.bot.service.client.dto.CetusCycleDTO;
-import at.naurandir.discord.clem.bot.service.client.dto.VallisCycleDTO;
-import at.naurandir.discord.clem.bot.service.client.dto.VoidFissureDTO;
-import at.naurandir.discord.clem.bot.service.client.dto.VoidTraderDTO;
+import at.naurandir.discord.clem.bot.service.client.dto.DropTableDTO;
+import at.naurandir.discord.clem.bot.service.client.dto.worldstate.AlertDTO;
+import at.naurandir.discord.clem.bot.service.client.dto.worldstate.CambionCycleDTO;
+import at.naurandir.discord.clem.bot.service.client.dto.worldstate.CetusCycleDTO;
+import at.naurandir.discord.clem.bot.service.client.dto.worldstate.VallisCycleDTO;
+import at.naurandir.discord.clem.bot.service.client.dto.worldstate.VoidFissureDTO;
+import at.naurandir.discord.clem.bot.service.client.dto.worldstate.VoidTraderDTO;
 import at.naurandir.discord.clem.bot.service.client.dto.WorldStateDTO;
+import at.naurandir.discord.clem.bot.service.client.dto.droptable.MissionDropDTO;
+import at.naurandir.discord.clem.bot.service.client.dto.droptable.RelicDropDTO;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -22,6 +25,7 @@ import lombok.Setter;
 @Setter
 public class WarframeState {
     
+    // world
     private List<AlertDTO> alerts;
     private List<VoidFissureDTO> fissures;
     
@@ -34,18 +38,22 @@ public class WarframeState {
     private boolean isVoidTraderStateChanged;
     private boolean isAlertsStateChanged;
     
+    // drop table
+    private List<RelicDropDTO> relics;  
+    private List<MissionDropDTO> missions;
+    
     private Comparator<VoidFissureDTO> voidFissureComparator = Comparator.comparing(VoidFissureDTO::getTierNum);
 
-    public WarframeState(WorldStateDTO newWorldState) {
-        updateData(newWorldState);
+    public WarframeState(WorldStateDTO newWorldState, DropTableDTO dropTable) {
+        updateWorldStateData(newWorldState);
     }
 
     public void updateByWorldState(WorldStateDTO newWorldState) {
-        checkDataChanged(newWorldState);
-        updateData(newWorldState);
+        checkWorldStateDataChanged(newWorldState);
+        updateWorldStateData(newWorldState);
     }
     
-    private void updateData(WorldStateDTO newWorldState) {
+    private void updateWorldStateData(WorldStateDTO newWorldState) {
         voidTrader = newWorldState.getVoidTraderDTO();
         
         alerts = newWorldState.getAlertsDTO();
@@ -57,12 +65,17 @@ public class WarframeState {
         cambionCycle = newWorldState.getCambionCycleDTO();
     }
     
-    private void checkDataChanged(WorldStateDTO newWorldState) {
+    private void checkWorldStateDataChanged(WorldStateDTO newWorldState) {
         setAlertsStateChanged((getAlerts() == null && newWorldState.getAlertsDTO() != null) ||
                 (getAlerts() != null && newWorldState.getAlertsDTO() == null) ||
                 getAlerts().size() != newWorldState.getAlertsDTO().size());
         
         setVoidTraderStateChanged(!Objects.equals(getVoidTrader().getActive(),
                 newWorldState.getVoidTraderDTO().getActive()));
+    }
+    
+    private void updateDropTableData(DropTableDTO dropTable) {
+        relics = dropTable.getRelics();
+        missions = dropTable.getMissions();
     }
 }

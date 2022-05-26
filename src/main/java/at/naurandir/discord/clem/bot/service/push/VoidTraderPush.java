@@ -1,8 +1,8 @@
 package at.naurandir.discord.clem.bot.service.push;
 
 import at.naurandir.discord.clem.bot.model.WarframeState;
-import at.naurandir.discord.clem.bot.service.client.dto.VoidTraderDTO;
-import at.naurandir.discord.clem.bot.service.client.dto.VoidTraderDTO.VoidTraderInventoryDTO;
+import at.naurandir.discord.clem.bot.service.client.dto.worldstate.VoidTraderDTO;
+import at.naurandir.discord.clem.bot.service.client.dto.worldstate.VoidTraderDTO.VoidTraderInventoryDTO;
 import at.naurandir.discord.clem.bot.utils.LocalDateTimeUtil;
 import discord4j.common.util.Snowflake;
 import discord4j.core.GatewayDiscordClient;
@@ -26,7 +26,7 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
-public class PusVoidTrader extends Push {
+public class VoidTraderPush extends Push {
     
     @Value("#{'${discord.clem.push.channels.void-trader}'.split(',')}")
     private List<String> interestingChannels;

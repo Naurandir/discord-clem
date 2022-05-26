@@ -1,7 +1,7 @@
 package at.naurandir.discord.clem.bot.service.push;
 
 import at.naurandir.discord.clem.bot.model.WarframeState;
-import at.naurandir.discord.clem.bot.service.client.dto.AlertDTO;
+import at.naurandir.discord.clem.bot.service.client.dto.worldstate.AlertDTO;
 import at.naurandir.discord.clem.bot.utils.LocalDateTimeUtil;
 import discord4j.common.util.Snowflake;
 import discord4j.core.GatewayDiscordClient;
@@ -26,7 +26,7 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
-public class PushAlerts extends Push {
+public class AlertsPush extends Push {
     
     @Value("#{'${discord.clem.push.channels.alerts}'.split(',')}")
     private List<String> interestingChannels;

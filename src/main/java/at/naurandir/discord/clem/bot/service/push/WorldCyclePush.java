@@ -23,7 +23,7 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
-public class PushWorldCycle extends Push {
+public class WorldCyclePush extends Push {
     
     @Value("#{'${discord.clem.push.channels.worldcycle}'.split(',')}")
     private List<String> interestingChannels;

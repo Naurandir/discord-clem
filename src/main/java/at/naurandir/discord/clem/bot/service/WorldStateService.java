@@ -2,6 +2,7 @@ package at.naurandir.discord.clem.bot.service;
 
 import at.naurandir.discord.clem.bot.model.WarframeState;
 import at.naurandir.discord.clem.bot.service.client.WarframeClient;
+import at.naurandir.discord.clem.bot.service.client.dto.DropTableDTO;
 import at.naurandir.discord.clem.bot.service.client.dto.WorldStateDTO;
 import java.io.IOException;
 import javax.annotation.PostConstruct;
@@ -23,8 +24,9 @@ public class WorldStateService {
     public void init() throws IOException {
         warframeClient = new WarframeClient();
         WorldStateDTO newWorldState = warframeClient.getCurrentWorldState();
+        DropTableDTO newDropTable = warframeClient.getCurrentDropTables();
         
-        warframeState = new WarframeState(newWorldState);
+        warframeState = new WarframeState(newWorldState, newDropTable);
     }
     
     public WarframeState getWarframeState() {

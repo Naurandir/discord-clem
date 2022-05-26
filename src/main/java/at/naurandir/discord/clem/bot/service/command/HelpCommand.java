@@ -12,7 +12,7 @@ import reactor.core.publisher.Mono;
  */
 @Slf4j
 @Component
-public class CommandHelp implements Command {
+public class HelpCommand implements Command {
     
     @Override
     public String getCommandWord() {

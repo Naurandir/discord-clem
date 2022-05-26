@@ -1,4 +1,4 @@
-package at.naurandir.discord.clem.bot.service.client.dto;
+package at.naurandir.discord.clem.bot.service.client.dto.worldstate;
 
 import com.google.gson.annotations.SerializedName;
 import lombok.Getter;

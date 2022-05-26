@@ -1,4 +1,4 @@
-package at.naurandir.discord.clem.bot.service.client.dto;
+package at.naurandir.discord.clem.bot.service.client.dto.worldstate;
 
 import lombok.Getter;
 import lombok.Setter;

@@ -1,5 +1,11 @@
 package at.naurandir.discord.clem.bot.service.client.dto;
 
+import at.naurandir.discord.clem.bot.service.client.dto.worldstate.VoidTraderDTO;
+import at.naurandir.discord.clem.bot.service.client.dto.worldstate.CetusCycleDTO;
+import at.naurandir.discord.clem.bot.service.client.dto.worldstate.AlertDTO;
+import at.naurandir.discord.clem.bot.service.client.dto.worldstate.VallisCycleDTO;
+import at.naurandir.discord.clem.bot.service.client.dto.worldstate.VoidFissureDTO;
+import at.naurandir.discord.clem.bot.service.client.dto.worldstate.CambionCycleDTO;
 import com.google.gson.annotations.SerializedName;
 import java.util.List;
 import lombok.Getter;
