@@ -23,6 +23,7 @@ import org.jsoup.select.Elements;
  */
 @Slf4j
 public class WarframeClient {
+    
     Gson gson = new Gson();
     
     public WorldStateDTO getCurrentWorldState() throws IOException {
@@ -53,21 +54,36 @@ public class WarframeClient {
             HttpGet httpGet = new HttpGet("https://warframe.fandom.com/wiki/Module:DropTables/JSON/Relics");
             
             try (CloseableHttpResponse response = httpclient.execute(httpGet)) {
-                log.info("getCurrentWorldState: received http status [{}]", response.getStatusLine());
+                log.info("getDropTableWithRelics: received http status [{}]", response.getStatusLine());
                 String htmlString = EntityUtils.toString(response.getEntity(), Charset.forName("UTF-8"));
                 
                 Document html = Jsoup.parse(htmlString);
                 Elements elements = html.getElementsByClass("mw-code");
                 
                 String jsonString = elements.first().text();
-                log.debug("getDropTables: found element: [{}]", jsonString);
+                jsonString = jsonString.replace("return'", "");
+                jsonString = jsonString.substring(0, jsonString.length() - 1);
                 
-                // json conform
-                jsonString = jsonString.replace("return'", "")
-                        .replace("&quot;", "\"");
+                return gson.fromJson(jsonString, DropTableDTO.class);
+            }
+        }
+    }
+    
+    private DropTableDTO getDropTableWithMissions() throws JsonSyntaxException, ParseException, IOException {
+        try (CloseableHttpClient httpclient = HttpClients.createDefault()) {
+            HttpGet httpGet = new HttpGet("https://warframe.fandom.com/wiki/Module:DropTables/JSON/Missions");
+            
+            try (CloseableHttpResponse response = httpclient.execute(httpGet)) {
+                log.info("getDropTableWithMissions: received http status [{}]", response.getStatusLine());
+                String htmlString = EntityUtils.toString(response.getEntity(), Charset.forName("UTF-8"));
                 
-                // remove the last ' as it is not part of the json
+                Document html = Jsoup.parse(htmlString);
+                Elements elements = html.getElementsByClass("mw-code");
+                
+                String jsonString = elements.first().text();
+                jsonString = jsonString.replace("return'", "").replace("&quot;", "\"");
                 jsonString = jsonString.substring(0, jsonString.length() - 2);
+                log.debug("getDropTableWithMissions: json to parse: [{}]", jsonString);
                 
                 return gson.fromJson(jsonString, DropTableDTO.class);
             }
