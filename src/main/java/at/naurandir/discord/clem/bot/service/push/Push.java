@@ -20,6 +20,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public abstract class Push {
     
+    private static final RestMessage MESSAGE_CONNECTION_RESET = RestMessage.create(null, Snowflake.of(0L), Snowflake.of(0L));
+    
     private final Map<Snowflake, Snowflake> channelMessageMapping = new HashMap<>();
     
     abstract void doNewPush(GatewayDiscordClient client, WarframeState warframeState, Snowflake channelId);
@@ -88,6 +90,9 @@ public abstract class Push {
                         log.warn("push: new push in channel [{}] as [{}] is sticky but expected older message was not found", 
                                 channelId, this.getClass().getSimpleName());
                         doNewPush(client, warframeState, channelSnowflake);
+                    } else if (MESSAGE_CONNECTION_RESET.equals(message)) {
+                        log.warn("push: it seems a connection reset happened for [{}], ignoring push for message", 
+                                this.getClass().getSimpleName());
                     } else {
                         log.info("push: update in channel [{}] as [{}] is sticky and expected older message [{}] was found", 
                                 channelId, this.getClass().getSimpleName(), message.getId());
@@ -105,7 +110,11 @@ public abstract class Push {
             client.getRestClient().getMessageById(channelId, messageId).getData().block();
             return client.getRestClient().getMessageById(channelId, messageId);
         } catch (Exception ex) {
-            log.warn("getMessageById: could not obtain message, error: ", ex.getMessage());
+            log.warn("getMessageById: could not obtain message, error: {}", ex.getMessage());
+            
+            if (ex.getMessage().contains("Connection reset by peer")) {
+                return MESSAGE_CONNECTION_RESET;
+            }
         }
         return null;
     }
