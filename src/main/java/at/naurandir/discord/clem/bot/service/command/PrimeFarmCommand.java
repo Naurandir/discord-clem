@@ -118,8 +118,8 @@ public class PrimeFarmCommand implements Command {
         String title = node + " (" + planet + ")";
         String message = rewardDrop.getItemName() + " - "
                 + (rotation != null ? "Rotation " + rotation + " - " : null)
-                + rewardDrop.getChance() + " (" 
-                + rewardDrop.getRarity() + ")";
+                + rewardDrop.getChance() + "% drop change (" 
+                + rewardDrop.getRarity().toString().toLowerCase() + ")";
         log.debug("addMissionData: added {} - {}", title, message);
         nodeMissionMessage.put(title, message);
     }
@@ -133,11 +133,15 @@ public class PrimeFarmCommand implements Command {
     }
     
     private EmbedCreateSpec generateEmbedMissions(Map<String, String> missionMessages) {
-        return generateEmbed("Missions with Relic Drop", 
-                "Missions that drop the found relics in order to farm the relics for desired item. If some Relics are not listed it means they are vaulted.", 
-                Color.TAHITI_GOLD, 
-                "https://preview.redd.it/99m1fk0q9x8z.jpg?width=640&crop=smart&auto=webp&s=625d5cc7a395ecff11d9b58df20eb949ae92ac7d", 
-                missionMessages);
+        StringBuilder descriptionBuilder = new StringBuilder("");
+        missionMessages.entrySet().stream().forEach(entry -> descriptionBuilder.append(entry.getKey() + " - " + entry.getValue()));
+        return EmbedCreateSpec.builder()
+                .color(Color.TAHITI_GOLD)
+                .title("Missions with Relic Drop")
+                .description("[[" + descriptionBuilder.toString() + "]]")
+                .thumbnail("https://preview.redd.it/99m1fk0q9x8z.jpg?width=640&crop=smart&auto=webp&s=625d5cc7a395ecff11d9b58df20eb949ae92ac7d")
+                .timestamp(Instant.now())
+                .build();
     }
     
     private EmbedCreateSpec generateEmbed(String title, String description, Color color, String thumbnail, Map<String, String> fieldData) {         
