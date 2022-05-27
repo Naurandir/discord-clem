@@ -134,7 +134,7 @@ public class PrimeFarmCommand implements Command {
     
     private EmbedCreateSpec generateEmbedMissions(Map<String, String> missionMessages) {
         StringBuilder descriptionBuilder = new StringBuilder("");
-        missionMessages.entrySet().stream().forEach(entry -> descriptionBuilder.append(entry.getKey() + " - " + entry.getValue()));
+        missionMessages.entrySet().stream().limit(50).forEach(entry -> descriptionBuilder.append(entry.getKey() + " - " + entry.getValue()));
         return EmbedCreateSpec.builder()
                 .color(Color.TAHITI_GOLD)
                 .title("Missions with Relic Drop")
