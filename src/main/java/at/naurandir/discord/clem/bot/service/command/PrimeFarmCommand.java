@@ -39,7 +39,7 @@ public class PrimeFarmCommand implements Command {
         Message message = event.getMessage();
         String item = getItem(event.getMessage().getContent());
         
-        log.info("handle: searching for relics in [{}] relics with input [{}]", 
+        log.info("handle: searching in [{}] relics with input [{}]", 
                 warframeState.getRelics().size(), item);
         
         Set<RelicDropDTO> relicsWithItem = getRelicsWithItem(item, warframeState);
@@ -77,7 +77,7 @@ public class PrimeFarmCommand implements Command {
             RewardDropDTO drop = relic.getRewards().stream()
                     .filter(reward -> reward.getItemName().toLowerCase().contains(item.toLowerCase()))
                     .findFirst().get();
-            relicMessages.putIfAbsent(relic.getTier() + " " + relic.getRelicName(), drop.getItemName() + "(" + drop.getRarity() + ")");
+            relicMessages.putIfAbsent(relic.getTier() + " " + relic.getRelicName(), drop.getItemName());
         }
         return relicMessages;
     }
@@ -85,7 +85,7 @@ public class PrimeFarmCommand implements Command {
     private Map<String, String> getMissionMessages(Set<RelicDropDTO> relicsWithItem, WarframeState warframeState) {
         Map<String, String> missionMessages = new HashMap<>();
         List<String> relicNames = relicsWithItem.stream()
-                .map(relic -> relic.getTier() + " " + relic.getRelicName())
+                .map(relic -> relic.getTier() + " " + relic.getRelicName() + " Relic")
                 .collect(Collectors.toList());
         
         for (String planet : warframeState.getMissions().keySet()) {
