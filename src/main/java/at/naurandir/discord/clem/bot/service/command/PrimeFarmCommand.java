@@ -9,6 +9,7 @@ import discord4j.core.object.entity.Message;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.util.Color;
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,7 +56,8 @@ public class PrimeFarmCommand implements Command {
     
     private String getItem(String content) {
         String[] splitted = content.split(" "); // 'prefix prime-farm <item>'
-        return StringUtils.join(splitted, " ").trim();
+        String[] words = Arrays.copyOfRange(splitted, 2, splitted.length);
+        return StringUtils.join(words, " ").trim();
     }
 
     private Set<RelicDropDTO> getRelicsWithItem(String item, WarframeState warframeState) {
@@ -65,7 +67,6 @@ public class PrimeFarmCommand implements Command {
     }
 
     private boolean rewardContainsItem(List<RewardDropDTO> rewards, String item) {
-        log.debug("rewardContainsItem: check if [{}] is in [{}]", item, rewards);
         return rewards.stream().anyMatch(reward -> reward.getItemName().toLowerCase().contains(item.toLowerCase()));
     }
     
