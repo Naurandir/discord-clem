@@ -89,7 +89,7 @@ public class UpdatePipelinePush extends Push {
     
     @Override
     void doUpdatePush(RestMessage message, WarframeState warframeState) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override

@@ -49,8 +49,8 @@ public class PrimeFarmCommand implements Command {
         Map<String, String> missionMessages = getMissionMessages(relicsWithItem, warframeState);
         
         return event.getMessage().getChannel()
-                .flatMap(channel -> channel.createMessage(generateEmbedRelics(message, relicMessages), 
-                                                          generateEmbedMissions(message, missionMessages)))
+                .flatMap(channel -> channel.createMessage(generateEmbedRelics(relicMessages), 
+                                                          generateEmbedMissions(missionMessages)))
                 .then();
     }
     
@@ -110,6 +110,7 @@ public class PrimeFarmCommand implements Command {
             }
         }
         
+        log.debug("getMissionMessages: got [{}] messages", missionMessages.size());
         return missionMessages;
     }
     
@@ -122,7 +123,7 @@ public class PrimeFarmCommand implements Command {
         nodeMissionMessage.put(title, message);
     }
     
-    private EmbedCreateSpec generateEmbedRelics(Message message, Map<String, String> relicMessages) {
+    private EmbedCreateSpec generateEmbedRelics(Map<String, String> relicMessages) {
         return generateEmbed("Relics with given Item Search", 
                 "The relics that are dropping items with given input.", 
                 Color.ORANGE, 
@@ -130,7 +131,7 @@ public class PrimeFarmCommand implements Command {
                 relicMessages);
     }
     
-    private EmbedCreateSpec generateEmbedMissions(Message message, Map<String, String> missionMessages) {
+    private EmbedCreateSpec generateEmbedMissions(Map<String, String> missionMessages) {
         return generateEmbed("Missions with Relic Drop", 
                 "Missions that drop the found relics in order to farm the relics for desired item. If some Relics are not listed it means they are vaulted.", 
                 Color.TAHITI_GOLD, 
