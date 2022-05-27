@@ -1,11 +1,21 @@
 package at.naurandir.discord.clem.bot.service.client;
 
+import at.naurandir.discord.clem.bot.model.enums.Rarity;
 import at.naurandir.discord.clem.bot.service.client.dto.DropTableDTO;
 import at.naurandir.discord.clem.bot.service.client.dto.WorldStateDTO;
+import at.naurandir.discord.clem.bot.service.client.dto.droptable.MissionDropDTO;
+import at.naurandir.discord.clem.bot.service.client.dto.droptable.MissionRewardDropDTO;
+import at.naurandir.discord.clem.bot.service.client.dto.droptable.RewardDropDTO;
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonSyntaxException;
+import com.google.gson.reflect.TypeToken;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.ParseException;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -41,8 +51,8 @@ public class WarframeClient {
     
     public DropTableDTO getCurrentDropTable() throws IOException {
         DropTableDTO dropTableDtoWithRelicsOnly = getDropTableWithRelics();
-        //DropTableDTO dropTableDtoWithMissionsOnly = getDropTableWithMissions();
-        return new DropTableDTO(dropTableDtoWithRelicsOnly.getRelics(), null);
+        DropTableDTO dropTableDtoWithMissionsOnly = getDropTableWithMissions();
+        return new DropTableDTO(dropTableDtoWithRelicsOnly.getRelics(), dropTableDtoWithMissionsOnly.getMissionRewards());
     }
 
     DropTableDTO getDropTableWithRelics() throws JsonSyntaxException, ParseException, IOException {
@@ -77,12 +87,76 @@ public class WarframeClient {
                 Elements elements = html.getElementsByClass("mw-code");
                 
                 String jsonString = elements.first().text();
-                jsonString = jsonString.replace("return[[", "");
-                jsonString = jsonString.substring(0, jsonString.length() - 2);
+                jsonString = jsonString.replace("return[[", "").replace("}}}]]", "}}}").replace(",{\"_id\":", ",\n{\"_id\":");
                 
-                return gson.fromJson(jsonString, DropTableDTO.class);
+                DropTableDTO dto = gson.fromJson(jsonString, DropTableDTO.class);
+                
+                List<MissionDropDTO> missionDrops = dto.getMissionRewards().values().stream()
+                        .flatMap(map -> map.values().stream())
+                        .collect(Collectors.toList());
+                
+                for (MissionDropDTO missionDrop : missionDrops) {
+                    if (missionDrop.getRewardsObject() instanceof List) {
+                        createGeneralRewards(missionDrop);
+                    } else {
+                        createRotationRewards(missionDrop);
+                    }
+                    
+                    missionDrop.setRewardsObject(null);
+                }
+                
+                return dto;
             }
         }
+    }
+
+    private void createGeneralRewards(MissionDropDTO missionDrop) {
+        List<Object> rewardObjectList = (List) missionDrop.getRewardsObject();
+        List<RewardDropDTO> generalRewards = new ArrayList<>();
+        
+        for (Object element : rewardObjectList) {
+            generalRewards.add(createRewardDrop(element));
+        }
+        
+        MissionRewardDropDTO missionRewardDrop = new MissionRewardDropDTO(List.of(), List.of(), List.of(), generalRewards);
+        missionDrop.setMissionRewards(missionRewardDrop);
+    }
+    
+    private void createRotationRewards(MissionDropDTO missionDrop) {
+        Map<String, List<Object>> rewardObjectMap = (Map<String, List<Object>>) missionDrop.getRewardsObject();
+        List<RewardDropDTO> rotationRewardsA = new ArrayList<>();
+        List<RewardDropDTO> rotationRewardsB = new ArrayList<>();
+        List<RewardDropDTO> rotationRewardsC = new ArrayList<>();
+        
+        if (rewardObjectMap.get("A") != null) {
+            for (Object element : rewardObjectMap.get("A")) {
+                rotationRewardsA.add(createRewardDrop(element));
+            }
+        }
+        
+        if (rewardObjectMap.get("B") != null) {
+            for (Object element : rewardObjectMap.get("B")) {
+                rotationRewardsB.add(createRewardDrop(element));
+            }
+        }
+        
+        if (rewardObjectMap.get("C") != null) {
+            for (Object element : rewardObjectMap.get("C")) {
+                rotationRewardsC.add(createRewardDrop(element));
+            }
+        }
+        
+        MissionRewardDropDTO missionRewardDrop = new MissionRewardDropDTO(rotationRewardsA, rotationRewardsB, rotationRewardsC, List.of());
+        missionDrop.setMissionRewards(missionRewardDrop);
+    }
+    
+    private RewardDropDTO createRewardDrop(Object element) throws NumberFormatException {
+        Map<String, Object> elementMap = (Map<String, Object>) element;
+        RewardDropDTO rewardDrop = new RewardDropDTO();
+        rewardDrop.setItemName((String) elementMap.get("itemName"));
+        rewardDrop.setRarity(Rarity.valueOf(((String) elementMap.get("rarity")).toUpperCase()));
+        rewardDrop.setChance((Double) elementMap.get("chance"));
+        return rewardDrop;
     }
     
     CloseableHttpClient getClient() {

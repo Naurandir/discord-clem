@@ -1,7 +1,6 @@
 package at.naurandir.discord.clem.bot.service.client.dto.droptable;
 
-import java.util.List;
-import java.util.Map;
+import com.google.gson.annotations.SerializedName;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,6 +18,8 @@ public class MissionDropDTO {
 
     private String gameMode;
     private Boolean isEvent;
-    private Map<String, List<RewardDropDTO>> rewards;
+    private MissionRewardDropDTO missionRewards;
     
+    @SerializedName("rewards")
+    private Object rewardsObject;
 }

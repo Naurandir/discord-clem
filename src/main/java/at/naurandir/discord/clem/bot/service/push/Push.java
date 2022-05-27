@@ -94,7 +94,7 @@ public abstract class Push {
                         log.warn("push: it seems a connection reset happened for [{}], ignoring push for message", 
                                 this.getClass().getSimpleName());
                     } else {
-                        log.info("push: update in channel [{}] as [{}] is sticky and expected older message [{}] was found", 
+                        log.info("push: update channel [{}] as [{}] sticky, expected older message [{}] found", 
                                 channelId, this.getClass().getSimpleName(), message.getId());
                         doUpdatePush(message, warframeState);
                     }

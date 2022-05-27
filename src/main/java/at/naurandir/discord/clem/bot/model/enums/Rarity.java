@@ -15,6 +15,7 @@ public enum Rarity {
     @SerializedName("Uncommon")
     UNCOMMON,
     @SerializedName("Rare")
-    RARE;
-    
+    RARE,
+    @SerializedName("Legendary")
+    LEGENDARY;
 }
