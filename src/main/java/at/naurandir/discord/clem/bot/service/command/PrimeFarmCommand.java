@@ -120,6 +120,7 @@ public class PrimeFarmCommand implements Command {
                 + (rotation != null ? "Rotation " + rotation + " - " : null)
                 + rewardDrop.getChance() + " (" 
                 + rewardDrop.getRarity() + ")";
+        log.debug("addMissionData: added {} - {}", title, message);
         nodeMissionMessage.put(title, message);
     }
     
