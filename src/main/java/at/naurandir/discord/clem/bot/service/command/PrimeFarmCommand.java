@@ -16,12 +16,14 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 /**
  *
  * @author Naurandir
  */
+@Component
 public class PrimeFarmCommand implements Command {
 
     @Override
