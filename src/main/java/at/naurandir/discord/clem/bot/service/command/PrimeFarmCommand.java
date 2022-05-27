@@ -37,7 +37,9 @@ public class PrimeFarmCommand implements Command {
     public Mono<Void> handle(MessageCreateEvent event, WarframeState warframeState) {
         Message message = event.getMessage();
         String item = getItem(event.getMessage().getContent());
-        log.info("handle: searching for relics and missions with input [{}]", item);
+        
+        log.info("handle: searching for relics in [{}] relics with input [{}]", 
+                warframeState.getRelics().size(), item);
         
         Set<RelicDropDTO> relicsWithItem = getRelicsWithItem(item, warframeState);
         log.debug("handle: found [{}] relics", relicsWithItem.size());
@@ -63,6 +65,7 @@ public class PrimeFarmCommand implements Command {
     }
 
     private boolean rewardContainsItem(List<RewardDropDTO> rewards, String item) {
+        log.debug("rewardContainsItem: check if [{}] is in [{}]", item, rewards);
         return rewards.stream().anyMatch(reward -> reward.getItemName().toLowerCase().contains(item.toLowerCase()));
     }
     
