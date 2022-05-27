@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
@@ -23,6 +24,7 @@ import reactor.core.publisher.Mono;
  *
  * @author Naurandir
  */
+@Slf4j
 @Component
 public class PrimeFarmCommand implements Command {
 
@@ -35,9 +37,12 @@ public class PrimeFarmCommand implements Command {
     public Mono<Void> handle(MessageCreateEvent event, WarframeState warframeState) {
         Message message = event.getMessage();
         String item = getItem(event.getMessage().getContent());
+        log.info("handle: searching for relics and missions with input [{}]", item);
         
         Set<RelicDropDTO> relicsWithItem = getRelicsWithItem(item, warframeState);
-        Map<String, String> relicMessages = getRelicMessages(relicsWithItem);
+        log.debug("handle: found [{}] relics", relicsWithItem.size());
+        
+        Map<String, String> relicMessages = getRelicMessages(relicsWithItem, item);
         Map<String, String> missionMessages = getMissionMessages(relicsWithItem, warframeState);
         
         return event.getMessage().getChannel()
@@ -48,7 +53,7 @@ public class PrimeFarmCommand implements Command {
     
     private String getItem(String content) {
         String[] splitted = content.split(" "); // 'prefix prime-farm <item>'
-        return StringUtils.join(splitted, " ");
+        return StringUtils.join(splitted, " ").trim();
     }
 
     private Set<RelicDropDTO> getRelicsWithItem(String item, WarframeState warframeState) {
@@ -61,13 +66,15 @@ public class PrimeFarmCommand implements Command {
         return rewards.stream().anyMatch(reward -> reward.getItemName().toLowerCase().contains(item.toLowerCase()));
     }
     
-    private Map<String, String> getRelicMessages(Set<RelicDropDTO> relicsWithItem) {
+    private Map<String, String> getRelicMessages(Set<RelicDropDTO> relicsWithItem, String item) {
         Map<String, String> relicMessages = new HashMap<>();
         
         for (RelicDropDTO relic : relicsWithItem) {
-            
+            RewardDropDTO drop = relic.getRewards().stream()
+                    .filter(reward -> reward.getItemName().toLowerCase().contains(item.toLowerCase()))
+                    .findFirst().get();
+            relicMessages.putIfAbsent(relic.getTier() + " " + relic.getRelicName(), drop.getItemName() + "(" + drop.getRarity() + ")");
         }
-        
         return relicMessages;
     }
 
