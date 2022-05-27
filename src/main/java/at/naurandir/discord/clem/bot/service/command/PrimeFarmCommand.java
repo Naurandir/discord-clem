@@ -118,7 +118,7 @@ public class PrimeFarmCommand implements Command {
         String title = node + " (" + planet + ")";
         String message = rewardDrop.getItemName() + " - "
                 + (rotation != null ? "Rotation " + rotation + " - " : "")
-                + rewardDrop.getChance() + "% drop change (" 
+                + rewardDrop.getChance() + "% (" 
                 + rewardDrop.getRarity().toString().toLowerCase() + ")";
         log.debug("addMissionData: added {} - {}", title, message);
         nodeMissionMessage.put(title, message);
@@ -134,7 +134,7 @@ public class PrimeFarmCommand implements Command {
     
     private EmbedCreateSpec generateEmbedMissions(Map<String, String> missionMessages) {
         StringBuilder descriptionBuilder = new StringBuilder("");
-        missionMessages.entrySet().stream().limit(30).forEach(entry -> 
+        missionMessages.entrySet().stream().limit(20).forEach(entry -> 
                 descriptionBuilder.append("***" + entry.getKey() + "*** - " + entry.getValue() + "\n"));
         return EmbedCreateSpec.builder()
                 .color(Color.TAHITI_GOLD)
