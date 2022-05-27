@@ -8,6 +8,7 @@ import at.naurandir.discord.clem.bot.service.client.dto.worldstate.VoidFissureDT
 import at.naurandir.discord.clem.bot.service.client.dto.worldstate.CambionCycleDTO;
 import com.google.gson.annotations.SerializedName;
 import java.util.List;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -19,6 +20,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
+@EqualsAndHashCode
 public class WorldStateDTO {
     
     @SerializedName("alerts")

@@ -68,10 +68,7 @@ public class WarframeState {
     }
     
     private void checkWorldStateDataChanged(WorldStateDTO newWorldState) {
-        setAlertsStateChanged((getAlerts() == null && newWorldState.getAlertsDTO() != null) ||
-                (getAlerts() != null && newWorldState.getAlertsDTO() == null) ||
-                getAlerts().size() != newWorldState.getAlertsDTO().size());
-        
+        setAlertsStateChanged(!Objects.equals(getAlerts(), newWorldState.getAlertsDTO()));        
         setVoidTraderStateChanged(!Objects.equals(getVoidTrader().getActive(),
                 newWorldState.getVoidTraderDTO().getActive()));
     }

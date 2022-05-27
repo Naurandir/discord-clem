@@ -2,6 +2,7 @@ package at.naurandir.discord.clem.bot.service.client.dto.worldstate;
 
 import com.google.gson.annotations.SerializedName;
 import java.util.List;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -13,6 +14,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
+@EqualsAndHashCode
 public class VoidTraderDTO {
     
     private String id;
@@ -29,6 +31,7 @@ public class VoidTraderDTO {
     @Getter
     @Setter
     @ToString
+    @EqualsAndHashCode
     public class VoidTraderInventoryDTO {
         
         private String item;
