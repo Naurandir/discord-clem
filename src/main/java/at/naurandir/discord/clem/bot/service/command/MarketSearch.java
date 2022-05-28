@@ -28,7 +28,7 @@ import reactor.core.publisher.Mono;
  */
 @Slf4j
 @Component
-public class MarketBuy implements Command {
+public class MarketSearch implements Command {
     
     private static final String BUY_DESCRIPTION = "***{platinum} Platinum*** User *{user}* - use\n`/w {user} Hi! I want to buy: {item} for {platinum} platinum. (warframe.market)`\n\n";
 
@@ -37,7 +37,7 @@ public class MarketBuy implements Command {
     
     @Override
     public String getCommandWord() {
-        return "market-buy";
+        return "market-search";
     }
 
     @Override
