@@ -32,11 +32,16 @@ public class RelicDropCommand implements Command {
     private static final String MISSION_SEARCH_TITLE = "Missions with Relic Drop for '{item}'";
     
     private static final String MISSION_DATA = "***{title}*** - {info}\n";
-    private static final String MISSION_SPECIFIC_INFO = "{item} ({dropChance}) {rotation}";
+    private static final String MISSION_SPECIFIC_INFO = "{item} ({dropChance}%) {rotation}";
 
     @Override
     public String getCommandWord() {
         return "relic-drop";
+    }
+    
+    @Override
+    public String getDescription() {
+        return "Shows all Relics that drop a specific item. It also shows related missions where to farm that relics. Usage: <bot-prefix> relic-drop <item>.";
     }
 
     @Override
@@ -122,7 +127,7 @@ public class RelicDropCommand implements Command {
         String title = node + " (" + planet + ")";
         String message = MISSION_SPECIFIC_INFO.replace("{item}", rewardDrop.getItemName())
                 .replace("{dropChance}", String.valueOf(rewardDrop.getChance()))
-                .replace("rotation",(rotation != null ? "Rot " + rotation : ""));
+                .replace("{rotation}",(rotation != null ? "Rot " + rotation : ""));
         nodeMissionMessage.put(title, message);
     }
     

@@ -1,7 +1,6 @@
 package at.naurandir.discord.clem.bot.service.command;
 
 import at.naurandir.discord.clem.bot.model.WarframeState;
-import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import reactor.core.publisher.Mono;
 
@@ -12,5 +11,6 @@ import reactor.core.publisher.Mono;
 public interface Command {
     
     String getCommandWord();
+    String getDescription();
     Mono<Void> handle(MessageCreateEvent event, WarframeState warframeState);
 }
