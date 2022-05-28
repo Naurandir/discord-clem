@@ -30,7 +30,8 @@ import reactor.core.publisher.Mono;
 public class MarketSearch implements Command {
     
     private static final String BUY_DESCRIPTION = "***{platinum} Platinum*** User *{user}* - use\n`/w {user} Hi! I want to buy: {item} for {platinum} platinum. (warframe.market)`\n\n";
-
+    private static final String ASSETS_BASE_URL = "https://warframe.market/static/assets/";
+    
     private WarframeClient warframeClient = new WarframeClient();
     
     @Override
@@ -112,7 +113,7 @@ public class MarketSearch implements Command {
                 .color(Color.DEEP_SEA)
                 .title(entry.getKey().getItemName())
                 .description(description.toString())
-                .thumbnail(entry.getKey().getThumb())
+                .thumbnail(ASSETS_BASE_URL + entry.getKey().getThumb())
                 .timestamp(Instant.now())
                 .build();
             
