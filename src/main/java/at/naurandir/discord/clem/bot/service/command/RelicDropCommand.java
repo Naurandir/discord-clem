@@ -5,7 +5,6 @@ import at.naurandir.discord.clem.bot.service.client.dto.droptable.MissionDropDTO
 import at.naurandir.discord.clem.bot.service.client.dto.droptable.RelicDropDTO;
 import at.naurandir.discord.clem.bot.service.client.dto.droptable.RewardDropDTO;
 import discord4j.core.event.domain.message.MessageCreateEvent;
-import discord4j.core.object.entity.Message;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.util.Color;
 import java.time.Instant;
@@ -13,7 +12,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -27,16 +25,22 @@ import reactor.core.publisher.Mono;
  */
 @Slf4j
 @Component
-public class PrimeFarmCommand implements Command {
+public class RelicDropCommand implements Command {
+    
+    private static final String RELIC_SEARCH_TITLE = "Relics with '{item}' Drop";
+    private static final String RELIC_SEARCH_DESCRIPTION = "Relics that drop desired item, note some can be vaulted.";
+    private static final String MISSION_SEARCH_TITLE = "Missions with Relic Drop for '{item}'";
+    
+    private static final String MISSION_DATA = "***{title}*** - {info}\n";
+    private static final String MISSION_SPECIFIC_INFO = "{item} ({dropChance}) {rotation}";
 
     @Override
     public String getCommandWord() {
-        return "prime-farm";
+        return "relic-drop";
     }
 
     @Override
     public Mono<Void> handle(MessageCreateEvent event, WarframeState warframeState) {
-        Message message = event.getMessage();
         String item = getItem(event.getMessage().getContent());
         
         log.info("handle: searching in [{}] relics with input [{}]", 
@@ -49,8 +53,8 @@ public class PrimeFarmCommand implements Command {
         Map<String, String> missionMessages = getMissionMessages(relicsWithItem, warframeState);
         
         return event.getMessage().getChannel()
-                .flatMap(channel -> channel.createMessage(generateEmbedRelics(relicMessages), 
-                                                          generateEmbedMissions(missionMessages)))
+                .flatMap(channel -> channel.createMessage(generateEmbedRelics(item, relicMessages), 
+                                                          generateEmbedMissions(item, missionMessages)))
                 .then();
     }
     
@@ -116,33 +120,31 @@ public class PrimeFarmCommand implements Command {
     
     private void addMissionData(Map<String, String> nodeMissionMessage, String planet, String node, RewardDropDTO rewardDrop, String rotation) {
         String title = node + " (" + planet + ")";
-        String message = rewardDrop.getItemName() + " - "
-                + (rotation != null ? "Rotation " + rotation + " - " : "")
-                + rewardDrop.getChance() + "% (" 
-                + rewardDrop.getRarity().toString().toLowerCase() + ")";
-        log.debug("addMissionData: added {} - {}", title, message);
+        String message = MISSION_SPECIFIC_INFO.replace("{item}", rewardDrop.getItemName())
+                .replace("{dropChance}", String.valueOf(rewardDrop.getChance()))
+                .replace("rotation",(rotation != null ? "Rot " + rotation : ""));
         nodeMissionMessage.put(title, message);
     }
     
-    private EmbedCreateSpec generateEmbedRelics(Map<String, String> relicMessages) {
-        return generateEmbed("Relics with given Item Search", 
-                "The relics that are dropping items with given input.", 
+    private EmbedCreateSpec generateEmbedRelics(String item, Map<String, String> relicMessages) {
+        return generateEmbed(RELIC_SEARCH_TITLE.replace("{item}", item), 
+                RELIC_SEARCH_DESCRIPTION, 
                 Color.ORANGE, 
                 "https://static.wikia.nocookie.net/warframe/images/0/0e/VoidProjectionsGoldD.png/revision/latest?cb=20160709035734", 
                 relicMessages);
     }
     
-    private EmbedCreateSpec generateEmbedMissions(Map<String, String> missionMessages) {
+    private EmbedCreateSpec generateEmbedMissions(String item, Map<String, String> missionMessages) {
         StringBuilder descriptionBuilder = new StringBuilder("");
         missionMessages.entrySet().stream().limit(20).forEach(entry -> 
-                descriptionBuilder.append("***" + entry.getKey() + "*** - " + entry.getValue() + "\n"));
-        return EmbedCreateSpec.builder()
-                .color(Color.TAHITI_GOLD)
-                .title("Missions with Relic Drop")
-                .description(descriptionBuilder.toString())
-                .thumbnail("https://preview.redd.it/99m1fk0q9x8z.jpg?width=640&crop=smart&auto=webp&s=625d5cc7a395ecff11d9b58df20eb949ae92ac7d")
-                .timestamp(Instant.now())
-                .build();
+                descriptionBuilder.append(MISSION_DATA.replace("{title}",entry.getKey())
+                        .replace("{info}", entry.getValue())));
+        
+        return generateEmbed(MISSION_SEARCH_TITLE.replace("{item}", item),
+                descriptionBuilder.toString(),
+                Color.TAHITI_GOLD,
+                "https://preview.redd.it/99m1fk0q9x8z.jpg?width=640&crop=smart&auto=webp&s=625d5cc7a395ecff11d9b58df20eb949ae92ac7d",
+                Map.of());
     }
     
     private EmbedCreateSpec generateEmbed(String title, String description, Color color, String thumbnail, Map<String, String> fieldData) {         
@@ -153,9 +155,7 @@ public class PrimeFarmCommand implements Command {
                 .thumbnail(thumbnail)
                 .timestamp(Instant.now());
         
-        for (Entry<String, String> entry : fieldData.entrySet()) {
-            embedBuilder.addField(entry.getKey(), entry.getValue(), true);
-        }
+        fieldData.entrySet().forEach(entry -> embedBuilder.addField(entry.getKey(), entry.getValue(), true));
         
         return embedBuilder.build();
     }
