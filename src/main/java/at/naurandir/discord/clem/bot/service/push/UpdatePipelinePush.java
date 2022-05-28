@@ -70,7 +70,7 @@ public class UpdatePipelinePush extends Push {
                 if (!alert.getActive()) {
                     continue;
                 }
-                message += "*" + alert.getMission() + "* - " + StringUtils.join(", ", alert.getRewardTypes()) +"\n";
+                alerts += "*" + alert.getMission() + "* - " + StringUtils.join(", ", alert.getRewardTypes()) +"\n";
             }
             
             // we only send a message if we got minimum 1 active alert to be shown.

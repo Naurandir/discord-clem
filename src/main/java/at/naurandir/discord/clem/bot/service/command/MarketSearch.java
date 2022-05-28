@@ -18,7 +18,6 @@ import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
@@ -32,8 +31,7 @@ public class MarketSearch implements Command {
     
     private static final String BUY_DESCRIPTION = "***{platinum} Platinum*** User *{user}* - use\n`/w {user} Hi! I want to buy: {item} for {platinum} platinum. (warframe.market)`\n\n";
 
-    @Autowired
-    private WarframeClient warframeClient;
+    private WarframeClient warframeClient = new WarframeClient();
     
     @Override
     public String getCommandWord() {
