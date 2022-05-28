@@ -143,4 +143,16 @@ public class BotService {
         }
     }
     
+    
+    /**
+     * once per day we refresh the market data
+     */
+    @Scheduled(fixedRate = 24 * 60 * 60 * 1_000)
+    public void refreshMarket() {
+        try {
+            worldStateService.refreshMarket();
+        } catch (Exception ex) {
+            log.error("refreshMarket: update throwed exception: ", ex);
+        }
+    }
 }

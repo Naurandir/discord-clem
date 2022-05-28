@@ -3,6 +3,7 @@ package at.naurandir.discord.clem.bot.service;
 import at.naurandir.discord.clem.bot.model.WarframeState;
 import at.naurandir.discord.clem.bot.service.client.WarframeClient;
 import at.naurandir.discord.clem.bot.service.client.dto.DropTableDTO;
+import at.naurandir.discord.clem.bot.service.client.dto.MarketDTO;
 import at.naurandir.discord.clem.bot.service.client.dto.WorldStateDTO;
 import java.io.IOException;
 import javax.annotation.PostConstruct;
@@ -25,8 +26,9 @@ public class WorldStateService {
         warframeClient = new WarframeClient();
         WorldStateDTO newWorldState = warframeClient.getCurrentWorldState();
         DropTableDTO newDropTable = warframeClient.getCurrentDropTable();
+        MarketDTO newMarket = warframeClient.getCurrentMarket();
         
-        warframeState = new WarframeState(newWorldState, newDropTable);
+        warframeState = new WarframeState(newWorldState, newDropTable, newMarket);
     }
     
     public WarframeState getWarframeState() {
@@ -37,7 +39,7 @@ public class WorldStateService {
         try {
             WorldStateDTO newWorldState = warframeClient.getCurrentWorldState();
             log.debug("refreshWorldState: received dto.");
-            warframeState.updateByWorldState(newWorldState);
+            warframeState.refreshWorldState(newWorldState);
         } catch (Exception ex) {
             log.error("refreshWorldState: update throwed exception: ", ex);
         }
@@ -47,9 +49,19 @@ public class WorldStateService {
         try {
             DropTableDTO dropTable = warframeClient.getCurrentDropTable();
             log.debug("refreshDropTable: received dto.");
-            warframeState.updateDropTableData(dropTable);
+            warframeState.refreshDropTableData(dropTable);
         } catch (Exception ex) {
             log.error("refreshDropTable: update throwed exception: ", ex);
+        }
+    }
+    
+    public void refreshMarket() {
+        try {
+            MarketDTO market = warframeClient.getCurrentMarket();
+            log.debug("refreshMarket: received dto.");
+            warframeState.refreshMarketData(market);
+        } catch (Exception ex) {
+            log.error("refreshMarket: update throwed exception: ", ex);
         }
     }
 }

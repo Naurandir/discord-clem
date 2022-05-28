@@ -2,10 +2,12 @@ package at.naurandir.discord.clem.bot.service.client;
 
 import at.naurandir.discord.clem.bot.model.enums.Rarity;
 import at.naurandir.discord.clem.bot.service.client.dto.DropTableDTO;
+import at.naurandir.discord.clem.bot.service.client.dto.MarketDTO;
 import at.naurandir.discord.clem.bot.service.client.dto.WorldStateDTO;
 import at.naurandir.discord.clem.bot.service.client.dto.droptable.MissionDropDTO;
 import at.naurandir.discord.clem.bot.service.client.dto.droptable.MissionRewardDropDTO;
 import at.naurandir.discord.clem.bot.service.client.dto.droptable.RewardDropDTO;
+import at.naurandir.discord.clem.bot.service.client.dto.market.MarketOrdersResultDTO;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonSyntaxException;
@@ -45,6 +47,33 @@ public class WarframeClient {
                 log.info("getCurrentWorldState: received http status [{}]", response.getStatusLine());
                 String jsonString = getHttpContent(response);
                 return gson.fromJson(jsonString, WorldStateDTO.class);
+            }
+        }
+    }
+    
+    public MarketDTO getCurrentMarket() throws IOException {
+        try (CloseableHttpClient httpClient = getClient()) {
+            HttpGet httpGet = new HttpGet("https://api.warframe.market/v1/items");
+            httpGet.addHeader("Language", "en");
+            
+            try (CloseableHttpResponse response = httpClient.execute(httpGet)) {
+                log.info("getCurrentWarframeMarket: received http status [{}]", response.getStatusLine());
+                String jsonString = getHttpContent(response);
+                return gson.fromJson(jsonString, MarketDTO.class);
+            }
+        }
+    }
+    
+    public MarketOrdersResultDTO getCurrentOrders(String urlName) throws IOException {
+        try (CloseableHttpClient httpClient = getClient()) {
+            HttpGet httpGet = new HttpGet("https://api.warframe.market/v1/items/" + urlName + "/orders");
+            httpGet.addHeader("Language", "en");
+            httpGet.addHeader("Platform", "pc");
+            
+            try (CloseableHttpResponse response = httpClient.execute(httpGet)) {
+                log.info("getCurrentOrders: received http status [{}]", response.getStatusLine());
+                String jsonString = getHttpContent(response);
+                return gson.fromJson(jsonString, MarketOrdersResultDTO.class);
             }
         }
     }
