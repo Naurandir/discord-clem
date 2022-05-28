@@ -29,10 +29,10 @@ import reactor.core.publisher.Mono;
 @Component
 public class MarketSearch implements Command {
     
-    private static final String BUY_DESCRIPTION = "***{platinum} Platinum*** User *{user}* - use\n`/w {user} Hi! I want to buy: {item} for {platinum} platinum. (warframe.market)`\n\n";
+    private static final String BUY_DESCRIPTION = "***{platinum} Platinum*** User *{user}*\n`/w {user} Hi! I want to buy: {item} for {platinum} platinum. Greetings :)`\n\n";
     private static final String ASSETS_BASE_URL = "https://warframe.market/static/assets/";
     
-    private WarframeClient warframeClient = new WarframeClient();
+    private final WarframeClient warframeClient = new WarframeClient();
     
     @Override
     public String getCommandWord() {
@@ -41,8 +41,8 @@ public class MarketSearch implements Command {
 
     @Override
     public String getDescription() {
-        return "Shows current prices of an item on the warframe market. "
-                + "Note it shows maximum up to 5 different items with similar name and max 5 current prices. "
+        return "Shows current prices of an item on the warframe market.\n"
+                + "Note it shows maximum up to 5 different items with similar name and max 5 current prices. \n"
                 + "Usage: *<bot-prefix> market-search <item>*.";
     }
 

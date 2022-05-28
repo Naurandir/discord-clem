@@ -41,7 +41,9 @@ public class RelicDropCommand implements Command {
     
     @Override
     public String getDescription() {
-        return "Shows all Relics that drop a specific item. It also shows related missions where to farm that relics. Usage: *<bot-prefix> relic-drop <item>*.";
+        return "Shows all Relics that drop a specific item.\n"
+                + "It also shows related missions where to farm that relics.\n"
+                + "Usage: *<bot-prefix> relic-drop <item>*.";
     }
 
     @Override
