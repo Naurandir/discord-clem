@@ -29,7 +29,7 @@ import reactor.core.publisher.Mono;
 @Component
 public class MarketSearch implements Command {
     
-    private static final String BUY_DESCRIPTION = "***{platinum} Platinum*** User *{user}*\n`/w {user} Hi! I want to buy: {item} for {platinum} platinum. Greetings :)`\n\n";
+    private static final String BUY_DESCRIPTION = "***{platinum} Platinum*** User *{user}* (Reputation {reputation})\n`/w {user} Hi! I want to buy: {item} for {platinum} platinum. Greetings :)`\n\n";
     private static final String ASSETS_BASE_URL = "https://warframe.market/static/assets/";
     
     private final WarframeClient warframeClient = new WarframeClient();
@@ -107,7 +107,8 @@ public class MarketSearch implements Command {
                 .replace("{platinum}", String.valueOf(order.getPlatinum()))
                 .replace("{platinum}", String.valueOf(order.getPlatinum()))
                 .replace("{user}", order.getUser().getName())
-                .replace("{user}", order.getUser().getName())));
+                .replace("{user}", order.getUser().getName())
+                .replace("{reputation}", String.valueOf(order.getUser().getReputation()))));
             
             EmbedCreateSpec embed= EmbedCreateSpec.builder()
                 .color(Color.DEEP_SEA)
