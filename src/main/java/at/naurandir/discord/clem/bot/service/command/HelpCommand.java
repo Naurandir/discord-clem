@@ -51,7 +51,7 @@ public class HelpCommand implements Command {
                 .color(Color.BISMARK)
                 .title("List of available Commands")
                 .description(description)
-                .thumbnail("")
+                .thumbnail("https://content.invisioncic.com/Mwarframe/pages_media/1_HannahIvara.png")
                 .timestamp(Instant.now())
                 .build();
     }

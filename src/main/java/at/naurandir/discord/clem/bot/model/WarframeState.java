@@ -10,6 +10,7 @@ import at.naurandir.discord.clem.bot.service.client.dto.worldstate.VoidTraderDTO
 import at.naurandir.discord.clem.bot.service.client.dto.WorldStateDTO;
 import at.naurandir.discord.clem.bot.service.client.dto.droptable.MissionDropDTO;
 import at.naurandir.discord.clem.bot.service.client.dto.droptable.RelicDropDTO;
+import at.naurandir.discord.clem.bot.service.client.dto.worldstate.EarthCycleDTO;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -30,6 +31,7 @@ public class WarframeState {
     private List<AlertDTO> alerts;
     private List<VoidFissureDTO> fissures;
     
+    private EarthCycleDTO earthCycle;
     private CetusCycleDTO cetusCycle;
     private VallisCycleDTO vallisCycle;
     private CambionCycleDTO cambionCycle;
@@ -62,6 +64,7 @@ public class WarframeState {
         fissures = newWorldState.getFissuresDTO();
         Collections.sort(fissures, voidFissureComparator);
 
+        earthCycle = newWorldState.getEarthCycleDTO();
         cetusCycle = newWorldState.getCetusCycleDTO();
         vallisCycle = newWorldState.getVallisCycleDTO();
         cambionCycle = newWorldState.getCambionCycleDTO();
@@ -73,7 +76,7 @@ public class WarframeState {
                 newWorldState.getVoidTraderDTO().getActive()));
     }
     
-    public void updateDropTableData(DropTableDTO dropTable) {
+    public final void updateDropTableData(DropTableDTO dropTable) {
         relics = dropTable.getRelics();
         missions = dropTable.getMissionRewards();
     }

@@ -6,6 +6,7 @@ import at.naurandir.discord.clem.bot.service.client.dto.worldstate.AlertDTO;
 import at.naurandir.discord.clem.bot.service.client.dto.worldstate.VallisCycleDTO;
 import at.naurandir.discord.clem.bot.service.client.dto.worldstate.VoidFissureDTO;
 import at.naurandir.discord.clem.bot.service.client.dto.worldstate.CambionCycleDTO;
+import at.naurandir.discord.clem.bot.service.client.dto.worldstate.EarthCycleDTO;
 import com.google.gson.annotations.SerializedName;
 import java.util.List;
 import lombok.EqualsAndHashCode;
@@ -28,6 +29,9 @@ public class WorldStateDTO {
     
     @SerializedName("fissures")
     private List<VoidFissureDTO> fissuresDTO;
+    
+    @SerializedName("earthCycle")
+    private EarthCycleDTO earthCycleDTO;
     
     @SerializedName("cetusCycle")
     private CetusCycleDTO cetusCycleDTO;

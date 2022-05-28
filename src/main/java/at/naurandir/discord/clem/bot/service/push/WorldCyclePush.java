@@ -76,9 +76,15 @@ public class WorldCyclePush extends Push {
         LocalDateTime now = LocalDateTime.now();
         
         // earth
+        Duration diffTime = LocalDateTimeUtil.getDiffTime(now, warframeState.getEarthCycle().getExpiry());
+        embedBuilder.addField("Earth",
+                STATE_MESSAGE.replace("{state}", warframeState.getEarthCycle().getState())
+                             .replace("{hours}", String.valueOf(diffTime.toHours()))
+                             .replace("{minutes}", String.valueOf(diffTime.toMinutesPart())),
+                true);
         
         // cetus
-        Duration diffTime = LocalDateTimeUtil.getDiffTime(now, warframeState.getCetusCycle().getExpiry());
+        diffTime = LocalDateTimeUtil.getDiffTime(now, warframeState.getCetusCycle().getExpiry());
         embedBuilder.addField("Cetus",
                 STATE_MESSAGE.replace("{state}", warframeState.getCetusCycle().getState())
                              .replace("{hours}", String.valueOf(diffTime.toHours()))
