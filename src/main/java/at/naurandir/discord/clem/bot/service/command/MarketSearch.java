@@ -42,7 +42,7 @@ public class MarketSearch implements Command {
     @Override
     public String getDescription() {
         return "Shows current prices of an item on the warframe market.\n"
-                + "Note it shows maximum up to 5 different items with similar name and max 5 current prices. \n"
+                + "Note it shows maximum up to 5 different items with similar name and max 3 current lowest prices. \n"
                 + "Usage: *<bot-prefix> market-search <item>*.";
     }
 
@@ -84,7 +84,7 @@ public class MarketSearch implements Command {
             foundOrders = foundOrders.stream()
                     .filter(order -> order.getOrderType() == OrderType.SELL)
                     .sorted((order1, order2) -> order1.getPlatinum().compareTo(order2.getPlatinum()))
-                    .limit(5)
+                    .limit(3)
                     .collect(Collectors.toList());
             
             itemOrders.put(marketItem, foundOrders);
