@@ -6,7 +6,6 @@ import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.util.Color;
 import java.time.Instant;
 import java.util.List;
-import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -20,10 +19,10 @@ import reactor.core.publisher.Mono;
 @Component
 public class HelpCommand implements Command {
     
-    private static final String COMMAND_DESCRIPTION = "***{command}*** - {description}\n";
+    private static final String COMMAND_DESCRIPTION = "***{command}*** - {description}\n\n";
     
     @Autowired
-    List<Command> commands;
+    private List<Command> commands;
     
     @Override
     public String getCommandWord() {
@@ -51,7 +50,7 @@ public class HelpCommand implements Command {
                 .color(Color.BISMARK)
                 .title("List of available Commands")
                 .description(description)
-                .thumbnail("https://content.invisioncic.com/Mwarframe/pages_media/1_HannahIvara.png")
+                .thumbnail("https://content.invisioncic.com/Mwarframe/pages_media/1_GlyphClem.png")
                 .timestamp(Instant.now())
                 .build();
     }
