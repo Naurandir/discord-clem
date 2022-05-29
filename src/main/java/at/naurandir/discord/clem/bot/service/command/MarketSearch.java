@@ -49,6 +49,12 @@ public class MarketSearch implements Command {
     @Override
     public Mono<Void> handle(MessageCreateEvent event, WarframeState warframeState) {
         String item = getItem(event.getMessage().getContent());
+        if (item.length() < 3) {
+            return event.getMessage().getChannel()
+                .flatMap(channel -> channel.createMessage("The given input [" + item + "] is too short. Please provide a longer name to search"))
+                .then();
+        }
+        
         List<MarketItemDTO> foundMarketItems = getMarketItems(item, warframeState.getMarketItems());
         
         Map<MarketItemDTO, List<MarketOrderDTO>> foundSellOrders = getSellOrders(foundMarketItems);

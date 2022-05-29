@@ -91,7 +91,7 @@ public abstract class Push {
                                 channelId, this.getClass().getSimpleName());
                         doNewPush(client, warframeState, channelSnowflake);
                     } else if (MESSAGE_ALLOWED_ERROR.equals(message)) {
-                        log.warn("push: it seems a connection reset happened for [{}], ignoring push for message", 
+                        log.warn("push: it seems an allowed error happend for [{}], ignoring push for message", 
                                 this.getClass().getSimpleName());
                     } else {
                         log.info("push: update channel [{}] as [{}] sticky, expected older message [{}] found", 
@@ -112,7 +112,7 @@ public abstract class Push {
         } catch (Exception ex) {
             log.warn("getMessageById: could not obtain message, error: {}", ex.getMessage());
             
-            if (ex.getMessage().contains("Connection reset by peer") || ex.getClass().equals(InterruptedException.class)) {
+            if (ex.getMessage().contains("Connection reset by peer") || ex.getMessage().contains("InterruptedException")) {
                 return MESSAGE_ALLOWED_ERROR;
             }
         }

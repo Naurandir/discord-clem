@@ -50,6 +50,12 @@ public class RelicDropCommand implements Command {
     public Mono<Void> handle(MessageCreateEvent event, WarframeState warframeState) {
         String item = getItem(event.getMessage().getContent());
         
+        if (item.length() < 3) {
+            return event.getMessage().getChannel()
+                .flatMap(channel -> channel.createMessage("The given input [" + item + "] is too short. Please provide a longer name to search"))
+                .then();
+        }
+        
         log.info("handle: searching in [{}] relics with input [{}]", 
                 warframeState.getRelics().size(), item);
         
