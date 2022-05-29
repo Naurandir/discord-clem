@@ -106,9 +106,9 @@ public class WarframeClient {
         
         for (int i=0; i<relicRewards.size()-8; i+=8) {
             String[] titleSplitted = relicRewards.get(i).selectFirst("th").text().split(" ");
-            String name = titleSplitted[0];
-            String tier = titleSplitted[1];
-            String relicKey = titleSplitted[0] + " " + titleSplitted[1];
+            String tier = titleSplitted[0];
+            String name = titleSplitted[1];
+            String relicKey = titleSplitted[1] + " " + titleSplitted[0];
             
             RelicDTO relicDrop = relics.get(relicKey);
             if (relicDrop != null) {
