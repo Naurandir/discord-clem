@@ -64,6 +64,7 @@ public class RelicDropCommand implements Command {
         
         Map<String, String> relicMessages = getRelicMessages(relicsWithItem, item);
         List<String> missionMessages = getMissionMessages(missionsWithRelics, item);
+        log.debug("handle: got [{}] mission messages", missionMessages.size());
         
         return event.getMessage().getChannel()
                 .flatMap(channel -> channel.createMessage(generateEmbedRelics(item, relicMessages), 
