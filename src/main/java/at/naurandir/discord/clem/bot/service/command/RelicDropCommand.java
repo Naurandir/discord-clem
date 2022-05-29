@@ -63,7 +63,7 @@ public class RelicDropCommand implements Command {
         log.debug("handle: found [{}] relics and [{}] missions", relicsWithItem.size(), missionsWithRelics.size());
         
         Map<String, String> relicMessages = getRelicMessages(relicsWithItem, item);
-        List<String> missionMessages = getMissionMessages(missionsWithRelics, item);
+        List<String> missionMessages = getMissionMessages(missionsWithRelics, relicsWithItem);
         log.debug("handle: got [{}] mission messages", missionMessages.size());
         
         return event.getMessage().getChannel()
@@ -156,30 +156,28 @@ public class RelicDropCommand implements Command {
         return relicMessages;
     }
 
-    private List<String> getMissionMessages(List<MissionDTO> missionsWithRelics, String item) {
+    private List<String> getMissionMessages(List<MissionDTO> missionsWithRelics, List<RelicDTO> relicsWithItem) {
         List<String> missionMessages = new ArrayList<>();
-        log.debug("getMissionMessages: checking against item [{}]", item);
+        List<String> relicItemNames = relicsWithItem.stream()
+                .map(relic -> relic.getTier() + " " + relic.getName() + " Relic")
+                .collect(Collectors.toList());
         
         for (MissionDTO mission : missionsWithRelics) {
             List<RewardDTO> rewardsWithItemGeneral = mission.getRewardsRotationGeneral().stream()
-                    .filter(reward -> reward.getReward().toLowerCase().contains(item.toLowerCase()))
+                    .filter(reward -> relicItemNames.contains(reward.getReward()))
                     .collect(Collectors.toList());
-            log.debug("getMissionMessages: got [{}] rewards general", rewardsWithItemGeneral.size());
             
             List<RewardDTO> rewardsWithItemRotationA = mission.getRewardsRotationA().stream()
-                    .filter(reward -> reward.getReward().toLowerCase().contains(item.toLowerCase()))
+                    .filter(reward -> relicItemNames.contains(reward.getReward()))
                     .collect(Collectors.toList());
-            log.debug("getMissionMessages: got [{}] rewards a", rewardsWithItemGeneral.size());
             
             List<RewardDTO> rewardsWithItemRotationB = mission.getRewardsRotationB().stream()
-                    .filter(reward -> reward.getReward().toLowerCase().contains(item.toLowerCase()))
+                    .filter(reward -> relicItemNames.contains(reward.getReward()))
                     .collect(Collectors.toList());
-            log.debug("getMissionMessages: got [{}] rewards b", rewardsWithItemGeneral.size());
             
             List<RewardDTO> rewardsWithItemRotationC = mission.getRewardsRotationC().stream()
-                    .filter(reward -> reward.getReward().toLowerCase().contains(item.toLowerCase()))
+                    .filter(reward -> relicItemNames.contains(reward.getReward()))
                     .collect(Collectors.toList());
-            log.debug("getMissionMessages: got [{}] rewards c", rewardsWithItemRotationC.size());
             
             rewardsWithItemGeneral.forEach(reward -> missionMessages.add(MISSION_DATA
                     .replace("{title}", mission.getName())
