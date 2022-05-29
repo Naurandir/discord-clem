@@ -31,7 +31,7 @@ public class RelicDropCommand implements Command {
     private static final String RELIC_SEARCH_DESCRIPTION = "Relics that drop desired item, note some can be vaulted.";
     private static final String MISSION_SEARCH_TITLE = "Missions with Relic Drop for '{item}'";
     
-    private static final String MISSION_DATA = "***{title}*** - {item} ({dropChance}%) {rotation}\n";
+    private static final String MISSION_DATA = "***{title}*** - {item} {rotation} ({dropChance}%)\n";
 
     @Override
     public String getCommandWord() {
@@ -122,7 +122,7 @@ public class RelicDropCommand implements Command {
     
     private EmbedCreateSpec generateEmbedMissions(String item, List<String> missionMessages) {
         StringBuilder descriptionBuilder = new StringBuilder("");
-        missionMessages.stream().limit(20).forEach(entry -> descriptionBuilder.append(entry).append("\n"));
+        missionMessages.stream().limit(20).forEach(entry -> descriptionBuilder.append(entry));
         
         return generateEmbed(MISSION_SEARCH_TITLE.replace("{item}", item),
                 descriptionBuilder.toString(),
@@ -182,21 +182,25 @@ public class RelicDropCommand implements Command {
             rewardsWithItemGeneral.forEach(reward -> missionMessages.add(MISSION_DATA
                     .replace("{title}", mission.getName())
                     .replace("{item}", reward.getReward())
+                    .replace(" {rotation}","")
                     .replace("{dropChance}", String.valueOf(reward.getChance().get(0)))));
             
             rewardsWithItemRotationA.forEach(reward -> missionMessages.add(MISSION_DATA
                     .replace("{title}", mission.getName())
                     .replace("{item}", reward.getReward())
+                    .replace("{rotation}","Rotation A")
                     .replace("{dropChance}", String.valueOf(reward.getChance().get(0)))));
             
             rewardsWithItemRotationB.forEach(reward -> missionMessages.add(MISSION_DATA
                     .replace("{title}", mission.getName())
                     .replace("{item}", reward.getReward())
+                    .replace("{rotation}","Rotation B")
                     .replace("{dropChance}", String.valueOf(reward.getChance().get(0)))));
             
             rewardsWithItemRotationC.forEach(reward -> missionMessages.add(MISSION_DATA
                     .replace("{title}", mission.getName())
                     .replace("{item}", reward.getReward())
+                    .replace("{rotation}","Rotation C")
                     .replace("{dropChance}", String.valueOf(reward.getChance().get(0)))));
         }
         
