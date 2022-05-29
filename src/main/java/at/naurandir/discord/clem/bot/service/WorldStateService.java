@@ -25,7 +25,7 @@ public class WorldStateService {
     public void init() throws IOException {
         warframeClient = new WarframeClient();
         WorldStateDTO newWorldState = warframeClient.getCurrentWorldState();
-        DropTableDTO newDropTable = warframeClient.getCurrentDropTableHtml();
+        DropTableDTO newDropTable = warframeClient.getCurrentDropTable();
         MarketDTO newMarket = warframeClient.getCurrentMarket();
         
         warframeState = new WarframeState(newWorldState, newDropTable, newMarket);
@@ -47,7 +47,7 @@ public class WorldStateService {
     
     public void refreshDropTable() {
         try {
-            DropTableDTO dropTable = warframeClient.getCurrentDropTableHtml();
+            DropTableDTO dropTable = warframeClient.getCurrentDropTable();
             log.debug("refreshDropTable: received dto.");
             warframeState.refreshDropTableData(dropTable);
         } catch (Exception ex) {

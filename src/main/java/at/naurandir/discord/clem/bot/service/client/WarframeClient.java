@@ -76,7 +76,7 @@ public class WarframeClient {
         }
     }
     
-    public DropTableDTO getCurrentDropTableHtml() throws IOException {
+    public DropTableDTO getCurrentDropTable() throws IOException {
         try (CloseableHttpClient httpClient = getClient()) {
             HttpGet httpGet = new HttpGet("https://n8k6e2y6.ssl.hwcdn.net/repos/hnfvc0o3jnfvc873njb03enrf56.html");
             
@@ -91,7 +91,7 @@ public class WarframeClient {
                 List<RelicDTO> relics = getRelicsHtml(relicElements);
                 
                 Elements missionElements = elements.get(0).select("tr");
-                List<MissionDTO> missions = getMissionsHtml(missionElements);
+                List<MissionDTO> missions = getMissions(missionElements);
                 
                 DropTableDTO dropTable = new DropTableDTO();
                 dropTable.setRelics(relics);
@@ -135,7 +135,7 @@ public class WarframeClient {
         return relics.values().stream().collect(Collectors.toList());
     }
     
-    private List<MissionDTO> getMissionsHtml(Elements missionElements) {
+    private List<MissionDTO> getMissions(Elements missionElements) {
         
         List<MissionDTO> missions = new ArrayList<>();
         MissionDTO currentMission = new MissionDTO();

@@ -60,7 +60,7 @@ public class RelicDropCommand implements Command {
         
         List<RelicDTO> relicsWithItem = getRelicsWithItem(item, warframeState);
         List<MissionDTO> missionsWithRelics = getMissionsWithRelics(relicsWithItem, warframeState);
-        log.debug("handle: found [{}] relics", relicsWithItem.size());
+        log.debug("handle: found [{}] relics and [{}] missions", relicsWithItem.size(), missionsWithRelics.size());
         
         Map<String, String> relicMessages = getRelicMessages(relicsWithItem, item);
         List<String> missionMessages = getMissionMessages(missionsWithRelics, item);
@@ -92,6 +92,7 @@ public class RelicDropCommand implements Command {
         List<String> relicItemNames = relicsWithItem.stream()
                 .map(relic -> relic.getTier() + " " + relic.getName() + " Relic")
                 .collect(Collectors.toList());
+        log.debug("getMissionsWithRelics: looking for missions with list [{}]", relicItemNames);
         
         for (MissionDTO mission : warframeState.getMissions()) {
             boolean isAnyRelicInMission = mission.getRewardsRotationA().stream()
@@ -102,6 +103,10 @@ public class RelicDropCommand implements Command {
                         .anyMatch(rotReward -> relicItemNames.contains(rotReward.getReward())) ||
                     mission.getRewardsRotationGeneral().stream()
                         .anyMatch(rotReward -> relicItemNames.contains(rotReward.getReward()));
+            
+            if (mission.getName().equals("Venus/Cytherean (Interception)")) {
+                log.debug("mission with Meso I2 in rotation B: {}, but boolean {}", mission.getRewardsRotationB(), isAnyRelicInMission);
+            }
             
             if (isAnyRelicInMission) {
                 missionsWithRelics.add(mission);
