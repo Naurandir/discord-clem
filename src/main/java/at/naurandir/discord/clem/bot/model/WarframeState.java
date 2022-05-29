@@ -9,14 +9,13 @@ import at.naurandir.discord.clem.bot.service.client.dto.worldstate.VallisCycleDT
 import at.naurandir.discord.clem.bot.service.client.dto.worldstate.VoidFissureDTO;
 import at.naurandir.discord.clem.bot.service.client.dto.worldstate.VoidTraderDTO;
 import at.naurandir.discord.clem.bot.service.client.dto.WorldStateDTO;
-import at.naurandir.discord.clem.bot.service.client.dto.droptable.MissionDropDTO;
-import at.naurandir.discord.clem.bot.service.client.dto.droptable.RelicDropDTO;
+import at.naurandir.discord.clem.bot.service.client.dto.droptable.MissionDTO;
+import at.naurandir.discord.clem.bot.service.client.dto.droptable.RelicDTO;
 import at.naurandir.discord.clem.bot.service.client.dto.market.MarketItemDTO;
 import at.naurandir.discord.clem.bot.service.client.dto.worldstate.EarthCycleDTO;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import lombok.Getter;
 import lombok.Setter;
@@ -44,8 +43,8 @@ public class WarframeState {
     private boolean isAlertsStateChanged;
     
     // drop table
-    private List<RelicDropDTO> relics;  
-    private Map<String,Map<String,MissionDropDTO>> missions;
+    private List<RelicDTO> relics;  
+    private List<MissionDTO> missions;
     
     // market
     private List<MarketItemDTO> marketItems;
@@ -65,7 +64,7 @@ public class WarframeState {
     
     public final void refreshDropTableData(DropTableDTO dropTable) {
         relics = dropTable.getRelics();
-        missions = dropTable.getMissionRewards();
+        missions = dropTable.getMissions();
     }
 
     public final void refreshMarketData(MarketDTO marketData) {

@@ -1,6 +1,8 @@
 package at.naurandir.discord.clem.bot.service.client.dto.droptable;
 
 import at.naurandir.discord.clem.bot.model.enums.Rarity;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,9 +16,10 @@ import lombok.ToString;
 @Setter
 @ToString
 @EqualsAndHashCode
-public class RewardDropDTO {
+public class RewardDTO {
     
-    private String itemName;
+    private String reward;
     private Rarity rarity;
-    private Double chance;
+    
+    private List<Double> chance = new ArrayList<>();
 }

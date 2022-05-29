@@ -1,6 +1,6 @@
 package at.naurandir.discord.clem.bot.service.client.dto.droptable;
 
-import at.naurandir.discord.clem.bot.model.enums.RelicState;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -15,10 +15,10 @@ import lombok.ToString;
 @Setter
 @ToString
 @EqualsAndHashCode
-public class RelicDropDTO {
+public class RelicDTO {
     
+    private String name;
     private String tier;
-    private String relicName;
-    private RelicState state;
-    private List<RewardDropDTO> rewards;
+    
+    private List<RewardDTO> drops = new ArrayList<>();
 }
