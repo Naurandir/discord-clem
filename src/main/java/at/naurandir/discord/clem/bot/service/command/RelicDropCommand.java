@@ -31,7 +31,7 @@ public class RelicDropCommand implements Command {
     private static final String RELIC_SEARCH_DESCRIPTION = "Relics that drop desired item, note some can be vaulted.";
     private static final String MISSION_SEARCH_TITLE = "Missions with Relic Drop for '{item}'";
     
-    private static final String MISSION_DESCRIPTION = "Note that only maximum 20 different mission drops are shown here. For other results specific the input more specific.\n";
+    private static final String MISSION_DESCRIPTION = "Note that only maximum 20 different mission drops are shown here. For better results precise the input.\n\n";
     private static final String MISSION_DATA = "***{title}*** - {item} {rotation} ({dropChance}%)\n";
 
     @Override
