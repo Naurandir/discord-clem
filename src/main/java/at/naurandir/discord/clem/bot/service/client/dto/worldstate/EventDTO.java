@@ -26,6 +26,6 @@ public class EventDTO {
     
     private String victimNode;
     
-    private Integer health;
+    private Double health;
     
 }
