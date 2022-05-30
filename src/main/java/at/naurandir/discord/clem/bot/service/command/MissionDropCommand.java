@@ -83,56 +83,55 @@ public class MissionDropCommand implements Command {
         
         return missionsWithItem;
     }
+    
+    private void addMissionMessages(MissionDTO mission, String item, List<String> missionMessages) {
+        List<RewardDTO> rewardsWithItemGeneral = mission.getRewardsRotationGeneral().stream()
+                .filter(reward -> reward.getReward().toLowerCase().contains(item.toLowerCase()))
+                .collect(Collectors.toList());
+        
+        List<RewardDTO> rewardsWithItemRotationA = mission.getRewardsRotationA().stream()
+                .filter(reward -> reward.getReward().toLowerCase().contains(item.toLowerCase()))
+                .collect(Collectors.toList());
+        
+        List<RewardDTO> rewardsWithItemRotationB = mission.getRewardsRotationB().stream()
+                .filter(reward -> reward.getReward().toLowerCase().contains(item.toLowerCase()))
+                .collect(Collectors.toList());
+        
+        List<RewardDTO> rewardsWithItemRotationC = mission.getRewardsRotationC().stream()
+                .filter(reward -> reward.getReward().toLowerCase().contains(item.toLowerCase()))
+                .collect(Collectors.toList());
+        
+        rewardsWithItemGeneral.forEach(reward -> missionMessages.add(MISSION_MESSAGE
+                .replace("{title}", mission.getName())
+                .replace("{item}", reward.getReward())
+                .replace(" {rotation}","")
+                .replace("{dropChance}", String.valueOf(reward.getChance().get(0)))));
+        
+        rewardsWithItemRotationA.forEach(reward -> missionMessages.add(MISSION_MESSAGE
+                .replace("{title}", mission.getName())
+                .replace("{item}", reward.getReward())
+                .replace("{rotation}","Rotation A")
+                .replace("{dropChance}", String.valueOf(reward.getChance().get(0)))));
+        
+        rewardsWithItemRotationB.forEach(reward -> missionMessages.add(MISSION_MESSAGE
+                .replace("{title}", mission.getName())
+                .replace("{item}", reward.getReward())
+                .replace("{rotation}","Rotation B")
+                .replace("{dropChance}", String.valueOf(reward.getChance().get(0)))));
+        
+        rewardsWithItemRotationC.forEach(reward -> missionMessages.add(MISSION_MESSAGE
+                .replace("{title}", mission.getName())
+                .replace("{item}", reward.getReward())
+                .replace("{rotation}","Rotation C")
+                .replace("{dropChance}", String.valueOf(reward.getChance().get(0)))));
+    }
 
     private EmbedCreateSpec generateEmbed(String item, List<MissionDTO> missionsWithItem) {
         StringBuilder descriptionBuilder = new StringBuilder(DESCRIPTION.replace("{item}", item));
         List<String> missionMessages = new ArrayList<>();
         
-        for (int i=0; i<30; i++) {
-            MissionDTO mission = missionsWithItem.get(i);
-            
-            List<RewardDTO> rewardsWithItemGeneral = mission.getRewardsRotationGeneral().stream()
-                    .filter(reward -> reward.getReward().toLowerCase().contains(item.toLowerCase()))
-                    .collect(Collectors.toList());
-            
-            List<RewardDTO> rewardsWithItemRotationA = mission.getRewardsRotationA().stream()
-                    .filter(reward -> reward.getReward().toLowerCase().contains(item.toLowerCase()))
-                    .collect(Collectors.toList());
-            
-            List<RewardDTO> rewardsWithItemRotationB = mission.getRewardsRotationB().stream()
-                    .filter(reward -> reward.getReward().toLowerCase().contains(item.toLowerCase()))
-                    .collect(Collectors.toList());
-            
-            List<RewardDTO> rewardsWithItemRotationC = mission.getRewardsRotationC().stream()
-                    .filter(reward -> reward.getReward().toLowerCase().contains(item.toLowerCase()))
-                    .collect(Collectors.toList());
-            
-            rewardsWithItemGeneral.forEach(reward -> missionMessages.add(MISSION_MESSAGE
-                    .replace("{title}", mission.getName())
-                    .replace("{item}", reward.getReward())
-                    .replace(" {rotation}","")
-                    .replace("{dropChance}", String.valueOf(reward.getChance().get(0)))));
-            
-            rewardsWithItemRotationA.forEach(reward -> missionMessages.add(MISSION_MESSAGE
-                    .replace("{title}", mission.getName())
-                    .replace("{item}", reward.getReward())
-                    .replace("{rotation}","Rotation A")
-                    .replace("{dropChance}", String.valueOf(reward.getChance().get(0)))));
-            
-            rewardsWithItemRotationB.forEach(reward -> missionMessages.add(MISSION_MESSAGE
-                    .replace("{title}", mission.getName())
-                    .replace("{item}", reward.getReward())
-                    .replace("{rotation}","Rotation B")
-                    .replace("{dropChance}", String.valueOf(reward.getChance().get(0)))));
-            
-            rewardsWithItemRotationC.forEach(reward -> missionMessages.add(MISSION_MESSAGE
-                    .replace("{title}", mission.getName())
-                    .replace("{item}", reward.getReward())
-                    .replace("{rotation}","Rotation C")
-                    .replace("{dropChance}", String.valueOf(reward.getChance().get(0)))));
-        }
-        
-        missionMessages.stream().limit(30).forEach(message -> descriptionBuilder.append(message));
+        missionsWithItem.stream().limit(20).forEach(mission -> addMissionMessages(mission, item, missionMessages));        
+        missionMessages.stream().limit(20).forEach(message -> descriptionBuilder.append(message));
         
         EmbedCreateSpec.Builder embedBuilder = EmbedCreateSpec.builder()
                 .color(Color.DARK_GOLDENROD)
