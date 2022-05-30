@@ -87,7 +87,9 @@ public class MissionDropCommand implements Command {
     private EmbedCreateSpec generateEmbed(String item, List<MissionDTO> missionsWithItem) {
         StringBuilder descriptionBuilder = new StringBuilder(DESCRIPTION.replace("{item}", item));
         
-        for (MissionDTO mission : missionsWithItem) {
+        for (int i=0; i<30; i++) {
+            MissionDTO mission = missionsWithItem.get(i);
+            
             List<RewardDTO> rewardsWithItemGeneral = mission.getRewardsRotationGeneral().stream()
                     .filter(reward -> reward.getReward().toLowerCase().contains(item.toLowerCase()))
                     .collect(Collectors.toList());
