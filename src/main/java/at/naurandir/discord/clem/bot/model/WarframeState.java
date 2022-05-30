@@ -89,9 +89,17 @@ public class WarframeState {
     }
     
     private void checkWorldStateDataChanged(WorldStateDTO newWorldState) {
-        setAlertsStateChanged(!Objects.equals(getAlerts(), newWorldState.getAlertsDTO()));        
         setVoidTraderStateChanged(!Objects.equals(getVoidTrader().getActive(),
                 newWorldState.getVoidTraderDTO().getActive()));
-        setEventStateChanged(!Objects.equals(getEvents(), newWorldState.getEventsDTO()));
+        
+        setAlertsStateChanged(!Objects.equals(
+                (newWorldState.getAlertsDTO() == null ? -1 : newWorldState.getAlertsDTO().size()),
+                (getAlerts() == null ? -1 : getAlerts().size())
+        ));        
+        
+        setEventStateChanged(!Objects.equals(
+                (newWorldState.getEventsDTO() == null ? -1 : newWorldState.getEventsDTO().size()),
+                (getEvents() == null ? -1 : getEvents().size())
+        ));
     }
 }
