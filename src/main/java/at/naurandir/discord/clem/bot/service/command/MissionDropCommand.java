@@ -131,7 +131,12 @@ public class MissionDropCommand implements Command {
         List<String> missionMessages = new ArrayList<>();
         
         missionsWithItem.stream().limit(20).forEach(mission -> addMissionMessages(mission, item, missionMessages));        
-        missionMessages.stream().limit(20).forEach(message -> descriptionBuilder.append(message));
+        
+        if (missionMessages.isEmpty()) {
+            descriptionBuilder.append("Nothing found in the Search. Maybe the Item was misspelled?");
+        } else {
+            missionMessages.stream().limit(20).forEach(message -> descriptionBuilder.append(message));
+        }
         
         EmbedCreateSpec.Builder embedBuilder = EmbedCreateSpec.builder()
                 .color(Color.DARK_GOLDENROD)

@@ -2,6 +2,7 @@ package at.naurandir.discord.clem.bot.service.push;
 
 import at.naurandir.discord.clem.bot.model.WarframeState;
 import at.naurandir.discord.clem.bot.service.client.dto.worldstate.AlertDTO;
+import at.naurandir.discord.clem.bot.service.client.dto.worldstate.EventDTO;
 import at.naurandir.discord.clem.bot.utils.LocalDateTimeUtil;
 import discord4j.common.util.Snowflake;
 import discord4j.core.GatewayDiscordClient;
@@ -26,6 +27,9 @@ public class UpdatePipelinePush extends Push {
     @Value("#{'${discord.clem.push.channels.update}'.split(',')}")
     private List<String> interestingChannels;
     
+    private static final String EVENTS_EXISTING = "***Events:*** Currently active Events existing:\n{events}";
+    private static final String EVENTS_GONE = "***Events:*** No more active Events existing.";
+    
     private static final String ALERTS_EXISTING = "***Alerts:*** Currently active Alerts existing:\n{alerts}";
     private static final String ALERTS_GONE = "***Alerts:*** No more active Alerts existing.";
     
@@ -36,6 +40,7 @@ public class UpdatePipelinePush extends Push {
     void doNewPush(GatewayDiscordClient client, WarframeState warframeState, Snowflake channelId) {
         voidTraderChangeNotify(warframeState, client, channelId);
         alertsChangeNotify(warframeState, client, channelId);
+        eventsChangeNotify(warframeState, client, channelId);
     }
     
     private void voidTraderChangeNotify(WarframeState warframeState, GatewayDiscordClient client, Snowflake channelId) {
@@ -63,7 +68,6 @@ public class UpdatePipelinePush extends Push {
 
     private void alertsChangeNotify(WarframeState warframeState, GatewayDiscordClient client, Snowflake channelId) {
         if (warframeState.isAlertsStateChanged() && warframeState.getAlerts() != null && warframeState.getAlerts().size() > 0) {
-            String message = ALERTS_EXISTING;
             String alerts = "";
             
             for (AlertDTO alert : warframeState.getAlerts()) {
@@ -75,14 +79,36 @@ public class UpdatePipelinePush extends Push {
             
             // we only send a message if we got minimum 1 active alert to be shown.
             if (!alerts.equals("")) {
-                message = message.replace("{alerts}", alerts);
                 client.rest().getChannelById(channelId)
-                        .createMessage(message)
+                        .createMessage(ALERTS_EXISTING.replace("{alerts}", alerts))
                         .subscribe();
             }
         } else if (warframeState.isAlertsStateChanged()) {
             client.rest().getChannelById(channelId)
                     .createMessage(ALERTS_GONE)
+                    .subscribe();
+        }
+    }
+    
+    private void eventsChangeNotify(WarframeState warframeState, GatewayDiscordClient client, Snowflake channelId) {
+        if (warframeState.isEventStateChanged() && warframeState.getEvents() != null && warframeState.getEvents().size() > 0) {
+            String events = "";
+            
+            for (EventDTO event : warframeState.getEvents()) {
+                if (!event.getActive()) {
+                    continue;
+                }
+                events += "*" + event.getDescription() + "* - " + event.getTooltip() +"\n";
+                
+                if (!events.equals("")) {
+                    client.rest().getChannelById(channelId)
+                        .createMessage(EVENTS_EXISTING.replace("{events}", events))
+                        .subscribe();
+                }
+            }
+        } else if (warframeState.isEventStateChanged()) {
+            client.rest().getChannelById(channelId)
+                    .createMessage(EVENTS_GONE)
                     .subscribe();
         }
     }

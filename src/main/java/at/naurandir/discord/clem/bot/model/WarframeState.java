@@ -13,6 +13,7 @@ import at.naurandir.discord.clem.bot.service.client.dto.droptable.MissionDTO;
 import at.naurandir.discord.clem.bot.service.client.dto.droptable.RelicDTO;
 import at.naurandir.discord.clem.bot.service.client.dto.market.MarketItemDTO;
 import at.naurandir.discord.clem.bot.service.client.dto.worldstate.EarthCycleDTO;
+import at.naurandir.discord.clem.bot.service.client.dto.worldstate.EventDTO;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -31,6 +32,7 @@ public class WarframeState {
     // world
     private List<AlertDTO> alerts;
     private List<VoidFissureDTO> fissures;
+    private List<EventDTO> events;
     
     private EarthCycleDTO earthCycle;
     private CetusCycleDTO cetusCycle;
@@ -41,6 +43,7 @@ public class WarframeState {
     
     private boolean isVoidTraderStateChanged;
     private boolean isAlertsStateChanged;
+    private boolean isEventStateChanged;
     
     // drop table
     private List<RelicDTO> relics;  
@@ -74,6 +77,7 @@ public class WarframeState {
     private void updateWorldStateData(WorldStateDTO newWorldState) {
         voidTrader = newWorldState.getVoidTraderDTO();
         
+        events = newWorldState.getEventsDTO();
         alerts = newWorldState.getAlertsDTO();
         fissures = newWorldState.getFissuresDTO();
         Collections.sort(fissures, voidFissureComparator);
@@ -88,5 +92,6 @@ public class WarframeState {
         setAlertsStateChanged(!Objects.equals(getAlerts(), newWorldState.getAlertsDTO()));        
         setVoidTraderStateChanged(!Objects.equals(getVoidTrader().getActive(),
                 newWorldState.getVoidTraderDTO().getActive()));
+        setEventStateChanged(!Objects.equals(getEvents(), newWorldState.getEventsDTO()));
     }
 }

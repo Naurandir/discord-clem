@@ -7,6 +7,7 @@ import at.naurandir.discord.clem.bot.service.client.dto.worldstate.VallisCycleDT
 import at.naurandir.discord.clem.bot.service.client.dto.worldstate.VoidFissureDTO;
 import at.naurandir.discord.clem.bot.service.client.dto.worldstate.CambionCycleDTO;
 import at.naurandir.discord.clem.bot.service.client.dto.worldstate.EarthCycleDTO;
+import at.naurandir.discord.clem.bot.service.client.dto.worldstate.EventDTO;
 import com.google.gson.annotations.SerializedName;
 import java.util.List;
 import lombok.EqualsAndHashCode;
@@ -44,4 +45,7 @@ public class WorldStateDTO {
     
     @SerializedName("voidTrader")
     private VoidTraderDTO voidTraderDTO;
+    
+    @SerializedName("events")
+    private List<EventDTO> eventsDTO;
 }

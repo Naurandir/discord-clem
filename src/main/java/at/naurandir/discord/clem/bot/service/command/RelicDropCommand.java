@@ -186,7 +186,12 @@ public class RelicDropCommand implements Command {
     
     private EmbedCreateSpec generateEmbedMissions(String item, List<String> missionMessages) {
         StringBuilder descriptionBuilder = new StringBuilder(MISSION_DESCRIPTION);
-        missionMessages.stream().limit(20).forEach(entry -> descriptionBuilder.append(entry));
+        
+        if (missionMessages.isEmpty()) {
+            descriptionBuilder.append("Nothing found in the Search. Maybe the Item was misspelled or the found Relics are vaulted.");
+        } else {
+            missionMessages.stream().limit(20).forEach(entry -> descriptionBuilder.append(entry));
+        };
         
         return generateEmbed(MISSION_SEARCH_TITLE.replace("{item}", item),
                 descriptionBuilder.toString(),
