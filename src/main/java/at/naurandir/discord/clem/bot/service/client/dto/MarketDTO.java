@@ -1,6 +1,7 @@
 package at.naurandir.discord.clem.bot.service.client.dto;
 
 import at.naurandir.discord.clem.bot.service.client.dto.market.MarketItemsDTO;
+import at.naurandir.discord.clem.bot.service.client.dto.market.MarketLichWeaponsDTO;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,5 +17,6 @@ import lombok.ToString;
 @EqualsAndHashCode
 public class MarketDTO {
     
-    private MarketItemsDTO payload;
+    private MarketItemsDTO items;
+    private MarketLichWeaponsDTO lichWeapons;
 }

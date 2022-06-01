@@ -5,11 +5,14 @@ import discord4j.common.util.Snowflake;
 
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.message.MessageCreateEvent;
+import discord4j.core.object.entity.Message;
 import discord4j.discordjson.json.MessageData;
 import discord4j.rest.entity.RestMessage;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 
@@ -81,7 +84,7 @@ public abstract class Push {
                     log.debug("push: new push as [{}] is not sticky.", this.getClass().getSimpleName());
                     doNewPush(client, warframeState, channelSnowflake);
                 } else if (channelMessageMapping.get(channelSnowflake) == null) {
-                    log.info("push: new push in channel [{}] as [{}] is sticky and no message found", 
+                    log.debug("push: new push in channel [{}] as [{}] is sticky and no message found", 
                             channelId, this.getClass().getSimpleName());
                     doNewPush(client, warframeState, channelSnowflake);
                 } else {
@@ -99,6 +102,7 @@ public abstract class Push {
                         doUpdatePush(message, warframeState);
                     }
                 }
+                log.debug("push: finished push for [{}]", this.getClass());
             }
         } catch (Exception ex) {
             log.error("push: something at push went wrong: ", ex);
@@ -107,12 +111,14 @@ public abstract class Push {
 
     private RestMessage getMessageById(GatewayDiscordClient client, Snowflake channelId, Snowflake messageId) {
         try {
-            client.getRestClient().getMessageById(channelId, messageId).getData().block();
-            return client.getRestClient().getMessageById(channelId, messageId);
+            Message message = client.getMessageById(channelId, messageId).block(Duration.ofSeconds(10L));
+            return Optional.ofNullable(message).orElseThrow(
+                    () -> new IllegalArgumentException("Message not found but no error received"))
+                    .getRestMessage();
         } catch (Exception ex) {
             log.warn("getMessageById: could not obtain message, error: {}", ex.getMessage());
-            
-            if (ex.getMessage().contains("Connection reset by peer") || ex.getMessage().contains("InterruptedException")) {
+            if (ex.getMessage().contains("Connection reset by peer") || ex.getMessage().contains("InterruptedException") ||
+                    ex.getMessage().equals("Message not found but no error received")) {
                 return MESSAGE_ALLOWED_ERROR;
             }
         }

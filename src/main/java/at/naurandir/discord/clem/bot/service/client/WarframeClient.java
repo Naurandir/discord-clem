@@ -7,6 +7,8 @@ import at.naurandir.discord.clem.bot.service.client.dto.WorldStateDTO;
 import at.naurandir.discord.clem.bot.service.client.dto.droptable.MissionDTO;
 import at.naurandir.discord.clem.bot.service.client.dto.droptable.RelicDTO;
 import at.naurandir.discord.clem.bot.service.client.dto.droptable.RewardDTO;
+import at.naurandir.discord.clem.bot.service.client.dto.market.MarketItemsDTO;
+import at.naurandir.discord.clem.bot.service.client.dto.market.MarketLichWeaponsDTO;
 import at.naurandir.discord.clem.bot.service.client.dto.market.MarketOrdersResultDTO;
 import com.google.gson.Gson;
 import java.io.IOException;
@@ -50,6 +52,14 @@ public class WarframeClient {
     }
     
     public MarketDTO getCurrentMarket() throws IOException {
+        MarketDTO market = new MarketDTO();
+        market.setItems(getCurrentMarketItems());
+        market.setLichWeapons(getCurrentLichWeapons());
+        
+        return market;
+    }
+    
+    private MarketItemsDTO getCurrentMarketItems() throws IOException {
         try (CloseableHttpClient httpClient = getClient()) {
             HttpGet httpGet = new HttpGet("https://api.warframe.market/v1/items");
             httpGet.addHeader("Language", "en");
@@ -57,7 +67,20 @@ public class WarframeClient {
             try (CloseableHttpResponse response = httpClient.execute(httpGet)) {
                 log.info("getCurrentWarframeMarket: received http status [{}]", response.getStatusLine());
                 String jsonString = getHttpContent(response);
-                return gson.fromJson(jsonString, MarketDTO.class);
+                return gson.fromJson(jsonString, MarketItemsDTO.class);
+            }
+        }
+    }
+    
+    private MarketLichWeaponsDTO getCurrentLichWeapons() throws IOException {
+        try (CloseableHttpClient httpClient = getClient()) {
+            HttpGet httpGet = new HttpGet("https://api.warframe.market/v1/lich/weapons");
+            httpGet.addHeader("Language", "en");
+            
+            try (CloseableHttpResponse response = httpClient.execute(httpGet)) {
+                log.info("getCurrentWarframeMarket: received http status [{}]", response.getStatusLine());
+                String jsonString = getHttpContent(response);
+                return gson.fromJson(jsonString, MarketLichWeaponsDTO.class);
             }
         }
     }
@@ -74,6 +97,12 @@ public class WarframeClient {
                 return gson.fromJson(jsonString, MarketOrdersResultDTO.class);
             }
         }
+    }
+    
+    public void getCurrentLichAuctions(String urlName) {
+        
+        
+        
     }
     
     public DropTableDTO getCurrentDropTable() throws IOException {

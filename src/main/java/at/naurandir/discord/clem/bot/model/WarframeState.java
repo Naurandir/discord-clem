@@ -18,6 +18,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -31,8 +32,8 @@ public class WarframeState {
     
     // world
     private List<AlertDTO> alerts;
-    private List<VoidFissureDTO> fissures;
     private List<EventDTO> events;
+    private List<VoidFissureDTO> fissures;
     
     private EarthCycleDTO earthCycle;
     private CetusCycleDTO cetusCycle;
@@ -51,6 +52,7 @@ public class WarframeState {
     
     // market
     private List<MarketItemDTO> marketItems;
+    private List<MarketItemDTO> marketLichWeapons;
     
     private Comparator<VoidFissureDTO> voidFissureComparator = Comparator.comparing(VoidFissureDTO::getTierNum);
 
@@ -71,15 +73,16 @@ public class WarframeState {
     }
 
     public final void refreshMarketData(MarketDTO marketData) {
-        marketItems = marketData.getPayload().getItems();
+        marketItems = marketData.getItems().getPayload().get("items");
+        marketLichWeapons = marketData.getLichWeapons().getPayload().get("weapons");
     }
     
     private void updateWorldStateData(WorldStateDTO newWorldState) {
         voidTrader = newWorldState.getVoidTraderDTO();
         
-        events = newWorldState.getEventsDTO();
-        alerts = newWorldState.getAlertsDTO();
-        fissures = newWorldState.getFissuresDTO();
+        events = Objects.requireNonNullElseGet(newWorldState.getEventsDTO(), List::of);
+        alerts = Objects.requireNonNullElseGet(newWorldState.getAlertsDTO(), List::of);
+        fissures = Objects.requireNonNullElseGet(newWorldState.getFissuresDTO(), List::of);
         Collections.sort(fissures, voidFissureComparator);
 
         earthCycle = newWorldState.getEarthCycleDTO();
@@ -93,13 +96,11 @@ public class WarframeState {
                 newWorldState.getVoidTraderDTO().getActive()));
         
         setAlertsStateChanged(!Objects.equals(
-                (newWorldState.getAlertsDTO() == null ? -1 : newWorldState.getAlertsDTO().size()),
-                (getAlerts() == null ? -1 : getAlerts().size())
-        ));        
+                Optional.of(newWorldState.getAlertsDTO()).orElse(List.of()).size(),
+                getAlerts().size()));        
         
         setEventStateChanged(!Objects.equals(
-                (newWorldState.getEventsDTO() == null ? -1 : newWorldState.getEventsDTO().size()),
-                (getEvents() == null ? -1 : getEvents().size())
-        ));
+                Optional.of(newWorldState.getEventsDTO()).orElse(List.of()).size(),
+                getEvents().size()));
     }
 }
