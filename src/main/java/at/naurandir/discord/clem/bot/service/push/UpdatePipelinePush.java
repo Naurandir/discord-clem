@@ -37,10 +37,11 @@ public class UpdatePipelinePush extends Push {
     private static final String VOID_TRADER_GONE = "***Void Trader:*** Baro Ki'Teer went back into the void, he will return in {days}d {hours}h {minutes}m.";
 
     @Override
-    void doNewPush(GatewayDiscordClient client, WarframeState warframeState, Snowflake channelId) {
+    MessageData doNewPush(GatewayDiscordClient client, WarframeState warframeState, Snowflake channelId) {
         voidTraderChangeNotify(warframeState, client, channelId);
         alertsChangeNotify(warframeState, client, channelId);
         eventsChangeNotify(warframeState, client, channelId);
+        return null;
     }
     
     private void voidTraderChangeNotify(WarframeState warframeState, GatewayDiscordClient client, Snowflake channelId) {

@@ -32,12 +32,11 @@ public class WorldCyclePush extends Push {
     private static final String STATE_MESSAGE = "{state} for {hours}h {minutes}m.";
 
     @Override
-    public void doNewPush(GatewayDiscordClient client, WarframeState warframeState, Snowflake channelId) {
+    public MessageData doNewPush(GatewayDiscordClient client, WarframeState warframeState, Snowflake channelId) {
         EmbedCreateSpec embed = generateEmbed(warframeState);
 
-        client.rest().getChannelById(channelId)
-                    .createMessage(embed.asRequest())
-                    .subscribe();
+        return client.rest().getChannelById(channelId)
+                    .createMessage(embed.asRequest()).block(Duration.ofSeconds(10L));
     }
     
     @Override

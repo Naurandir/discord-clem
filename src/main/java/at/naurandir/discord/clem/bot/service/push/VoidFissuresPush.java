@@ -37,12 +37,12 @@ public class VoidFissuresPush extends Push {
             + " *expire:* {hours}h {minutes}m";
 
     @Override
-    void doNewPush(GatewayDiscordClient client, WarframeState warframeState, Snowflake channelId) {
+    MessageData doNewPush(GatewayDiscordClient client, WarframeState warframeState, Snowflake channelId) {
         EmbedCreateSpec embed = generateEmbed(warframeState);
 
-        client.rest().getChannelById(channelId)
+        return client.rest().getChannelById(channelId)
                     .createMessage(embed.asRequest())
-                    .subscribe();
+                    .block(Duration.ofSeconds(10L));
     }
 
     @Override

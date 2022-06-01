@@ -5,14 +5,11 @@ import discord4j.common.util.Snowflake;
 
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.message.MessageCreateEvent;
-import discord4j.core.object.entity.Message;
 import discord4j.discordjson.json.MessageData;
 import discord4j.rest.entity.RestMessage;
-import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 
@@ -23,11 +20,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public abstract class Push {
     
-    private static final RestMessage MESSAGE_ALLOWED_ERROR = RestMessage.create(null, Snowflake.of(0L), Snowflake.of(0L));
+    private final Map<Snowflake, MessageData> channelMessageMapping = new HashMap<>();
     
-    private final Map<Snowflake, Snowflake> channelMessageMapping = new HashMap<>();
-    
-    abstract void doNewPush(GatewayDiscordClient client, WarframeState warframeState, Snowflake channelId);
+    abstract MessageData doNewPush(GatewayDiscordClient client, WarframeState warframeState, Snowflake channelId);
     abstract void doUpdatePush(RestMessage message, WarframeState warframeState);
     abstract List<String> getInterestingChannels();
     abstract boolean isOwnMessage(MessageData messageData);
@@ -46,7 +41,7 @@ public abstract class Push {
             for (MessageData messageData : messageDataList) {
                 log.info("init: found message id [{}] as existing pinned message from bot, adding to mapping",
                         messageData.id().asString());
-                channelMessageMapping.put(channelSnowflakeId, Snowflake.of(messageData.id().asString()));
+                channelMessageMapping.put(channelSnowflakeId, messageData);
             }
         }  
         } catch (Exception ex) {
@@ -64,13 +59,13 @@ public abstract class Push {
         }
         
         Snowflake channelId = event.getMessage().getChannelId();
-        Snowflake messageId = event.getMessage().getId();
-        channelMessageMapping.putIfAbsent(channelId, messageId);
+        MessageData data = event.getMessage().getData();
+        channelMessageMapping.putIfAbsent(channelId, data);
         
-        if (!channelMessageMapping.get(channelId).equals(messageId)) {
+        if (!channelMessageMapping.get(channelId).equals(data)) {
             log.warn("handleOwnEvent: current messageId [{}] not the same as in mapping [{}], using now as new one",
-                    messageId, channelMessageMapping.get(channelId));
-            channelMessageMapping.put(channelId, messageId);
+                    data.id(), channelMessageMapping.get(channelId));
+            channelMessageMapping.put(channelId, data);
         }
         
         event.getMessage().pin().subscribe();
@@ -86,44 +81,18 @@ public abstract class Push {
                 } else if (channelMessageMapping.get(channelSnowflake) == null) {
                     log.debug("push: new push in channel [{}] as [{}] is sticky and no message found", 
                             channelId, this.getClass().getSimpleName());
-                    doNewPush(client, warframeState, channelSnowflake);
+                    MessageData message = doNewPush(client, warframeState, channelSnowflake);
+                    channelMessageMapping.put(channelSnowflake, message);
                 } else {
-                    RestMessage message = getMessageById(client, channelSnowflake, channelMessageMapping.get(channelSnowflake));
-                    if (message == null) {
-                        log.warn("push: new push in channel [{}] as [{}] is sticky but expected older message was not found", 
-                                channelId, this.getClass().getSimpleName());
-                        doNewPush(client, warframeState, channelSnowflake);
-                    } else if (MESSAGE_ALLOWED_ERROR.equals(message)) {
-                        log.warn("push: it seems an allowed error happend for [{}], ignoring push for message", 
-                                this.getClass().getSimpleName());
-                    } else {
-                        log.info("push: update channel [{}] as [{}] sticky, expected older message [{}] found", 
-                                channelId, this.getClass().getSimpleName(), message.getId());
-                        doUpdatePush(message, warframeState);
-                    }
+                    MessageData message = channelMessageMapping.get(channelSnowflake);
+                    log.info("push: update channel [{}] as [{}] sticky, expected older message [{}] found", 
+                                channelId, this.getClass().getSimpleName(), message.id());
+                        doUpdatePush(RestMessage.create(client.getRestClient(), channelSnowflake, Snowflake.of(message.id().asLong())), warframeState);
                 }
                 log.debug("push: finished push for [{}]", this.getClass());
             }
         } catch (Exception ex) {
             log.error("push: something at push went wrong: ", ex);
         }
-    }
-
-    private RestMessage getMessageById(GatewayDiscordClient client, Snowflake channelId, Snowflake messageId) {
-        try {
-            Message message = client.getMessageById(channelId, messageId).block(Duration.ofSeconds(10L));
-            return Optional.ofNullable(message).orElseThrow(
-                    () -> new IllegalArgumentException("Message not found but no error received"))
-                    .getRestMessage();
-        } catch (Exception ex) {
-            log.warn("getMessageById: could not obtain message, error: {}", ex.getMessage());
-            if (ex.getMessage().contains("Connection reset by peer") || 
-                    ex.getMessage().contains("InterruptedException") ||
-                    ex.getMessage().contains("Timeout on blocking read for") ||
-                    ex.getMessage().equals("Message not found but no error received")) {
-                return MESSAGE_ALLOWED_ERROR;
-            }
-        }
-        return null;
     }
 }
