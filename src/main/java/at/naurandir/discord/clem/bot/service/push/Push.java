@@ -117,7 +117,9 @@ public abstract class Push {
                     .getRestMessage();
         } catch (Exception ex) {
             log.warn("getMessageById: could not obtain message, error: {}", ex.getMessage());
-            if (ex.getMessage().contains("Connection reset by peer") || ex.getMessage().contains("InterruptedException") ||
+            if (ex.getMessage().contains("Connection reset by peer") || 
+                    ex.getMessage().contains("InterruptedException") ||
+                    ex.getMessage().contains("Timeout on blocking read for") ||
                     ex.getMessage().equals("Message not found but no error received")) {
                 return MESSAGE_ALLOWED_ERROR;
             }
