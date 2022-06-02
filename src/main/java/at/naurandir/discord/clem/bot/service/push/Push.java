@@ -90,7 +90,12 @@ public abstract class Push {
                     try {
                         doUpdatePush(RestMessage.create(client.getRestClient(), channelSnowflake, Snowflake.of(message.id().asLong())), warframeState);
                     } catch (Exception ex) {
-                        log.warn("error: ", ex.getMessage());
+                        if (ex.getMessage().contains("channelSnowflake")) {
+                            log.warn("push: received error [{}] that indicates the original message is gone, removing message from in memory data ", ex.getMessage());
+                            channelMessageMapping.remove(channelSnowflake);
+                            return;
+                        }
+                        throw ex;
                     }
                 }
                 log.debug("push: finished push for [{}]", this.getClass());
