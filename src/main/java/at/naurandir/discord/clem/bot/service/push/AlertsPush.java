@@ -54,7 +54,7 @@ public class AlertsPush extends Push {
                 .embedOrNull(generateEmbed(warframeState).asRequest())
                 .build();
         
-        message.edit(editRequest).block(Duration.ofSeconds(20L));
+        message.edit(editRequest).subscribe();
     }
 
     @Override

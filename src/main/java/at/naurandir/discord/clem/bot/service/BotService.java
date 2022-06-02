@@ -6,6 +6,7 @@ import at.naurandir.discord.clem.bot.service.push.Push;
 import discord4j.core.DiscordClient;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.message.MessageCreateEvent;
+import discord4j.core.event.domain.message.MessageDeleteEvent;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.presence.ClientActivity;
 import discord4j.core.object.presence.ClientPresence;
@@ -62,6 +63,7 @@ public class BotService {
                 .block();
         
         client.on(MessageCreateEvent.class, this::handleMessage).subscribe();
+        client.on(MessageDeleteEvent.class, this::handleMessage).subscribe();
     }
     
     private void initPushes() {
@@ -75,28 +77,21 @@ public class BotService {
         log.info("destroy: destroying bot done");
     }
     
-    private boolean isOwnBot(MessageCreateEvent event) {
-        return event.getMember().isPresent() && 
-               event.getMember().get().getId().equals(client.getSelfId());
-    }
-    
-    private boolean isMessageToDelete(MessageCreateEvent event) {
-        return event.getMessage().getType().equals(Message.Type.CHANNEL_PINNED_MESSAGE);
-    }
-    
     private Mono<Void> handleMessage(MessageCreateEvent event) {
-        log.debug("handleCommand: received message create event [{} - {}]", 
+        log.debug("handleMessage: received message create event [{} - {}]", 
                 event.getMessage().getContent(), event.getMessage().getEmbeds());
         
-        if (isOwnBot(event) && isMessageToDelete(event)) {
+        if (isOwnBot(event) && isPinnedMessage(event)) {
             event.getMessage()
                     .delete("not required message, like pin status message, can be deleted")
                     .subscribe();
+            return Flux.empty().then();
         } else if (isOwnBot(event)) {
-            handleOwnEvent(event);
+            pushes.forEach(push -> push.handleOwnEvent(event));
+            return Flux.empty().then();
+        } else {
+            return handleEvent(event, prefix);
         }
-        
-        return handleEvent(event, prefix);
     }
     
     public Mono<Void> handleEvent(MessageCreateEvent event, String prefix) {
@@ -112,8 +107,34 @@ public class BotService {
                 .flatMap(command -> command.handle(event, worldStateService.getWarframeState()));
     }
     
-    public void handleOwnEvent(MessageCreateEvent event) {
-        pushes.forEach(push -> push.handleOwnEvent(event));
+    private Mono<Void> handleMessage(MessageDeleteEvent event) {
+        log.debug("handleMessage: received message delete event [{}]", 
+                event.getMessage());
+        
+        if (event.getMessage().isEmpty()) {
+            return Flux.empty().then();
+        }
+        
+        if (!isOwnBot(event)) {
+            return Flux.empty().then();
+        }
+        
+        pushes.forEach(push -> push.handleDeleteOwnEvent(event));
+        return Flux.empty().then();
+    }
+    
+    private boolean isOwnBot(MessageCreateEvent event) {
+        return event.getMember().isPresent() && 
+               event.getMember().get().getId().equals(client.getSelfId());
+    }
+    
+    private boolean isOwnBot(MessageDeleteEvent event) {
+        return event.getMessage().isPresent() &&
+               event.getMessage().get().getData().author().id().asLong() == client.getSelfId().asLong();
+    }
+    
+    private boolean isPinnedMessage(MessageCreateEvent event) {
+        return event.getMessage().getType().equals(Message.Type.CHANNEL_PINNED_MESSAGE);
     }
     
     /**
