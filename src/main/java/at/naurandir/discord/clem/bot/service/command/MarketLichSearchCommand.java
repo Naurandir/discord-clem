@@ -78,7 +78,7 @@ public class MarketLichSearchCommand implements Command {
         
         String element = splitted[2]; // <prefix> command <element> <item>
         if (element.startsWith("--")) {
-            return Optional.of(element);
+            return Optional.of(element.substring(2));
         }
         
         return Optional.empty();

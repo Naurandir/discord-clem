@@ -107,6 +107,7 @@ public class WarframeClient {
             if (element.isPresent()) {
                 url += "&element=" + element.get();
             }
+            log.debug("getCurrentLichAuctions: calling [{}]", url);
             
             HttpGet httpGet = new HttpGet(url);
             httpGet.addHeader("Language", "en");

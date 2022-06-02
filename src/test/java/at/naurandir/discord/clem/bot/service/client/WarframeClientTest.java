@@ -4,6 +4,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
+import java.util.Optional;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.junit.jupiter.api.BeforeEach;
@@ -44,7 +45,7 @@ public class WarframeClientTest {
 //
 //        when(httpClient.execute(any())).thenReturn(response);
 //    }
-//
+
 //    @Test
 //    public void shouldParseRelicsDropTableFromHtml() throws IOException {
 //        RelicDropDTO expected = new RelicDropDTO();
