@@ -50,7 +50,7 @@ public class VoidTraderPush extends Push {
         MessageEditRequest editRequest = MessageEditRequest.builder()
                 .embedOrNull(generateEmbed(warframeState).asRequest())
                 .build();
-        message.edit(editRequest).subscribe();
+        message.edit(editRequest).block(Duration.ofSeconds(10L));
     }
 
     @Override

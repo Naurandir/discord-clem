@@ -51,7 +51,7 @@ public class VoidFissuresPush extends Push {
                 .embedOrNull(generateEmbed(warframeState).asRequest())
                 .build();
 
-        message.edit(editRequest).subscribe();
+        message.edit(editRequest).block(Duration.ofSeconds(10L));
     }
 
     @Override

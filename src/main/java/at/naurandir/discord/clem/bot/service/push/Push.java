@@ -87,7 +87,11 @@ public abstract class Push {
                     MessageData message = channelMessageMapping.get(channelSnowflake);
                     log.info("push: update channel [{}] as [{}] sticky, expected older message [{}] found", 
                                 channelId, this.getClass().getSimpleName(), message.id());
+                    try {
                         doUpdatePush(RestMessage.create(client.getRestClient(), channelSnowflake, Snowflake.of(message.id().asLong())), warframeState);
+                    } catch (Exception ex) {
+                        log.warn("error: ", ex.getMessage());
+                    }
                 }
                 log.debug("push: finished push for [{}]", this.getClass());
             }
