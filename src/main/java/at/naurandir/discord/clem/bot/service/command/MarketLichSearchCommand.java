@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -140,7 +141,7 @@ public class MarketLichSearchCommand implements Command {
                 .replace("{reputation}", AUCTION_BASE_URL + auction.getId())
                 .replace("{damageType}", auction.getItem().getType())
                 .replace("{damage}", String.valueOf(auction.getItem().getDamage()))
-                .replace("{quirk}", auction.getItem().getQuirk())
+                .replace("{quirk}", Objects.requireNonNullElseGet(auction.getItem().getQuirk(), () -> "-"))
                 .replace("{ephemera}", auction.getItem().getHasEphemera() ? "yes" : "no")
                 .replace("{startingPrice}", String.valueOf(auction.getStartingPrice()))
                 .replace("{topBid}", auction.getTopBid() != null ? String.valueOf(auction.getTopBid()) : "-")
