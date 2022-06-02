@@ -11,12 +11,11 @@ import lombok.ToString;
  *
  * @author Naurandir
  */
-
 @Getter
 @Setter
 @ToString
 @EqualsAndHashCode
-public class MarketLichWeaponsDTO {
+public class MarketLichAuctionsDTO {
     
-    private Map<String, List<MarketLichWeaponDTO>> payload;
+    private Map<String, List<MarketLichAuctionDTO>> payload;
 }

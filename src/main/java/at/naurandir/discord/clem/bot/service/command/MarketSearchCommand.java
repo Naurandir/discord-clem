@@ -27,7 +27,7 @@ import reactor.core.publisher.Mono;
  */
 @Slf4j
 @Component
-public class MarketSearch implements Command {
+public class MarketSearchCommand implements Command {
     
     private static final String BUY_DESCRIPTION = "***{platinum} Platinum*** User *{user}* (Reputation {reputation})\n`/w {user} Hi! I want to buy: {item} for {platinum} platinum. Greetings :)`\n\n";
     private static final String ASSETS_BASE_URL = "https://warframe.market/static/assets/";

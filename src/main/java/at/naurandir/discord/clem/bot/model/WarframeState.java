@@ -12,6 +12,7 @@ import at.naurandir.discord.clem.bot.service.client.dto.WorldStateDTO;
 import at.naurandir.discord.clem.bot.service.client.dto.droptable.MissionDTO;
 import at.naurandir.discord.clem.bot.service.client.dto.droptable.RelicDTO;
 import at.naurandir.discord.clem.bot.service.client.dto.market.MarketItemDTO;
+import at.naurandir.discord.clem.bot.service.client.dto.market.MarketLichWeaponDTO;
 import at.naurandir.discord.clem.bot.service.client.dto.worldstate.EarthCycleDTO;
 import at.naurandir.discord.clem.bot.service.client.dto.worldstate.EventDTO;
 import java.util.Collections;
@@ -52,7 +53,7 @@ public class WarframeState {
     
     // market
     private List<MarketItemDTO> marketItems;
-    private List<MarketItemDTO> marketLichWeapons;
+    private List<MarketLichWeaponDTO> marketLichWeapons;
     
     private Comparator<VoidFissureDTO> voidFissureComparator = Comparator.comparing(VoidFissureDTO::getTierNum);
 

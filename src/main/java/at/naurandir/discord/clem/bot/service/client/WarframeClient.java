@@ -8,6 +8,7 @@ import at.naurandir.discord.clem.bot.service.client.dto.droptable.MissionDTO;
 import at.naurandir.discord.clem.bot.service.client.dto.droptable.RelicDTO;
 import at.naurandir.discord.clem.bot.service.client.dto.droptable.RewardDTO;
 import at.naurandir.discord.clem.bot.service.client.dto.market.MarketItemsDTO;
+import at.naurandir.discord.clem.bot.service.client.dto.market.MarketLichAuctionsDTO;
 import at.naurandir.discord.clem.bot.service.client.dto.market.MarketLichWeaponsDTO;
 import at.naurandir.discord.clem.bot.service.client.dto.market.MarketOrdersResultDTO;
 import com.google.gson.Gson;
@@ -17,6 +18,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -65,7 +67,7 @@ public class WarframeClient {
             httpGet.addHeader("Language", "en");
             
             try (CloseableHttpResponse response = httpClient.execute(httpGet)) {
-                log.info("getCurrentWarframeMarket: received http status [{}]", response.getStatusLine());
+                log.info("getCurrentMarketItems: received http status [{}]", response.getStatusLine());
                 String jsonString = getHttpContent(response);
                 return gson.fromJson(jsonString, MarketItemsDTO.class);
             }
@@ -78,7 +80,7 @@ public class WarframeClient {
             httpGet.addHeader("Language", "en");
             
             try (CloseableHttpResponse response = httpClient.execute(httpGet)) {
-                log.info("getCurrentWarframeMarket: received http status [{}]", response.getStatusLine());
+                log.info("getCurrentLichWeapons: received http status [{}]", response.getStatusLine());
                 String jsonString = getHttpContent(response);
                 return gson.fromJson(jsonString, MarketLichWeaponsDTO.class);
             }
@@ -99,10 +101,23 @@ public class WarframeClient {
         }
     }
     
-    public void getCurrentLichAuctions(String urlName) {
-        
-        
-        
+    public MarketLichAuctionsDTO getCurrentLichAuctions(String urlName, Optional<String> element) throws IOException {
+        try (CloseableHttpClient httpClient = getClient()) {
+            String url = "https://api.warframe.market/v1/auctions/search?type=lich&weapon_url_name=" + urlName;
+            if (element.isPresent()) {
+                url += "&element=" + element.get();
+            }
+            
+            HttpGet httpGet = new HttpGet(url);
+            httpGet.addHeader("Language", "en");
+            httpGet.addHeader("Platform", "pc");
+            
+            try (CloseableHttpResponse response = httpClient.execute(httpGet)) {
+                log.info("getCurrentLichAuctions: received http status [{}]", response.getStatusLine());
+                String jsonString = getHttpContent(response);
+                return gson.fromJson(jsonString, MarketLichAuctionsDTO.class);
+            }
+        }
     }
     
     public DropTableDTO getCurrentDropTable() throws IOException {

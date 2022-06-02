@@ -94,19 +94,6 @@ public class BotService {
         }
     }
     
-    public Mono<Void> handleEvent(MessageCreateEvent event, String prefix) {
-        if (event.getMember().isPresent() && event.getMember().get().isBot()) {
-            return Flux.empty().then();
-        }
-        
-        return Flux.fromIterable(commands)
-                .filter(command -> event.getMember().isEmpty() || !event.getMember().get().isBot())
-                .filter(command -> event.getMessage().getContent().startsWith(
-                        prefix + " " + command.getCommandWord()))
-                .next()
-                .flatMap(command -> command.handle(event, worldStateService.getWarframeState()));
-    }
-    
     private Mono<Void> handleMessage(MessageDeleteEvent event) {
         log.debug("handleMessage: received message delete event [{}]", 
                 event.getMessage());
@@ -121,6 +108,19 @@ public class BotService {
         
         pushes.forEach(push -> push.handleDeleteOwnEvent(event));
         return Flux.empty().then();
+    }
+    
+    public Mono<Void> handleEvent(MessageCreateEvent event, String prefix) {
+        if (event.getMember().isPresent() && event.getMember().get().isBot()) {
+            return Flux.empty().then();
+        }
+        
+        return Flux.fromIterable(commands)
+                .filter(command -> event.getMember().isEmpty() || !event.getMember().get().isBot())
+                .filter(command -> event.getMessage().getContent().startsWith(
+                        prefix + " " + command.getCommandWord()))
+                .next()
+                .flatMap(command -> command.handle(event, worldStateService.getWarframeState()));
     }
     
     private boolean isOwnBot(MessageCreateEvent event) {
