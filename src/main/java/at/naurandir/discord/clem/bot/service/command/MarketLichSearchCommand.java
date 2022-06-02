@@ -28,9 +28,10 @@ import reactor.core.publisher.Mono;
 @Slf4j
 @Component
 public class MarketLichSearchCommand implements Command {
-    private static final String DESCRIPTION = "***<a href=\"{auctionUrl}\">Auction Link</a>*** User *{user}* (Reputation {reputation})\n"
+    private static final String DESCRIPTION = "***{auctionUrl}***\n"
+            + "*User {user}* (Reputation {reputation})\n"
             + "*{damageType} {damage}* - quirk: {quirk}, has ephemera: {ephemera}\n"
-            + "{Start Price {startingPrice} plat, Current Top Bid {topBid} plat, Buy Out Price: {buyoutPrice} plat.\n\n";
+            + "Start Price {startingPrice} plat, Current Top Bid {topBid} plat, Buy Out Price: {buyoutPrice} plat.\n\n";
     
     private static final String ASSETS_BASE_URL = "https://warframe.market/static/assets/";
     private static final String AUCTION_BASE_URL = "https://warframe.market/auction/";
@@ -137,8 +138,9 @@ public class MarketLichSearchCommand implements Command {
             StringBuilder description = new StringBuilder("");
             
             entry.getValue().forEach(auction -> description.append(DESCRIPTION
-                .replace("{auctionUrl}", entry.getKey().getItemName())
-                .replace("{reputation}", AUCTION_BASE_URL + auction.getId())
+                .replace("{auctionUrl}", AUCTION_BASE_URL + auction.getId())
+                .replace("{user}", auction.getOwner().getName())
+                .replace("{reputation}", String.valueOf(auction.getOwner().getReputation()))
                 .replace("{damageType}", auction.getItem().getType())
                 .replace("{damage}", String.valueOf(auction.getItem().getDamage()))
                 .replace("{quirk}", Objects.requireNonNullElseGet(auction.getItem().getQuirk(), () -> "-"))
