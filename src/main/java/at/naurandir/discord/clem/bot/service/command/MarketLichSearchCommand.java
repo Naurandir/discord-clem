@@ -28,10 +28,11 @@ import reactor.core.publisher.Mono;
 @Slf4j
 @Component
 public class MarketLichSearchCommand implements Command {
-    private static final String DESCRIPTION = "{auctionUrl}\n"
-            + "***{damageType} {damage}*** - quirk: {quirk}, has ephemera: {ephemera}\n"
-            + "Start Price ***{startingPrice} plat***, Current Top Bid ***{topBid} plat***, Buy Out Price: ***{buyoutPrice} plat***.\n"
-            + "*User {user}* (Reputation {reputation})\n\n";
+    private static final String DESCRIPTION = "List of found Lich Auctions";
+    
+    private static final String EMBED_TITLE = "<a href=\"{auctionUrl}\">Auction</a>";
+    private static final String EMBED_DESCRIPTION = "Start: {startingPrice}p\nCurrent: {topBid}p\nDirect: {buyoutPrice}p\n"
+            + "Element: {damage}% {damageType}\nQuirk: {quirk}\nEphemera: {ephemera}\nUser: {user} (Rep: {reputation})";
     
     private static final String ASSETS_BASE_URL = "https://warframe.market/static/assets/";
     private static final String AUCTION_BASE_URL = "https://warframe.market/auction/";
@@ -106,7 +107,7 @@ public class MarketLichSearchCommand implements Command {
         Map<MarketLichWeaponDTO, List<MarketLichAuctionDTO>> lichAuctions = new HashMap<>();
         
         // maximum 5 items will be analysed
-        List<MarketLichWeaponDTO> interestingWeapons = marketLichWeapons.stream().limit(5).collect(Collectors.toList());
+        List<MarketLichWeaponDTO> interestingWeapons = marketLichWeapons.stream().limit(3).collect(Collectors.toList());
         
         for (MarketLichWeaponDTO lichWeapon : interestingWeapons) {
             try {
@@ -117,7 +118,7 @@ public class MarketLichSearchCommand implements Command {
                         .filter(auction -> !auction.getClosed() && auction.getVisible())
                         .sorted((auction1, auction2) -> 
                                 auction1.getStartingPrice().compareTo(auction2.getStartingPrice()))
-                        .limit(5)
+                        .limit(6)
                         .collect(Collectors.toList());
                 
                 lichAuctions.put(lichWeapon, foundAuctions);
@@ -135,29 +136,29 @@ public class MarketLichSearchCommand implements Command {
         int i=0;
         
         for (Map.Entry<MarketLichWeaponDTO, List<MarketLichAuctionDTO>> entry : foundLichAuctions.entrySet()) {
-            StringBuilder description = new StringBuilder("");
             
-            entry.getValue().forEach(auction -> description.append(DESCRIPTION
-                .replace("{auctionUrl}", AUCTION_BASE_URL + auction.getId())
-                .replace("{user}", auction.getOwner().getName())
-                .replace("{reputation}", String.valueOf(auction.getOwner().getReputation()))
-                .replace("{damageType}", auction.getItem().getElement())
-                .replace("{damage}", String.valueOf(auction.getItem().getDamage()))
-                .replace("{quirk}", Objects.requireNonNullElseGet(auction.getItem().getQuirk(), () -> "-"))
-                .replace("{ephemera}", auction.getItem().getHasEphemera() ? "yes" : "no")
-                .replace("{startingPrice}", String.valueOf(auction.getStartingPrice()))
-                .replace("{topBid}", auction.getTopBid() != null ? String.valueOf(auction.getTopBid()) : "-")
-                .replace("{buyoutPrice}", auction.getBuyoutPrice() != null ? String.valueOf(auction.getBuyoutPrice()) : "-")));
-            
-            EmbedCreateSpec embed= EmbedCreateSpec.builder()
+            EmbedCreateSpec.Builder builder = EmbedCreateSpec.builder()
                 .color(Color.RUST)
                 .title(entry.getKey().getItemName())
-                .description(description.toString())
+                .description(DESCRIPTION)
                 .thumbnail(ASSETS_BASE_URL + entry.getKey().getThumb())
-                .timestamp(Instant.now())
-                .build();
+                .timestamp(Instant.now());
             
-            embeds[i] = embed;
+            entry.getValue().forEach(auction -> builder.addField(
+                    EMBED_TITLE
+                            .replace("{auctionUrl}", AUCTION_BASE_URL + auction.getId()), 
+                    EMBED_DESCRIPTION
+                            .replace("{user}", auction.getOwner().getName())
+                            .replace("{reputation}", String.valueOf(auction.getOwner().getReputation()))
+                            .replace("{damageType}", auction.getItem().getElement())
+                            .replace("{damage}", String.valueOf(auction.getItem().getDamage()))
+                            .replace("{quirk}", Objects.requireNonNullElseGet(auction.getItem().getQuirk(), () -> "-"))
+                            .replace("{startingPrice}", String.valueOf(auction.getStartingPrice()))
+                            .replace("{topBid}", auction.getTopBid() != null ? String.valueOf(auction.getTopBid()) : "-")
+                            .replace("{buyoutPrice}", auction.getBuyoutPrice() != null ? String.valueOf(auction.getBuyoutPrice()) : "-"),
+                    true));
+            
+            embeds[i] = builder.build();
             i++;
         }
         

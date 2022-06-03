@@ -27,14 +27,14 @@ public class UpdatePipelinePush extends Push {
     @Value("#{'${discord.clem.push.channels.update}'.split(',')}")
     private List<String> interestingChannels;
     
-    private static final String EVENTS_EXISTING = "***Events:*** Currently active Events existing:\n{events}";
-    private static final String EVENTS_GONE = "***Events:*** No more active Events existing.";
+    private static final String EVENTS_EXISTING = "***Events:***\n{events}";
+    private static final String EVENTS_GONE = "***Events:***\nNo more active Events existing.";
     
-    private static final String ALERTS_EXISTING = "***Alerts:*** Currently active Alerts existing:\n{alerts}";
-    private static final String ALERTS_GONE = "***Alerts:*** No more active Alerts existing.";
+    private static final String ALERTS_EXISTING = "***Alerts:***\n{alerts}";
+    private static final String ALERTS_GONE = "***Alerts:***\nNo more active Alerts existing.";
     
-    private static final String VOID_TRADER_HERE = "***Void Trader:*** Baro Ki'Teer arrived at *{location}*, he will leave in {days}d {hours}h {minutes}m.";
-    private static final String VOID_TRADER_GONE = "***Void Trader:*** Baro Ki'Teer went back into the void, he will return in {days}d {hours}h {minutes}m.";
+    private static final String VOID_TRADER_HERE = "***Void Trader:***\nBaro Ki'Teer arrived at *{location}*, he will leave in {days}d {hours}h {minutes}m.";
+    private static final String VOID_TRADER_GONE = "***Void Trader:***\nBaro Ki'Teer went back into the void, he will return in {days}d {hours}h {minutes}m.";
 
     @Override
     MessageData doNewPush(GatewayDiscordClient client, WarframeState warframeState, Snowflake channelId) {
