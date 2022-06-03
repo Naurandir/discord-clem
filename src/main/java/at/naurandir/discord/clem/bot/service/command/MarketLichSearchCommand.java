@@ -42,7 +42,7 @@ public class MarketLichSearchCommand implements Command {
             + "please use one of the following:\nimpact :hammer:, heat :fire:, cold :snowflake:, electricity :zap:, toxin :skull_crossbones:, magnetic :magnet:, radiation :radiactive:";
     
     private static final String EMBED_TITLE = "{auctionUrl}";
-    private static final String EMBED_DESCRIPTION = "*Start:* {startingPrice}:coin:\n*Current:* {topBid}:coin:\n*Direct:* {buyoutPrice}:coin:\n"
+    private static final String EMBED_DESCRIPTION = "*Start:* {startingPrice} plat\n*Current:* {topBid} plat\n*Direct:* {buyoutPrice} plat\n"
             + "*Element:* {damage}% {damageType}\n*Quirk:* {quirk}\n*Ephemera:* {ephemera}\n*User:* {user}\nReputation: {reputation}";
     
     private static final String ASSETS_BASE_URL = "https://warframe.market/static/assets/";
