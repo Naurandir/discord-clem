@@ -29,10 +29,16 @@ import reactor.core.publisher.Mono;
 @Component
 public class MarketLichSearchCommand implements Command {
     
+    private static final String DESCRIPTION = "List of found Lich Auctions";
+    
     private static final String TITLE_NOT_FOUND = "No Lich Auctions found";
     private static final String DESCRIPTION_NOT_FOUND = "No Lich Auctions could be found to given Search. Please look if the input is misspelled.";
     
-    private static final String DESCRIPTION = "List of found Lich Auctions";
+    private static final String TITLE_TOO_SHORT = "Too Short Search Input";
+    private static final String DESCRIPTION_TOO_SHORT = "In order to make a decent search, please input minimum 3 characters for the item.";
+
+    private static final String TITLE_ELEMENT_INVALID = "Element is Invalid";
+    private static final String DESCRIPTION_ELEMENT_INVALID = "The given element not existing, please use one of the following:\nimpact, heat, cold, electricity, toxin, magnetic, radiation.";
     
     private static final String EMBED_TITLE = "{auctionUrl}";
     private static final String EMBED_DESCRIPTION = "*Start:* {startingPrice}p\n*Current:* {topBid}p\n*Direct:* {buyoutPrice}p\n"
@@ -41,7 +47,11 @@ public class MarketLichSearchCommand implements Command {
     private static final String ASSETS_BASE_URL = "https://warframe.market/static/assets/";
     private static final String AUCTION_BASE_URL = "https://warframe.market/auction/";
     
+    private static final String INVALID_ELEMENT = "Invalid_Element";
+    
     private final WarframeClient warframeClient = new WarframeClient();
+    
+    private final List<String> elements = List.of("impact", "heat", "cold", "electricity", "toxin", "magnetic", "radiation");
     
     @Override
     public String getCommandWord() {
@@ -60,17 +70,23 @@ public class MarketLichSearchCommand implements Command {
     @Override
     public Mono<Void> handle(MessageCreateEvent event, WarframeState warframeState) {
         Optional<String> selectedElement = getPossibleElement(event.getMessage().getContent());
+        if (selectedElement.isPresent() && selectedElement.get().equals(INVALID_ELEMENT)) {
+            return event.getMessage().getChannel()
+                .flatMap(channel -> channel.createMessage(createErrorResponse(TITLE_ELEMENT_INVALID, DESCRIPTION_ELEMENT_INVALID)))
+                .then();
+        }
+        
         String item = getItem(event.getMessage().getContent(), selectedElement);
         if (item.length() < 3) {
             return event.getMessage().getChannel()
-                .flatMap(channel -> channel.createMessage("The given input [" + item + "] is too short. Please provide a longer name to search"))
+                .flatMap(channel -> channel.createMessage(createErrorResponse(TITLE_TOO_SHORT, DESCRIPTION_TOO_SHORT)))
                 .then();
         }
         
         List<MarketLichWeaponDTO> foundLichWeapons = getLichWeapons(item, warframeState.getMarketLichWeapons());
         if (foundLichWeapons.isEmpty()) {
             return event.getMessage().getChannel()
-                .flatMap(channel -> channel.createMessage(createNoItemsFoundResponse()))
+                .flatMap(channel -> channel.createMessage(createErrorResponse(TITLE_NOT_FOUND, DESCRIPTION_NOT_FOUND)))
                 .then();
         }
         
@@ -90,7 +106,11 @@ public class MarketLichSearchCommand implements Command {
         
         String element = splitted[2]; // <prefix> command <element> <item>
         if (element.startsWith("--")) {
-            return Optional.of(element.substring(2));
+            String foundElement = element.substring(2).toLowerCase();
+            if (!elements.contains(foundElement)) {
+                return Optional.of(INVALID_ELEMENT);
+            }
+            return Optional.of(foundElement);
         }
         
         return Optional.empty();
@@ -176,11 +196,11 @@ public class MarketLichSearchCommand implements Command {
         return embeds;
     }
     
-    private EmbedCreateSpec createNoItemsFoundResponse() {
+    private EmbedCreateSpec createErrorResponse(String title, String description) {
         return EmbedCreateSpec.builder()
                 .color(Color.RUST)
-                .title(TITLE_NOT_FOUND)
-                .description(DESCRIPTION_NOT_FOUND)
+                .title(title)
+                .description(description)
                 .timestamp(Instant.now())
                 .build();
     }
