@@ -39,7 +39,7 @@ public class MarketLichSearchCommand implements Command {
 
     private static final String TITLE_ELEMENT_INVALID = "Element is Invalid";
     private static final String DESCRIPTION_ELEMENT_INVALID = "The given element not existing, "
-            + "please use one of the following:\nimpact :hammer:, heat :fire:, cold :snowflake:, electricity :zap:, toxin :skull_crossbone:, magnetic :magnet:, radiation :radiactive:";
+            + "please use one of the following:\nimpact :hammer:, heat :fire:, cold :snowflake:, electricity :zap:, toxin :skull_crossbones:, magnetic :magnet:, radiation :radiactive:";
     
     private static final String EMBED_TITLE = "{auctionUrl}";
     private static final String EMBED_DESCRIPTION = "*Start:* {startingPrice}:coin:\n*Current:* {topBid}:coin:\n*Direct:* {buyoutPrice}:coin:\n"
@@ -58,7 +58,7 @@ public class MarketLichSearchCommand implements Command {
             "heat", ":fire:",
             "cold", ":snowflake:",
             "electricity", ":zap:",
-            "toxin", ":skull_crossbone:",
+            "toxin", ":skull_crossbones:",
             "magnetic", ":magnet:",
             "radiation", ":radiactive:");
     
@@ -73,7 +73,7 @@ public class MarketLichSearchCommand implements Command {
                 + "Note it shows only max 5 different items with similar name and max 5 current auctions. \n"
                 + "Usage: *<bot-prefix> market-lich-search <optional --element> <item>*.\n"
                 + "Example: *!clem market-lich-search --heat Nukor\n"
-                + "Valid elements: impact :hammer:, heat :fire:, cold :snowflake:, electricity :zap:, toxin :skull_crossbone:, magnetic :magnet:, radiation :radiactive:";
+                + "Valid elements: impact :hammer:, heat :fire:, cold :snowflake:, electricity :zap:, toxin :skull_crossbones:, magnetic :magnet:, radiation :radiactive:";
     }
 
     @Override
