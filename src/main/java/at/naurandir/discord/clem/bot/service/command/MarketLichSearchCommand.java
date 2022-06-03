@@ -28,11 +28,15 @@ import reactor.core.publisher.Mono;
 @Slf4j
 @Component
 public class MarketLichSearchCommand implements Command {
+    
+    private static final String TITLE_NOT_FOUND = "No Lich Auctions found";
+    private static final String DESCRIPTION_NOT_FOUND = "No Lich Auctions could be found to given Search. Please look if the input is misspelled.";
+    
     private static final String DESCRIPTION = "List of found Lich Auctions";
     
-    private static final String EMBED_TITLE = "<a href=\"{auctionUrl}\">Auction</a>";
-    private static final String EMBED_DESCRIPTION = "Start: {startingPrice}p\nCurrent: {topBid}p\nDirect: {buyoutPrice}p\n"
-            + "Element: {damage}% {damageType}\nQuirk: {quirk}\nEphemera: {ephemera}\nUser: {user} (Rep: {reputation})";
+    private static final String EMBED_TITLE = "{auctionUrl}";
+    private static final String EMBED_DESCRIPTION = "*Start:* {startingPrice}p\n*Current:* {topBid}p\n*Direct:* {buyoutPrice}p\n"
+            + "*Element:* {damage}% {damageType}\n*Quirk:* {quirk}\n*Ephemera:* {ephemera}\n*User:* {user} (Rep: {reputation})";
     
     private static final String ASSETS_BASE_URL = "https://warframe.market/static/assets/";
     private static final String AUCTION_BASE_URL = "https://warframe.market/auction/";
@@ -64,8 +68,13 @@ public class MarketLichSearchCommand implements Command {
         }
         
         List<MarketLichWeaponDTO> foundLichWeapons = getLichWeapons(item, warframeState.getMarketLichWeapons());
-        Map<MarketLichWeaponDTO, List<MarketLichAuctionDTO>> foundLichAuctions = getAuctions(foundLichWeapons, selectedElement);
+        if (foundLichWeapons.isEmpty()) {
+            return event.getMessage().getChannel()
+                .flatMap(channel -> channel.createMessage(createNoItemsFoundResponse()))
+                .then();
+        }
         
+        Map<MarketLichWeaponDTO, List<MarketLichAuctionDTO>> foundLichAuctions = getAuctions(foundLichWeapons, selectedElement);
         EmbedCreateSpec[] embeddedMessages = getEmbeddedResult(foundLichAuctions);
         return event.getMessage().getChannel()
                 .flatMap(channel -> channel.createMessage(embeddedMessages))
@@ -132,6 +141,7 @@ public class MarketLichSearchCommand implements Command {
     }
 
     private EmbedCreateSpec[] getEmbeddedResult(Map<MarketLichWeaponDTO, List<MarketLichAuctionDTO>> foundLichAuctions) {
+        
         EmbedCreateSpec[] embeds = new EmbedCreateSpec[foundLichAuctions.size()];
         int i=0;
         
@@ -152,7 +162,8 @@ public class MarketLichSearchCommand implements Command {
                             .replace("{reputation}", String.valueOf(auction.getOwner().getReputation()))
                             .replace("{damageType}", auction.getItem().getElement())
                             .replace("{damage}", String.valueOf(auction.getItem().getDamage()))
-                            .replace("{quirk}", Objects.requireNonNullElseGet(auction.getItem().getQuirk(), () -> "-"))
+                            .replace("{ephemera}", auction.getItem().getHasEphemera() ? "yes" : "no")
+                            .replace("{quirk}", Objects.requireNonNullElseGet(auction.getItem().getQuirk(), () -> "-").replace("-", " "))
                             .replace("{startingPrice}", String.valueOf(auction.getStartingPrice()))
                             .replace("{topBid}", auction.getTopBid() != null ? String.valueOf(auction.getTopBid()) : "-")
                             .replace("{buyoutPrice}", auction.getBuyoutPrice() != null ? String.valueOf(auction.getBuyoutPrice()) : "-"),
@@ -163,5 +174,14 @@ public class MarketLichSearchCommand implements Command {
         }
         
         return embeds;
+    }
+    
+    private EmbedCreateSpec createNoItemsFoundResponse() {
+        return EmbedCreateSpec.builder()
+                .color(Color.RUST)
+                .title(TITLE_NOT_FOUND)
+                .description(DESCRIPTION_NOT_FOUND)
+                .timestamp(Instant.now())
+                .build();
     }
 }
