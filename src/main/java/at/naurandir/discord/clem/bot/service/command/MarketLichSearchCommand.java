@@ -38,11 +38,12 @@ public class MarketLichSearchCommand implements Command {
     private static final String DESCRIPTION_TOO_SHORT = "In order to make a decent search, please input minimum 3 characters for the item.";
 
     private static final String TITLE_ELEMENT_INVALID = "Element is Invalid";
-    private static final String DESCRIPTION_ELEMENT_INVALID = "The given element not existing, please use one of the following:\nimpact, heat, cold, electricity, toxin, magnetic, radiation.";
+    private static final String DESCRIPTION_ELEMENT_INVALID = "The given element not existing, "
+            + "please use one of the following:\nimpact :hammer:, heat :fire:, cold :snowflake:, electricity :zap:, toxin :skull_crossbone:, magnetic :magnet:, radiation :radiactive:";
     
     private static final String EMBED_TITLE = "{auctionUrl}";
-    private static final String EMBED_DESCRIPTION = "*Start:* {startingPrice}p\n*Current:* {topBid}p\n*Direct:* {buyoutPrice}p\n"
-            + "*Element:* {damage}% {damageType}\n*Quirk:* {quirk}\n*Ephemera:* {ephemera}\n*User:* {user} (Rep: {reputation})";
+    private static final String EMBED_DESCRIPTION = "*Start:* {startingPrice}:coin:\n*Current:* {topBid}:coin:\n*Direct:* {buyoutPrice}:coin:\n"
+            + "*Element:* {damage}% {damageType}\n*Quirk:* {quirk}\n*Ephemera:* {ephemera}\n*User:* {user}\nReputation: {reputation}";
     
     private static final String ASSETS_BASE_URL = "https://warframe.market/static/assets/";
     private static final String AUCTION_BASE_URL = "https://warframe.market/auction/";
@@ -52,6 +53,14 @@ public class MarketLichSearchCommand implements Command {
     private final WarframeClient warframeClient = new WarframeClient();
     
     private final List<String> elements = List.of("impact", "heat", "cold", "electricity", "toxin", "magnetic", "radiation");
+    private final Map<String, String> elementEmojis = Map.of(
+            "impact", ":hammer:",
+            "heat", ":fire:",
+            "cold", ":snowflake:",
+            "electricity", ":zap:",
+            "toxin", ":skull_crossbone:",
+            "magnetic", ":magnet:",
+            "radiation", ":radiactive:");
     
     @Override
     public String getCommandWord() {
@@ -64,7 +73,7 @@ public class MarketLichSearchCommand implements Command {
                 + "Note it shows only max 5 different items with similar name and max 5 current auctions. \n"
                 + "Usage: *<bot-prefix> market-lich-search <optional --element> <item>*.\n"
                 + "Example: *!clem market-lich-search --heat Nukor\n"
-                + "Valid elements: impact, heat, cold, electricity, toxin, magnetic, radiation.";
+                + "Valid elements: impact :hammer:, heat :fire:, cold :snowflake:, electricity :zap:, toxin :skull_crossbone:, magnetic :magnet:, radiation :radiactive:";
     }
 
     @Override
@@ -180,7 +189,7 @@ public class MarketLichSearchCommand implements Command {
                     EMBED_DESCRIPTION
                             .replace("{user}", auction.getOwner().getName())
                             .replace("{reputation}", String.valueOf(auction.getOwner().getReputation()))
-                            .replace("{damageType}", auction.getItem().getElement())
+                            .replace("{damageType}", elementEmojis.get(auction.getItem().getElement()))
                             .replace("{damage}", String.valueOf(auction.getItem().getDamage()))
                             .replace("{ephemera}", auction.getItem().getHasEphemera() ? "yes" : "no")
                             .replace("{quirk}", Objects.requireNonNullElseGet(auction.getItem().getQuirk(), () -> "-").replace("-", " "))
