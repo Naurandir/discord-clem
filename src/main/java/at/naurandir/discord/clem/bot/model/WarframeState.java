@@ -20,6 +20,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -44,8 +45,9 @@ public class WarframeState {
     private VoidTraderDTO voidTrader;
     
     private boolean isVoidTraderStateChanged;
-    private boolean isAlertsStateChanged;
-    private boolean isEventStateChanged;
+    
+    private List<String> oldAlertIds;
+    private List<String> oldEventIds;
     
     // drop table
     private List<RelicDTO> relics;  
@@ -58,13 +60,16 @@ public class WarframeState {
     private Comparator<VoidFissureDTO> voidFissureComparator = Comparator.comparing(VoidFissureDTO::getTierNum);
 
     public WarframeState(WorldStateDTO newWorldState, DropTableDTO dropTable, MarketDTO market) {
+        oldAlertIds = List.of();
+        oldEventIds = List.of();
+        
         updateWorldStateData(newWorldState);
         refreshDropTableData(dropTable);
         refreshMarketData(market);
     }
 
     public void refreshWorldState(WorldStateDTO newWorldState) {
-        checkWorldStateDataChanged(newWorldState);
+        updateWorldStateDataChanged(newWorldState);
         updateWorldStateData(newWorldState);
     }
     
@@ -92,16 +97,16 @@ public class WarframeState {
         cambionCycle = newWorldState.getCambionCycleDTO();
     }
     
-    private void checkWorldStateDataChanged(WorldStateDTO newWorldState) {
+    private void updateWorldStateDataChanged(WorldStateDTO newWorldState) {
         setVoidTraderStateChanged(!Objects.equals(getVoidTrader().getActive(),
                 newWorldState.getVoidTraderDTO().getActive()));
         
-        setAlertsStateChanged(!Objects.equals(
-                Optional.of(newWorldState.getAlertsDTO()).orElse(List.of()).size(),
-                getAlerts().size()));        
+        setOldEventIds(events.stream()
+                .map(event -> event.getId())
+                .collect(Collectors.toList()));
         
-        setEventStateChanged(!Objects.equals(
-                Optional.of(newWorldState.getEventsDTO()).orElse(List.of()).size(),
-                getEvents().size()));
+        setOldAlertIds(alerts.stream()
+                .map(alert -> alert.getId())
+                .collect(Collectors.toList()));
     }
 }

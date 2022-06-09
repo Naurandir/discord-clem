@@ -41,7 +41,7 @@ public class MarketLichSearchCommand implements Command {
     private static final String DESCRIPTION_ELEMENT_INVALID = "The given element not existing, "
             + "please use one of the following:\nimpact :hammer:, heat :fire:, cold :snowflake:, electricity :zap:, toxin :skull_crossbones:, magnetic :magnet:, radiation :radiactive:";
     
-    private static final String EMBED_TITLE = "{auctionUrl}";
+    private static final String EMBED_TITLE = "[Auction Link]({auctionUrl})";
     private static final String EMBED_DESCRIPTION = "*Start:* {startingPrice} plat\n*Current:* {topBid} plat\n*Direct:* {buyoutPrice} plat\n"
             + "*Element:* {damage}% {damageType}\n*Quirk:* {quirk}\n*Ephemera:* {ephemera}\n*User:* {user}\nReputation: {reputation}";
     

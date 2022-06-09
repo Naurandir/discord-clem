@@ -27,10 +27,10 @@ public class UpdatePipelinePush extends Push {
     @Value("#{'${discord.clem.push.channels.update}'.split(',')}")
     private List<String> interestingChannels;
     
-    private static final String EVENTS_EXISTING = "***Events:***\n{events}";
+    private static final String EVENT_EXISTING = "***New Event:***\n{event}";
     private static final String EVENTS_GONE = "***Events:***\nNo more active Events existing.";
     
-    private static final String ALERTS_EXISTING = "***Alerts:***\n{alerts}";
+    private static final String ALERT_EXISTING = "***New Alert:***\n{alert}";
     private static final String ALERTS_GONE = "***Alerts:***\nNo more active Alerts existing.";
     
     private static final String VOID_TRADER_HERE = "***Void Trader:***\nBaro Ki'Teer arrived at *{location}*, he will leave in {days}d {hours}h {minutes}m.";
@@ -68,49 +68,52 @@ public class UpdatePipelinePush extends Push {
     }
 
     private void alertsChangeNotify(WarframeState warframeState, GatewayDiscordClient client, Snowflake channelId) {
-        if (warframeState.isAlertsStateChanged() && warframeState.getAlerts() != null && warframeState.getAlerts().size() > 0) {
-            String alerts = "";
-            
-            for (AlertDTO alert : warframeState.getAlerts()) {
-                if (!alert.getActive()) {
-                    continue;
-                }
-                alerts += "*" + alert.getMission() + "* - " + StringUtils.join(", ", alert.getRewardTypes()) +"\n";
-            }
-            
-            // we only send a message if we got minimum 1 active alert to be shown.
-            if (!alerts.equals("")) {
-                client.rest().getChannelById(channelId)
-                        .createMessage(ALERTS_EXISTING.replace("{alerts}", alerts))
-                        .subscribe();
-            }
-        } else if (warframeState.isAlertsStateChanged()) {
+        if (warframeState.getAlerts().isEmpty()) {
             client.rest().getChannelById(channelId)
                     .createMessage(ALERTS_GONE)
                     .subscribe();
         }
+        
+        for (AlertDTO alert : warframeState.getAlerts()) {
+            if (!alert.getActive()) {
+                continue;
+            }
+            
+            if (warframeState.getOldAlertIds().contains(alert.getId())) {
+                continue;
+            }
+            
+            String alertMessage = "*" + alert.getMission() + "* - " + StringUtils.join(", ", alert.getRewardTypes()) +"\n";
+            
+            client.rest().getChannelById(channelId)
+                        .createMessage(ALERT_EXISTING.replace("{alert}", alertMessage))
+                        .subscribe();
+            
+        }
     }
     
     private void eventsChangeNotify(WarframeState warframeState, GatewayDiscordClient client, Snowflake channelId) {
-        if (warframeState.isEventStateChanged() && warframeState.getEvents() != null && warframeState.getEvents().size() > 0) {
-            String events = "";
-            
-            for (EventDTO event : warframeState.getEvents()) {
-                if (!event.getActive()) {
-                    continue;
-                }
-                events += "*" + event.getDescription() + "* - " + event.getTooltip() +"\n";
-                
-                if (!events.equals("")) {
-                    client.rest().getChannelById(channelId)
-                        .createMessage(EVENTS_EXISTING.replace("{events}", events))
-                        .subscribe();
-                }
-            }
-        } else if (warframeState.isEventStateChanged()) {
+        if (warframeState.getEvents().isEmpty()) {
             client.rest().getChannelById(channelId)
                     .createMessage(EVENTS_GONE)
                     .subscribe();
+        }
+        
+        for (EventDTO event : warframeState.getEvents()) {
+            if (!event.getActive()) {
+                continue;
+            }
+            
+            if (warframeState.getOldEventIds().contains(event.getId())) {
+                continue;
+            }
+            
+            String eventMessage = "*" + event.getDescription() + "* - " + event.getTooltip() + "\n";
+            
+            client.rest().getChannelById(channelId)
+                        .createMessage(EVENT_EXISTING.replace("{event}", eventMessage))
+                        .subscribe();
+            
         }
     }
     
