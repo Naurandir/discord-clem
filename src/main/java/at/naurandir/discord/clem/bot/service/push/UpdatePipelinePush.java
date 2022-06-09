@@ -68,7 +68,7 @@ public class UpdatePipelinePush extends Push {
     }
 
     private void alertsChangeNotify(WarframeState warframeState, GatewayDiscordClient client, Snowflake channelId) {
-        if (warframeState.getAlerts().isEmpty()) {
+        if (warframeState.getAlerts().isEmpty() && !warframeState.getOldAlertIds().isEmpty()) {
             client.rest().getChannelById(channelId)
                     .createMessage(ALERTS_GONE)
                     .subscribe();
@@ -93,7 +93,7 @@ public class UpdatePipelinePush extends Push {
     }
     
     private void eventsChangeNotify(WarframeState warframeState, GatewayDiscordClient client, Snowflake channelId) {
-        if (warframeState.getEvents().isEmpty()) {
+        if (warframeState.getEvents().isEmpty() && !warframeState.getOldEventIds().isEmpty()) {
             client.rest().getChannelById(channelId)
                     .createMessage(EVENTS_GONE)
                     .subscribe();
