@@ -24,4 +24,6 @@ public class MarketOrderDTO {
     private OrderType orderType;
     
     private MarketUserDTO user;
+    
+    private Boolean visible;
 }

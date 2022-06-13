@@ -89,7 +89,7 @@ public class MarketSearchCommand implements Command {
                 List<MarketOrderDTO> foundOrders = warframeClient.getCurrentOrders(marketItem.getUrlName()).getPayload().getOrders();
             
             foundOrders = foundOrders.stream()
-                    .filter(order -> order.getOrderType() == OrderType.SELL)
+                    .filter(order -> order.getOrderType() == OrderType.SELL && order.getVisible())
                     .filter(order -> order.getUser().getStatus() == OnlineStatus.INGAME || 
                                      order.getUser().getStatus() == OnlineStatus.ONLINE)
                     .sorted((order1, order2) -> order1.getPlatinum().compareTo(order2.getPlatinum()))
