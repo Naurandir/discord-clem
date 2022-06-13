@@ -1,6 +1,7 @@
 package at.naurandir.discord.clem.bot.service.command;
 
 import at.naurandir.discord.clem.bot.model.WarframeState;
+import at.naurandir.discord.clem.bot.model.enums.OnlineStatus;
 import at.naurandir.discord.clem.bot.service.client.WarframeClient;
 import at.naurandir.discord.clem.bot.service.client.dto.market.MarketLichAuctionDTO;
 import at.naurandir.discord.clem.bot.service.client.dto.market.MarketLichWeaponDTO;
@@ -145,7 +146,7 @@ public class MarketLichSearchCommand implements Command {
             Optional<String> element) {
         Map<MarketLichWeaponDTO, List<MarketLichAuctionDTO>> lichAuctions = new HashMap<>();
         
-        // maximum 5 items will be analysed
+        // maximum 3 items will be analysed
         List<MarketLichWeaponDTO> interestingWeapons = marketLichWeapons.stream().limit(3).collect(Collectors.toList());
         
         for (MarketLichWeaponDTO lichWeapon : interestingWeapons) {
@@ -155,6 +156,8 @@ public class MarketLichSearchCommand implements Command {
                 
                 foundAuctions = foundAuctions.stream()
                         .filter(auction -> !auction.getClosed() && auction.getVisible())
+                        .filter(auction -> auction.getOwner().getStatus() == OnlineStatus.INGAME || 
+                                           auction.getOwner().getStatus() == OnlineStatus.ONLINE)
                         .sorted((auction1, auction2) -> 
                                 auction1.getStartingPrice().compareTo(auction2.getStartingPrice()))
                         .limit(6)
