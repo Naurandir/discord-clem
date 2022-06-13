@@ -8,6 +8,8 @@ import com.google.gson.annotations.SerializedName;
  */
 public enum OnlineStatus {
     
+    @SerializedName("ingame")
+    INGAME,
     @SerializedName("online")
     ONLINE,
     @SerializedName("offline")

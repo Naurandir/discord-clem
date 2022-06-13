@@ -1,6 +1,7 @@
 package at.naurandir.discord.clem.bot.service.command;
 
 import at.naurandir.discord.clem.bot.model.WarframeState;
+import at.naurandir.discord.clem.bot.model.enums.OnlineStatus;
 import at.naurandir.discord.clem.bot.model.enums.OrderType;
 import at.naurandir.discord.clem.bot.service.client.WarframeClient;
 import at.naurandir.discord.clem.bot.service.client.dto.market.MarketItemDTO;
@@ -42,7 +43,7 @@ public class MarketSearchCommand implements Command {
     @Override
     public String getDescription() {
         return "Shows current prices of an item on the warframe market.\n"
-                + "Note it shows maximum up to 5 different items with similar name and max 3 current lowest prices. \n"
+                + "Note it shows maximum up to 5 different items with similar name and max 5 current lowest prices. \n"
                 + "Usage: *<bot-prefix> market-search <item>*.";
     }
 
@@ -89,8 +90,9 @@ public class MarketSearchCommand implements Command {
             
             foundOrders = foundOrders.stream()
                     .filter(order -> order.getOrderType() == OrderType.SELL)
+                    .filter(order -> order.getUser().getStatus() == OnlineStatus.INGAME || order.getUser().getStatus() == OnlineStatus.ONLINE)
                     .sorted((order1, order2) -> order1.getPlatinum().compareTo(order2.getPlatinum()))
-                    .limit(3)
+                    .limit(5)
                     .collect(Collectors.toList());
             
             itemOrders.put(marketItem, foundOrders);
