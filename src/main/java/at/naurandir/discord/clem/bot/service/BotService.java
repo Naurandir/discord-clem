@@ -176,4 +176,16 @@ public class BotService {
             log.error("refreshMarket: update throwed exception: ", ex);
         }
     }
+    
+    /**
+     * once per day we refresh the builds data
+     */
+    @Scheduled(fixedRate = 24 * 60 * 60 * 1_000)
+    public void refreshBuilds() {
+        try {
+            worldStateService.refreshBuilds();
+        } catch (Exception ex) {
+            log.error("refreshBuilds: update throwed exception: ", ex);
+        }
+    }
 }

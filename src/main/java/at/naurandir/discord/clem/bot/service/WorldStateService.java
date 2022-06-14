@@ -5,6 +5,7 @@ import at.naurandir.discord.clem.bot.service.client.WarframeClient;
 import at.naurandir.discord.clem.bot.service.client.dto.DropTableDTO;
 import at.naurandir.discord.clem.bot.service.client.dto.MarketDTO;
 import at.naurandir.discord.clem.bot.service.client.dto.WorldStateDTO;
+import at.naurandir.discord.clem.bot.service.client.dto.overframe.OverframeDTO;
 import java.io.IOException;
 import javax.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
@@ -27,8 +28,9 @@ public class WorldStateService {
         WorldStateDTO newWorldState = warframeClient.getCurrentWorldState();
         DropTableDTO newDropTable = warframeClient.getCurrentDropTable();
         MarketDTO newMarket = warframeClient.getCurrentMarket();
+        OverframeDTO builds = warframeClient.getCurrentBuilds();
         
-        warframeState = new WarframeState(newWorldState, newDropTable, newMarket);
+        warframeState = new WarframeState(newWorldState, newDropTable, newMarket, builds);
     }
     
     public WarframeState getWarframeState() {
@@ -62,6 +64,16 @@ public class WorldStateService {
             warframeState.refreshMarketData(market);
         } catch (Exception ex) {
             log.error("refreshMarket: update throwed exception: ", ex);
+        }
+    }
+    
+    public void refreshBuilds() {
+        try {
+            OverframeDTO overframeBuilds = warframeClient.getCurrentBuilds();
+            log.debug("refreshBuilds: received dto.");
+            warframeState.refreshBuildsData(overframeBuilds);
+        } catch (Exception ex) {
+            log.error("refreshBuilds: update throwed exception: ", ex);
         }
     }
 }

@@ -13,6 +13,7 @@ import at.naurandir.discord.clem.bot.service.client.dto.droptable.MissionDTO;
 import at.naurandir.discord.clem.bot.service.client.dto.droptable.RelicDTO;
 import at.naurandir.discord.clem.bot.service.client.dto.market.MarketItemDTO;
 import at.naurandir.discord.clem.bot.service.client.dto.market.MarketLichWeaponDTO;
+import at.naurandir.discord.clem.bot.service.client.dto.overframe.OverframeDTO;
 import at.naurandir.discord.clem.bot.service.client.dto.worldstate.EarthCycleDTO;
 import at.naurandir.discord.clem.bot.service.client.dto.worldstate.EventDTO;
 import java.util.Collections;
@@ -57,15 +58,19 @@ public class WarframeState {
     private List<MarketItemDTO> marketItems;
     private List<MarketLichWeaponDTO> marketLichWeapons;
     
+    // builds
+    private OverframeDTO overframeBuilds;
+    
     private Comparator<VoidFissureDTO> voidFissureComparator = Comparator.comparing(VoidFissureDTO::getTierNum);
 
-    public WarframeState(WorldStateDTO newWorldState, DropTableDTO dropTable, MarketDTO market) {
+    public WarframeState(WorldStateDTO newWorldState, DropTableDTO dropTable, MarketDTO market, OverframeDTO buildsData) {
         oldAlertIds = List.of();
         oldEventIds = List.of();
         
         updateWorldStateData(newWorldState);
         refreshDropTableData(dropTable);
         refreshMarketData(market);
+        refreshBuildsData(buildsData);
     }
 
     public void refreshWorldState(WorldStateDTO newWorldState) {
@@ -81,6 +86,10 @@ public class WarframeState {
     public final void refreshMarketData(MarketDTO marketData) {
         marketItems = marketData.getItems().getPayload().get("items");
         marketLichWeapons = marketData.getLichWeapons().getPayload().get("weapons");
+    }
+    
+    public final void refreshBuildsData(OverframeDTO buildsData) {
+        overframeBuilds = buildsData;
     }
     
     private void updateWorldStateData(WorldStateDTO newWorldState) {

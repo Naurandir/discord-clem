@@ -11,6 +11,11 @@ import at.naurandir.discord.clem.bot.service.client.dto.market.MarketItemsDTO;
 import at.naurandir.discord.clem.bot.service.client.dto.market.MarketLichAuctionsDTO;
 import at.naurandir.discord.clem.bot.service.client.dto.market.MarketLichWeaponsDTO;
 import at.naurandir.discord.clem.bot.service.client.dto.market.MarketOrdersResultDTO;
+import at.naurandir.discord.clem.bot.service.client.dto.overframe.OverframeBuildDTO;
+import at.naurandir.discord.clem.bot.service.client.dto.overframe.OverframeDTO;
+import at.naurandir.discord.clem.bot.service.client.dto.overframe.OverframeItemDTO;
+import at.naurandir.discord.clem.bot.service.client.dto.overframe.OverframeItemTierDTO;
+import at.naurandir.discord.clem.bot.service.client.dto.overframe.OverframeItemTierListDTO;
 import com.google.gson.Gson;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -117,6 +122,101 @@ public class WarframeClient {
                 log.info("getCurrentLichAuctions: received http status [{}]", response.getStatusLine());
                 String jsonString = getHttpContent(response);
                 return gson.fromJson(jsonString, MarketLichAuctionsDTO.class);
+            }
+        }
+    }
+    
+    public OverframeDTO getCurrentBuilds() throws IOException {
+        OverframeDTO dto = new OverframeDTO();
+        
+        OverframeItemTierListDTO warframeTierlist = getTierList("0");
+        OverframeItemTierListDTO primaryWeaponTierlist = getTierList("1");
+        OverframeItemTierListDTO secondaryTierlist = getTierList("2");
+        OverframeItemTierListDTO meeleTierlist = getTierList("3");
+        
+        List<OverframeItemDTO> warframes = new ArrayList<>();
+        for (OverframeItemTierDTO itemTier : warframeTierlist.getTierList()) {
+            warframes.add(getOverframeItem(itemTier.getItemId()));
+        }
+        
+        List<OverframeItemDTO> primaryWeapons = new ArrayList<>();
+        for (OverframeItemTierDTO itemTier : primaryWeaponTierlist.getTierList()) {
+            primaryWeapons.add(getOverframeItem(itemTier.getItemId()));
+        }
+        
+        List<OverframeItemDTO> secondaryWeapons = new ArrayList<>();
+        for (OverframeItemTierDTO itemTier : secondaryTierlist.getTierList()) {
+            secondaryWeapons.add(getOverframeItem(itemTier.getItemId()));
+        }
+        
+        List<OverframeItemDTO> meeleWeapons = new ArrayList<>();
+        for (OverframeItemTierDTO itemTier : meeleTierlist.getTierList()) {
+            meeleWeapons.add(getOverframeItem(itemTier.getItemId()));
+        }
+        
+        dto.setWarframes(warframes);
+        dto.setPrimaryWeapons(primaryWeapons);
+        dto.setSecondaryWeapons(secondaryWeapons);
+        dto.setMeeleWeapons(meeleWeapons);
+        
+        return dto;
+    }
+    
+    private OverframeItemTierListDTO getTierList(String type) throws IOException {
+        try (CloseableHttpClient httpClient = getClient()) {
+            HttpGet httpGet = new HttpGet("https://overframe.gg/api/v1/tierlists/" + type + "/");            
+            try (CloseableHttpResponse response = httpClient.execute(httpGet)) {
+                log.info("getTierList: received http status [{}]", response.getStatusLine());
+                String jsonString = getHttpContent(response);
+                return gson.fromJson(jsonString, OverframeItemTierListDTO.class);
+            }
+        }
+    }
+    
+    private OverframeItemDTO getOverframeItem(Long id) throws IOException {
+        OverframeItemDTO item = new OverframeItemDTO();
+        item.setId(id);
+        
+        try (CloseableHttpClient httpClient = getClient()) {
+            HttpGet httpGet = new HttpGet("https://overframe.gg/items/arsenal/5576/" + id + "/");            
+            try (CloseableHttpResponse response = httpClient.execute(httpGet)) {
+                log.info("getOverframeItem: received http status [{}] for item id [{}]", response.getStatusLine(), id);
+                
+                String htmlString = getHttpContent(response);
+                Document html = Jsoup.parse(htmlString);
+                
+                // title
+                // Title: Warframe Kuva Zarr - Warframe Kuva Zarr Builds - Overframe
+                item.setName(html.select("title").first().text().split(" - ")[0].replace("Warframe ", ""));
+                
+                // picture url
+                Elements metaElements = html.select("meta");
+                for (Element metaElement : metaElements) {
+                    if (metaElement.attr("content").startsWith("https://overframe.gg")) {
+                        item.setPictureUrl(metaElement.attr("content"));
+                        break;
+                    }
+                }
+                
+                // Builds
+                item.setBuilds(new ArrayList<>());
+                Elements buildElements = html.select("article").get(1).getElementsByTag("a");
+                for (Element build : buildElements) {
+                    OverframeBuildDTO buildDTO = new OverframeBuildDTO();
+                    
+                    buildDTO.setUrl("https://overframe.gg" + build.attr("href"));
+                    buildDTO.setVotes(build.child(2).text());
+                    
+                    Element buildData = build.child(1);
+                    
+                    buildDTO.setTitle(buildData.child(0).text());
+                    buildDTO.setFormasUsed(buildData.child(2).child(0).text());
+                    buildDTO.setGuideLength(buildData.child(2).child(1).text());
+                    
+                    item.getBuilds().add(buildDTO);
+                }
+                
+                return item;
             }
         }
     }

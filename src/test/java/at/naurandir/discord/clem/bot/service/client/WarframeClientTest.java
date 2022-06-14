@@ -27,7 +27,7 @@ public class WarframeClientTest {
 //    
 //    private String httpContent = "";
 //
-//    private WarframeClient warframeClient;
+    private WarframeClient warframeClient;
 //
 //    @BeforeEach
 //    public void setup() throws IOException {
@@ -103,4 +103,11 @@ public class WarframeClientTest {
 //        assertEquals(1, dto.getMissionRewards().size());
 //        assertEquals(expected, dto.getMissionRewards());
 //    }
+    
+//    @Test
+//    public void realCall() throws IOException {
+//        warframeClient = new WarframeClient();
+//        warframeClient.getCurrentBuilds();
+//    }
+    
 }
