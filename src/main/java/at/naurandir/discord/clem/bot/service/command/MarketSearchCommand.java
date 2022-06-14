@@ -11,6 +11,7 @@ import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.util.Color;
 import java.io.IOException;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -106,8 +107,8 @@ public class MarketSearchCommand implements Command {
     }
 
     private EmbedCreateSpec[] getEmbeddedResult(Map<MarketItemDTO, List<MarketOrderDTO>> foundSellOrders) {
-        EmbedCreateSpec[] embeds = new EmbedCreateSpec[foundSellOrders.size()];
-        int i=0;
+        List<EmbedCreateSpec> embeds = new ArrayList<>();
+        EmbedCreateSpec[] embedArray = new EmbedCreateSpec[foundSellOrders.size()];
         
         for (Entry<MarketItemDTO, List<MarketOrderDTO>> entry : foundSellOrders.entrySet()) {
             StringBuilder description = new StringBuilder("");
@@ -127,11 +128,10 @@ public class MarketSearchCommand implements Command {
                 .timestamp(Instant.now())
                 .build();
             
-            embeds[i] = embed;
-            i++;
+            embeds.add(embed);
         }
         
-        return embeds;
+        return embeds.toArray(embedArray);
     }
     
 }

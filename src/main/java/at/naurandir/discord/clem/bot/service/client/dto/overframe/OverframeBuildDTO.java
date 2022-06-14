@@ -18,7 +18,6 @@ public class OverframeBuildDTO {
     private String title;
     private String url;
     private String votes;
-    private String warframeVersion;
     private String formasUsed;
     private String guideLength;
 }

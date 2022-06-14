@@ -10,6 +10,7 @@ import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.util.Color;
 import java.io.IOException;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -174,9 +175,8 @@ public class MarketLichSearchCommand implements Command {
     }
 
     private EmbedCreateSpec[] getEmbeddedResult(Map<MarketLichWeaponDTO, List<MarketLichAuctionDTO>> foundLichAuctions) {
-        
-        EmbedCreateSpec[] embeds = new EmbedCreateSpec[foundLichAuctions.size()];
-        int i=0;
+        List<EmbedCreateSpec> embeds = new ArrayList<>();
+        EmbedCreateSpec[] embedArray = new EmbedCreateSpec[foundLichAuctions.size()];
         
         for (Map.Entry<MarketLichWeaponDTO, List<MarketLichAuctionDTO>> entry : foundLichAuctions.entrySet()) {
             
@@ -202,11 +202,10 @@ public class MarketLichSearchCommand implements Command {
                             .replace("{buyoutPrice}", auction.getBuyoutPrice() != null ? String.valueOf(auction.getBuyoutPrice()) : "-"),
                     true));
             
-            embeds[i] = builder.build();
-            i++;
+            embeds.add(builder.build());
         }
         
-        return embeds;
+        return embeds.toArray(embedArray);
     }
     
     private EmbedCreateSpec createErrorResponse(String title, String description) {
