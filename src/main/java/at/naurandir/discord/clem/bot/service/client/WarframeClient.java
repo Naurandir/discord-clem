@@ -193,7 +193,7 @@ public class WarframeClient {
                 Elements metaElements = html.select("meta");
                 for (Element metaElement : metaElements) {
                     String content = metaElement.attr("content");
-                    if (content.startsWith("https://overframe.gg") && content.contains("Icons")) {
+                    if (content.startsWith("https://media.overframe.gg/") && content.contains("Icons")) {
                         item.setPictureUrl(content);
                         break;
                     }
