@@ -178,7 +178,7 @@ public class WarframeClient {
         item.setId(id);
         
         try (CloseableHttpClient httpClient = getClient()) {
-            HttpGet httpGet = new HttpGet("https://overframe.gg/items/arsenal/5576/" + id + "/");            
+            HttpGet httpGet = new HttpGet("https://overframe.gg/items/arsenal/" + id + "/");            
             try (CloseableHttpResponse response = httpClient.execute(httpGet)) {
                 log.info("getOverframeItem: received http status [{}] for item id [{}]", response.getStatusLine(), id);
                 
@@ -211,7 +211,12 @@ public class WarframeClient {
                     
                     buildDTO.setTitle(buildData.child(0).text());
                     buildDTO.setFormasUsed(buildData.child(2).child(0).text());
-                    buildDTO.setGuideLength(buildData.child(2).child(1).text());
+                    
+                    if (buildData.child(2).childrenSize() > 1) {
+                        buildDTO.setGuideLength(buildData.child(2).child(1).text());
+                    } else {
+                        buildDTO.setGuideLength("Normal Guide");
+                    }
                     
                     item.getBuilds().add(buildDTO);
                 }

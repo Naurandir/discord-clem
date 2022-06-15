@@ -53,7 +53,7 @@ public class BuildSearchCommand implements Command {
         }
         
         List<OverframeItemDTO> foundItems = getBuildItems(item, warframeState.getOverframeBuilds());
-        log.debug("handle: found [{}] items for given inp0ut [{}]", foundItems.size(), item);
+        log.debug("handle: found [{}] items for given input [{}]", foundItems.size(), item);
         
         if (foundItems.isEmpty()) {
             return event.getMessage().getChannel()
@@ -77,19 +77,19 @@ public class BuildSearchCommand implements Command {
         List<OverframeItemDTO> items = new ArrayList<>();
         
         items.addAll(overframeBuilds.getWarframes().stream()
-                .filter(foundItem -> foundItem.getName().contains(item))
+                .filter(foundItem -> foundItem.getName().toLowerCase().contains(item.toLowerCase()))
                 .collect(Collectors.toList()));
         
         items.addAll(overframeBuilds.getPrimaryWeapons().stream()
-                .filter(foundItem -> foundItem.getName().contains(item))
+                .filter(foundItem -> foundItem.getName().toLowerCase().contains(item.toLowerCase()))
                 .collect(Collectors.toList()));
         
         items.addAll(overframeBuilds.getSecondaryWeapons().stream()
-                .filter(foundItem -> foundItem.getName().contains(item))
+                .filter(foundItem -> foundItem.getName().toLowerCase().contains(item.toLowerCase()))
                 .collect(Collectors.toList()));
         
         items.addAll(overframeBuilds.getMeeleWeapons().stream()
-                .filter(foundItem -> foundItem.getName().contains(item))
+                .filter(foundItem -> foundItem.getName().toLowerCase().contains(item.toLowerCase()))
                 .collect(Collectors.toList()));
         
         return items.stream()
