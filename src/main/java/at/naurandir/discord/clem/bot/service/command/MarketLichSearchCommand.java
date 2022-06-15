@@ -96,6 +96,8 @@ public class MarketLichSearchCommand implements Command {
         }
         
         List<MarketLichWeaponDTO> foundLichWeapons = getLichWeapons(item, warframeState.getMarketLichWeapons());
+        log.debug("handle: found [{}] lich weapons for given input [{}]", foundLichWeapons.size(), item);
+        
         if (foundLichWeapons.isEmpty()) {
             return event.getMessage().getChannel()
                 .flatMap(channel -> channel.createMessage(createErrorResponse(TITLE_NOT_FOUND, DESCRIPTION_NOT_FOUND)))
@@ -103,6 +105,7 @@ public class MarketLichSearchCommand implements Command {
         }
         
         Map<MarketLichWeaponDTO, List<MarketLichAuctionDTO>> foundLichAuctions = getAuctions(foundLichWeapons, selectedElement);
+        
         EmbedCreateSpec[] embeddedMessages = getEmbeddedResult(foundLichAuctions);
         return event.getMessage().getChannel()
                 .flatMap(channel -> channel.createMessage(embeddedMessages))

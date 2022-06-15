@@ -27,6 +27,9 @@ public class BuildSearchCommand implements Command {
     private static final String DESCRIPTION = "List of found Overframe Builds";
     private static final String EMBED_TITLE = "***{title}*** ({votes})";
     private static final String EMBED_DESCRIPTION = "{url}\n {forma} - {guide}";
+    
+    private static final String TITLE_NOT_FOUND = "No Warframe / Weapon found";
+    private static final String DESCRIPTION_NOT_FOUND = "No Warframe / Weapon could be found to given Search. Please look if the input is misspelled.";
 
     @Override
     public String getCommandWord() {
@@ -50,6 +53,13 @@ public class BuildSearchCommand implements Command {
         }
         
         List<OverframeItemDTO> foundItems = getBuildItems(item, warframeState.getOverframeBuilds());
+        log.debug("handle: found [{}] items for given inp0ut [{}]", foundItems.size(), item);
+        
+        if (foundItems.isEmpty()) {
+            return event.getMessage().getChannel()
+                .flatMap(channel -> channel.createMessage(createErrorResponse(TITLE_NOT_FOUND, DESCRIPTION_NOT_FOUND)))
+                .then();
+        }
         
         EmbedCreateSpec[] embeddedMessages = getEmbeddedResult(foundItems);
         return event.getMessage().getChannel()
@@ -113,6 +123,15 @@ public class BuildSearchCommand implements Command {
         
         EmbedCreateSpec[] embedArray = new EmbedCreateSpec[foundItems.size()];
         return embeds.toArray(embedArray);
+    }
+    
+    private EmbedCreateSpec createErrorResponse(String title, String description) {
+        return EmbedCreateSpec.builder()
+                .color(Color.ENDEAVOUR)
+                .title(title)
+                .description(description)
+                .timestamp(Instant.now())
+                .build();
     }
     
 }
