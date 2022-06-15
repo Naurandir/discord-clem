@@ -142,7 +142,7 @@ public class BotService {
      * analyse the difference and push the difference into the channels
      * save the new state
      */
-    @Scheduled(fixedRate = 60 * 1_000)
+    @Scheduled(fixedDelay = 60 * 1_000, fixedRate = 60 * 1_000)
     public void refreshWorldState() {
         try {
             worldStateService.refreshWorldState();
@@ -155,7 +155,7 @@ public class BotService {
     /**
      * once per hour we refresh the drop tables
      */
-    @Scheduled(fixedRate = 60 * 60 * 1_000)
+    @Scheduled(fixedDelay = 24 * 60 * 60 * 1_000, fixedRate = 60 * 60 * 1_000)
     public void refreshDropTables() {
         try {
             worldStateService.refreshDropTable();
@@ -168,7 +168,7 @@ public class BotService {
     /**
      * once per day we refresh the market data
      */
-    @Scheduled(fixedRate = 24 * 60 * 60 * 1_000)
+    @Scheduled(fixedDelay = 24 * 60 * 60 * 1_000, fixedRate = 24 * 60 * 60 * 1_000)
     public void refreshMarket() {
         try {
             worldStateService.refreshMarket();
@@ -180,7 +180,7 @@ public class BotService {
     /**
      * once per day we refresh the builds data
      */
-    @Scheduled(fixedRate = 24 * 60 * 60 * 1_000)
+    @Scheduled(fixedDelay = 24 * 60 * 60 * 1_000, fixedRate = 24 * 60 * 60 * 1_000)
     public void refreshBuilds() {
         try {
             worldStateService.refreshBuilds();
