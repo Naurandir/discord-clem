@@ -25,8 +25,8 @@ import reactor.core.publisher.Mono;
 public class BuildSearchCommand implements Command {
     
     private static final String DESCRIPTION = "List of found Overframe Builds";
-    private static final String EMBED_TITLE = "***{title}*** ({votes})";
-    private static final String EMBED_DESCRIPTION = "{url}\n {forma} - {guide}";
+    private static final String EMBED_TITLE = "***{title}***";
+    private static final String EMBED_DESCRIPTION = "{url}\n {forma} - {guide} ({votes})";
     
     private static final String TITLE_NOT_FOUND = "No Warframe / Weapon found";
     private static final String DESCRIPTION_NOT_FOUND = "No Warframe / Weapon could be found to given Search. Please look if the input is misspelled.";
@@ -110,11 +110,11 @@ public class BuildSearchCommand implements Command {
             
             foundItem.getBuilds().stream().limit(5).forEach(build -> builder.addField(
                     EMBED_TITLE
-                            .replace("{title}", build.getTitle())
-                            .replace("{votes}", build.getVotes()),
+                            .replace("{title}", build.getTitle()),
                     EMBED_DESCRIPTION
                             .replace("{url}", build.getUrl())
                             .replace("{forma}", build.getFormasUsed())
+                            .replace("{votes}", build.getVotes())
                             .replace("{guide}", build.getGuideLength()),
                     true));
             
