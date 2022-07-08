@@ -34,7 +34,7 @@ public class UpdatePipelinePush extends Push {
     private static final String ALERTS_GONE = "***Alerts:***\nNo more active Alerts existing.";
     
     private static final String VOID_TRADER_HERE = "***Void Trader:***\nBaro Ki'Teer arrived at *{location}*, he will leave in {days}d {hours}h {minutes}m.";
-    private static final String VOID_TRADER_GONE = "***Void Trader:***\nBaro Ki'Teer went back into the void, he will return in {days}d {hours}h {minutes}m.";
+    private static final String VOID_TRADER_GONE = "***Void Trader:***\nBaro Ki'Teer went back into the void.";
 
     @Override
     MessageData doNewPush(GatewayDiscordClient client, WarframeState warframeState, Snowflake channelId) {
@@ -56,13 +56,8 @@ public class UpdatePipelinePush extends Push {
                     .createMessage(message)
                     .subscribe();
         } else if (warframeState.isVoidTraderStateChanged()) {
-            Duration diffTimeActivation = LocalDateTimeUtil.getDiffTime(LocalDateTime.now(), warframeState.getVoidTrader().getActivation());
-            String message = VOID_TRADER_GONE.replace("{days}", String.valueOf(diffTimeActivation.toDays()))
-                    .replace("{hours}", String.valueOf(diffTimeActivation.toHoursPart()))
-                    .replace("{minutes}", String.valueOf(diffTimeActivation.toMinutesPart()));
-            
             client.rest().getChannelById(channelId)
-                    .createMessage(message)
+                    .createMessage(VOID_TRADER_GONE)
                     .subscribe();
         }
     }
