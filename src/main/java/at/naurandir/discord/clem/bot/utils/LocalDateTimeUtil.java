@@ -4,19 +4,17 @@ package at.naurandir.discord.clem.bot.utils;
 import java.sql.Timestamp;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.Month;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 /**
  *
  * @author Naurandir
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class LocalDateTimeUtil {
-    
-    private LocalDateTimeUtil() {
-        //
-    }
     
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
     
@@ -47,5 +45,9 @@ public class LocalDateTimeUtil {
         Timestamp timestamp2 = Timestamp.valueOf(time2);
         
         return Duration.of(timestamp2.getTime()-timestamp1.getTime(), ChronoUnit.MILLIS);
+    }
+    
+    public static LocalDateTime getTime(String timeString) {
+        return LocalDateTime.parse(timeString, formatter);
     }
 }

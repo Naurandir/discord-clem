@@ -7,11 +7,15 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  *
  * @author Naurandir
  */
+@Getter
+@Setter
 @MappedSuperclass
 public abstract class DbEntity implements Serializable {
     
@@ -19,8 +23,8 @@ public abstract class DbEntity implements Serializable {
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Long id;
     
-    @Column(length = 40)
-    private String publicId;
+    @Column
+    private String externalId;
     
     @Column(length = 50)
     private String name;
