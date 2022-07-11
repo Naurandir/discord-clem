@@ -16,10 +16,10 @@ import lombok.Setter;
 @Table(name = "mission")
 public class Mission extends DbEntity {
     
-    @Column
+    @Column(length = 50)
     private String node;
     
-    @Column
+    @Column(length = 30)
     private String faction;
     
     @Column
@@ -28,9 +28,9 @@ public class Mission extends DbEntity {
     @Column
     private Integer minEnemyLevel;
     
-    @Column
+    @Column(length = 30)
     private String type;
     
-    @Column
+    @Column(length = 255)
     private String description;
 }

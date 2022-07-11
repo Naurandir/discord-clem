@@ -26,7 +26,7 @@ public abstract class DbEntity implements Serializable {
     @Column
     private String externalId;
     
-    @Column(length = 50)
+    @Column(length = 100)
     private String name;
     
     @Column

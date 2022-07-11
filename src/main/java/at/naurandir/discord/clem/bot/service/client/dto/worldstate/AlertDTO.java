@@ -12,7 +12,6 @@ public class AlertDTO {
     
         private MissionDTO mission;
         private Boolean active;
-        private Boolean expired;
         private String id;
         private String expiry;
         private String activation;

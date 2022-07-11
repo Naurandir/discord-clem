@@ -27,7 +27,16 @@ public class Alert extends DbEntity {
     private Mission alertMission;
     
     @Column
-    private LocalDateTime alertStart;
+    private LocalDateTime activation;
+    
+    @Column
+    private LocalDateTime expiry;
+    
+    @Column
+    private Boolean notifiedActivation;
+    
+    @Column
+    private Boolean notifiedExpiry;
     
     @Column
     @Convert(converter = RewardTypesConverter.class)

@@ -45,6 +45,9 @@ public class BotService {
     @Autowired
     private WorldStateService worldStateService;
     
+    @Autowired
+    private AlertService alertService;
+    
     private GatewayDiscordClient client;
     
     @PostConstruct
@@ -186,6 +189,21 @@ public class BotService {
             worldStateService.refreshBuilds();
         } catch (Exception ex) {
             log.error("refreshBuilds: update throwed exception: ", ex);
+        }
+    }
+    
+    // new logic
+    /**
+     * once per minute sync alerts in warframe
+     */
+    @Scheduled(initialDelay = 60 * 1_000, fixedRate = 60 * 1_000)
+    public void syncAlerts() {
+        try {
+            log.info("syncAlertService: syncing...");
+            alertService.syncAlerts();
+            // alert pushes maybe need to act
+        } catch (Exception ex) {
+            log.error("syncAlertService: sync throwed exception: ", ex);
         }
     }
 }

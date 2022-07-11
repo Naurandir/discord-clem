@@ -16,15 +16,18 @@ public interface AlertMapper {
     @Mappings({
         @Mapping(source="id", target="externalId"),
         @Mapping(source="mission", target="alertMission"),
-        @Mapping(source="activation", target="alertStart", dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"),
+        @Mapping(source="activation", target="activation", dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"),
+        @Mapping(source="expiry", target="expiry", dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"),
         @Mapping(source= "dto", target="name", qualifiedByName = "getAlertName"),
         @Mapping(target="modifyDate", expression="java(LocalDateTime.now())"),
-        @Mapping(target="startDate", expression="java(LocalDateTime.now())")
+        @Mapping(target="startDate", expression="java(LocalDateTime.now())"),
+        
+        @Mapping(target = "id", ignore = true)
     })
     Alert alertDtoToAlert(AlertDTO dto);
     
     @Named("getAlertName")
     default String getAlertName(AlertDTO dto) {
-        return dto.getId() + " - " + dto.getMission().getNode() + " - " + dto.getMission().getType();
+        return dto.getMission().getNode() + " - " + dto.getMission().getType();
     }
 }

@@ -16,8 +16,11 @@ import at.naurandir.discord.clem.bot.service.client.dto.overframe.OverframeDTO;
 import at.naurandir.discord.clem.bot.service.client.dto.overframe.OverframeItemDTO;
 import at.naurandir.discord.clem.bot.service.client.dto.overframe.OverframeItemTierDTO;
 import at.naurandir.discord.clem.bot.service.client.dto.overframe.OverframeItemTierListDTO;
+import at.naurandir.discord.clem.bot.service.client.dto.worldstate.AlertDTO;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -44,6 +47,24 @@ import org.jsoup.select.Elements;
 public class WarframeClient {
     
     Gson gson = new Gson();
+    
+    public List<AlertDTO> getData(String url, Map<String, String> headers) throws IOException {
+        try (CloseableHttpClient httpClient = getClient()) {
+            HttpGet httpGet = new HttpGet(url);
+            for (Map.Entry<String, String> header : headers.entrySet()) {
+                httpGet.addHeader(header.getKey(), header.getValue());
+            }
+            
+            try (CloseableHttpResponse response = httpClient.execute(httpGet)) {
+                log.info("getData: received http status [{}] for url [{}]", response.getStatusLine(), url);
+                String jsonString = getHttpContent(response);
+                
+                Type clazzType = new TypeToken<List<AlertDTO>>(){}.getType();
+                return gson.fromJson(jsonString, clazzType);
+            }
+        }
+    }
+    
     
     public WorldStateDTO getCurrentWorldState() throws IOException {
         try (CloseableHttpClient httpClient = getClient()) {
