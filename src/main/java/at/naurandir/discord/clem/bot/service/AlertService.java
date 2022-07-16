@@ -1,19 +1,17 @@
 package at.naurandir.discord.clem.bot.service;
 
-import at.naurandir.discord.clem.bot.model.Alert;
-import at.naurandir.discord.clem.bot.model.AlertMapper;
+import at.naurandir.discord.clem.bot.model.alert.Alert;
+import at.naurandir.discord.clem.bot.model.alert.AlertMapper;
 import at.naurandir.discord.clem.bot.repository.AlertRepository;
 import at.naurandir.discord.clem.bot.service.client.WarframeClient;
 import at.naurandir.discord.clem.bot.service.client.dto.worldstate.AlertDTO;
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 /**
@@ -24,37 +22,30 @@ import org.springframework.stereotype.Service;
 @Service
 public class AlertService {
     
-    private final AlertMapper mapper;
-    private final AlertRepository alertRepository;
-    private final WarframeClient warframeClient;
-    
-    private final String apiUrl;
-    private final Map<String, String> apiHeaders;
+    @Autowired
+    private AlertMapper mapper;
     
     @Autowired
-    public AlertService(AlertRepository alertRepository, AlertMapper mapper) {
-        this.alertRepository = alertRepository;
-        this.mapper = mapper;
-        this.warframeClient = new WarframeClient();
-        
-        this.apiUrl = "https://api.warframestat.us/pc/alerts";
-        
-        Map<String, String> tempHeaders = new HashMap<>();
-        tempHeaders.put("Accept-Language", "en");
-        this.apiHeaders = Collections.unmodifiableMap(tempHeaders);
-    }
+    private AlertRepository alertRepository;
     
-    @Transactional
+    @Value( "${discord.clem.alert.url}" )
+    private String apiUrl;
+    
+    @Value("#{${discord.clem.alert.headers}}")
+    private Map<String, String> apiHeaders;
+    
+    private final WarframeClient warframeClient = new WarframeClient();
+    
     public void syncAlerts() throws IOException {
-        List<AlertDTO> currentAlerts = warframeClient.getData(apiUrl, apiHeaders);
-        List<Alert> alertsDB = alertRepository.findByEndDateIsNull();
+        List<AlertDTO> currentAlerts = warframeClient.getListData(apiUrl, apiHeaders);
+        List<Alert> dbAlerts = alertRepository.findByEndDateIsNull();
         
         LocalDateTime now = LocalDateTime.now();
         
         // add new alerts
         for (AlertDTO alert : currentAlerts) {
-            boolean isInDatabase = alertsDB.stream()
-                    .anyMatch(alertDB -> alertDB.getExternalId().equals(alert.getId()));
+            boolean isInDatabase = dbAlerts.stream()
+                    .anyMatch(dbAlert -> dbAlert.getExternalId().equals(alert.getId()));
             
             if (isInDatabase) {
                 log.debug("syncAlerts: alert [{}] already exists in database", alert.getId());
@@ -63,8 +54,6 @@ public class AlertService {
             
             log.debug("syncAlerts: alert [{}] not existing, adding to database...", alert.getId());
             Alert newAlert = mapper.alertDtoToAlert(alert);
-            newAlert.setNotifiedActivation(false);
-            newAlert.setNotifiedExpiry(false);
             
             newAlert.setStartDate(now);
             newAlert.setModifyDate(now);
@@ -73,12 +62,22 @@ public class AlertService {
                 newAlert.setEndDate(now);
             }
             
+            // add mission
+//            Mission alertMission = new Mission();
+//            alertMission.setNode(alert.getMission().getNode());
+//            alertMission.setType(alert.getMission().getType());
+//            alertMission.setFaction(alert.getMission().getFaction());
+//            alertMission.setMinEnemyLevel(alert.getMission().getMinEnemyLevel());
+//            alertMission.setMaxEnemyLevel(alert.getMission().getMaxEnemyLevel());
+//            
+//            newAlert.setAlertMission(alertMission);
+            
             newAlert = alertRepository.save(newAlert);
             log.info("syncAlerts: alert [{}] added to database, db id [{}]", alert.getId(), newAlert.getId());
         }
         
-        // inactivate
-        for (Alert alert : alertsDB) {
+        // remove old alerts
+        for (Alert alert : dbAlerts) {
             if (now.isAfter(alert.getExpiry())) {
                 alert.setModifyDate(now);
                 alert.setEndDate(now);
@@ -89,12 +88,7 @@ public class AlertService {
         }
     }
     
-    @Transactional
     public List<Alert> getActiveAlerts() {
         return alertRepository.findByEndDateIsNull();
-    }
-    
-    private List<Alert> findOldInactiveAlerts() {
-        return alertRepository.findByEndDateAfter(LocalDateTime.now().minusDays(31));
     }
 }

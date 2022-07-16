@@ -48,7 +48,22 @@ public class WarframeClient {
     
     Gson gson = new Gson();
     
-    public List<AlertDTO> getData(String url, Map<String, String> headers) throws IOException {
+    public <T> T getData(String url, Map<String, String> headers, Class<T> clazz) throws IOException {
+        try (CloseableHttpClient httpClient = getClient()) {
+            HttpGet httpGet = new HttpGet(url);
+            for (Map.Entry<String, String> header : headers.entrySet()) {
+                httpGet.addHeader(header.getKey(), header.getValue());
+            }
+            
+            try (CloseableHttpResponse response = httpClient.execute(httpGet)) {
+                log.info("getData: received http status [{}] for url [{}]", response.getStatusLine(), url);
+                String jsonString = getHttpContent(response);
+                return gson.fromJson(jsonString, clazz);
+            }
+        }
+    }
+    
+    public List<AlertDTO> getListData(String url, Map<String, String> headers) throws IOException {
         try (CloseableHttpClient httpClient = getClient()) {
             HttpGet httpGet = new HttpGet(url);
             for (Map.Entry<String, String> header : headers.entrySet()) {
@@ -150,35 +165,35 @@ public class WarframeClient {
     public OverframeDTO getCurrentBuilds() throws IOException {
         OverframeDTO dto = new OverframeDTO();
         
-        OverframeItemTierListDTO warframeTierlist = getTierList("0");
-        OverframeItemTierListDTO primaryWeaponTierlist = getTierList("1");
-        OverframeItemTierListDTO secondaryTierlist = getTierList("2");
-        OverframeItemTierListDTO meeleTierlist = getTierList("3");
-        
-        List<OverframeItemDTO> warframes = new ArrayList<>();
-        for (OverframeItemTierDTO itemTier : warframeTierlist.getTierList()) {
-            warframes.add(getOverframeItem(itemTier.getItemId()));
-        }
-        
-        List<OverframeItemDTO> primaryWeapons = new ArrayList<>();
-        for (OverframeItemTierDTO itemTier : primaryWeaponTierlist.getTierList()) {
-            primaryWeapons.add(getOverframeItem(itemTier.getItemId()));
-        }
-        
-        List<OverframeItemDTO> secondaryWeapons = new ArrayList<>();
-        for (OverframeItemTierDTO itemTier : secondaryTierlist.getTierList()) {
-            secondaryWeapons.add(getOverframeItem(itemTier.getItemId()));
-        }
-        
-        List<OverframeItemDTO> meeleWeapons = new ArrayList<>();
-        for (OverframeItemTierDTO itemTier : meeleTierlist.getTierList()) {
-            meeleWeapons.add(getOverframeItem(itemTier.getItemId()));
-        }
-        
-        dto.setWarframes(warframes);
-        dto.setPrimaryWeapons(primaryWeapons);
-        dto.setSecondaryWeapons(secondaryWeapons);
-        dto.setMeeleWeapons(meeleWeapons);
+//        OverframeItemTierListDTO warframeTierlist = getTierList("0");
+//        OverframeItemTierListDTO primaryWeaponTierlist = getTierList("1");
+//        OverframeItemTierListDTO secondaryTierlist = getTierList("2");
+//        OverframeItemTierListDTO meeleTierlist = getTierList("3");
+//        
+//        List<OverframeItemDTO> warframes = new ArrayList<>();
+//        for (OverframeItemTierDTO itemTier : warframeTierlist.getTierList()) {
+//            warframes.add(getOverframeItem(itemTier.getItemId()));
+//        }
+//        
+//        List<OverframeItemDTO> primaryWeapons = new ArrayList<>();
+//        for (OverframeItemTierDTO itemTier : primaryWeaponTierlist.getTierList()) {
+//            primaryWeapons.add(getOverframeItem(itemTier.getItemId()));
+//        }
+//        
+//        List<OverframeItemDTO> secondaryWeapons = new ArrayList<>();
+//        for (OverframeItemTierDTO itemTier : secondaryTierlist.getTierList()) {
+//            secondaryWeapons.add(getOverframeItem(itemTier.getItemId()));
+//        }
+//        
+//        List<OverframeItemDTO> meeleWeapons = new ArrayList<>();
+//        for (OverframeItemTierDTO itemTier : meeleTierlist.getTierList()) {
+//            meeleWeapons.add(getOverframeItem(itemTier.getItemId()));
+//        }
+//        
+//        dto.setWarframes(warframes);
+//        dto.setPrimaryWeapons(primaryWeapons);
+//        dto.setSecondaryWeapons(secondaryWeapons);
+//        dto.setMeeleWeapons(meeleWeapons);
         
         return dto;
     }

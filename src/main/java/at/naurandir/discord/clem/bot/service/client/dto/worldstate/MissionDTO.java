@@ -24,6 +24,6 @@ public class MissionDTO {
     private String description;
     
     @SerializedName("reward")
-    private RewardDTO rewartDTO;
+    private RewardDTO rewardDTO;
     
 }

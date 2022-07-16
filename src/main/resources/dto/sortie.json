@@ -1,0 +1,32 @@
+{
+	"id": "62d18b7d6bcbfc379adfa350",
+	"activation": "2022-07-15T16:00:00.000Z",
+	"startString": "-1h 23m 49s",
+	"expiry": "2022-07-16T16:00:00.000Z",
+	"active": true,
+	"rewardPool": "Sortie Rewards",
+	"variants": [
+		{
+			"missionType": "殲滅",
+			"modifier": "能量減少",
+			"modifierDescription": "戰甲的能量上限降低為四分之一，並且能量恢復速率也會大大降低。",
+			"node": "Metis (木星)"
+		},
+		{
+			"missionType": "間諜",
+			"modifier": "敌人护盾强化",
+			"modifierDescription": "敵人已有強化護盾，建議使用磁力元素。",
+			"node": "Iliad (火衛一)"
+		},
+		{
+			"missionType": "生存",
+			"modifier": "敌人元素强化(爆炸)",
+			"modifierDescription": "Enemies deal increased Blast damage and also have increased Immunity to said damage type.",
+			"node": "Valac (歐羅巴)"
+		}
+	],
+	"boss": "Alad V",
+	"faction": "Corpus",
+	"expired": false,
+	"eta": "22h 36m 10s"
+}

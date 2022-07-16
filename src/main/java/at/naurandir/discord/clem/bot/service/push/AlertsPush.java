@@ -1,7 +1,8 @@
 package at.naurandir.discord.clem.bot.service.push;
 
+import at.naurandir.discord.clem.bot.model.alert.Alert;
 import at.naurandir.discord.clem.bot.model.WarframeState;
-import at.naurandir.discord.clem.bot.service.client.dto.worldstate.AlertDTO;
+import at.naurandir.discord.clem.bot.service.AlertService;
 import at.naurandir.discord.clem.bot.utils.LocalDateTimeUtil;
 import discord4j.common.util.Snowflake;
 import discord4j.core.GatewayDiscordClient;
@@ -15,8 +16,9 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -27,6 +29,9 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 public class AlertsPush extends Push {
+    
+    @Autowired
+    private AlertService alertService;
     
     @Value("#{'${discord.clem.push.channels.alerts}'.split(',')}")
     private List<String> interestingChannels;
@@ -41,7 +46,7 @@ public class AlertsPush extends Push {
 
     @Override
     MessageData doNewPush(GatewayDiscordClient client, WarframeState warframeState, Snowflake channelId) {
-        EmbedCreateSpec embed = generateEmbed(warframeState);
+        EmbedCreateSpec embed = generateEmbed(alertService.getActiveAlerts());
 
         return client.rest().getChannelById(channelId)
                     .createMessage(embed.asRequest())
@@ -51,7 +56,7 @@ public class AlertsPush extends Push {
     @Override
     void doUpdatePush(RestMessage message, WarframeState warframeState) {
         MessageEditRequest editRequest = MessageEditRequest.builder()
-                .embedOrNull(generateEmbed(warframeState).asRequest())
+                .embedOrNull(generateEmbed(alertService.getActiveAlerts()).asRequest())
                 .build();
         
         message.edit(editRequest).subscribe();
@@ -78,8 +83,8 @@ public class AlertsPush extends Push {
         return true;
     }
     
-    private EmbedCreateSpec generateEmbed(WarframeState warframeState) {  
-        String description = warframeState.getAlerts().stream().anyMatch(alert -> alert.getActive()) ? DESCRIPTION : DESCRIPTION_NO_ALERTS;
+    private EmbedCreateSpec generateEmbed(List<Alert> activeAlerts) {
+        String description = activeAlerts.isEmpty() ? DESCRIPTION_NO_ALERTS : DESCRIPTION;
         
         Builder embedBuilder = EmbedCreateSpec.builder()
                 .color(Color.RED)
@@ -88,21 +93,21 @@ public class AlertsPush extends Push {
                 .thumbnail("https://cutewallpaper.org/21/warframe-desktop-icon/Warframe-Alerts-7.2.1-Download-APK-for-Android-Aptoide.png")
                 .timestamp(Instant.now());
         
-        for (AlertDTO alert : warframeState.getAlerts()) {
+        for (Alert alert : activeAlerts) {
             
-            if (!alert.getActive()) {
-                log.debug("generateEmbed: found expired alert [{}]", alert);
+            Duration diffTime = LocalDateTimeUtil.getDiffTime(LocalDateTime.now(), alert.getExpiry());
+            if (diffTime.isNegative()) {
+                log.debug("generateEmbed: found expired [{}] alert [{}]", diffTime, alert);
                 continue;
             }
             
-            Duration diffTime = LocalDateTimeUtil.getDiffTime(LocalDateTime.now(), alert.getExpiry());
-            Integer minLevel = alert.getMission().getMinEnemyLevel() == null ? 1 : alert.getMission().getMinEnemyLevel();
-            Integer maxLevel = alert.getMission().getMaxEnemyLevel() == null ? 999 : alert.getMission().getMaxEnemyLevel();
+            Integer minLevel = Objects.requireNonNullElse(alert.getAlertMission().getMinEnemyLevel(), 1);
+            Integer maxLevel = Objects.requireNonNullElse(alert.getAlertMission().getMaxEnemyLevel(), 999);
             
-            embedBuilder.addField(alert.getMission().getNode(), 
-                    ALERT_DESCRIPTION.replace("{type}", alert.getMission().getType())
-                                     .replace("{reward}", StringUtils.join(alert.getMission().getRewartDTO().getAsString(), ", "))
-                                     .replace("{enemyType}", alert.getMission().getFaction())
+            embedBuilder.addField(alert.getAlertMission().getNode(), 
+                    ALERT_DESCRIPTION.replace("{type}", alert.getAlertMission().getType())
+                                     .replace("{reward}", alert.getRewards())
+                                     .replace("{enemyType}", alert.getAlertMission().getFaction())
                                      .replace("{minLevel}", String.valueOf(minLevel))
                                      .replace("{maxLevel}", String.valueOf(maxLevel))
                                      .replace("{days}", String.valueOf(diffTime.toDays()))

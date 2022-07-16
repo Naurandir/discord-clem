@@ -48,6 +48,9 @@ public class BotService {
     @Autowired
     private AlertService alertService;
     
+    @Autowired
+    private WorldCycleService worldCycleService;
+    
     private GatewayDiscordClient client;
     
     @PostConstruct
@@ -183,7 +186,7 @@ public class BotService {
     /**
      * once per day we refresh the builds data
      */
-    @Scheduled(initialDelay = 24 * 60 * 60 * 1_000, fixedRate = 24 * 60 * 60 * 1_000)
+    //@Scheduled(initialDelay = 24 * 60 * 60 * 1_000, fixedRate = 24 * 60 * 60 * 1_000)
     public void refreshBuilds() {
         try {
             worldStateService.refreshBuilds();
@@ -193,17 +196,30 @@ public class BotService {
     }
     
     // new logic
-    /**
-     * once per minute sync alerts in warframe
-     */
+    
     @Scheduled(initialDelay = 60 * 1_000, fixedRate = 60 * 1_000)
     public void syncAlerts() {
         try {
-            log.info("syncAlertService: syncing...");
+            log.debug("syncAlertService: syncing...");
             alertService.syncAlerts();
-            // alert pushes maybe need to act
+            log.debug("syncAlertService: syncing done.");
+            
+            pushes.forEach(push -> push.push(client, worldStateService.getWarframeState()));
         } catch (Exception ex) {
             log.error("syncAlertService: sync throwed exception: ", ex);
+        }
+    }
+    
+    @Scheduled(fixedRate = 60 * 1_000)
+    public void syncWorldCycles() {
+        try {
+            log.debug("syncWorldCycles: syncing...");
+            worldCycleService.syncCycles();
+            log.debug("syncWorldCycles: syncing done.");
+            
+            pushes.forEach(push -> push.push(client, worldStateService.getWarframeState()));
+        } catch (Exception ex) {
+            log.error("syncWorldCycles: sync throwed exception: ", ex);
         }
     }
 }

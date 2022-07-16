@@ -1,0 +1,789 @@
+[
+	{
+		"id": "1657909400153CetusSyndicate",
+		"activation": "2022-07-15T15:53:21.279Z",
+		"startString": "-1h 34m 28s",
+		"expiry": "2022-07-15T18:23:20.153Z",
+		"active": true,
+		"syndicate": "Ostrons",
+		"syndicateKey": "Ostrons",
+		"nodes": [],
+		"jobs": [
+			{
+				"id": "CaptureBountyCapTwo1657909400153",
+				"rewardPool": [
+					"Pattern Mismatch. Results inaccurate."
+				],
+				"type": "Spy Catcher",
+				"enemyLevels": [
+					5,
+					15
+				],
+				"standingStages": [
+					500,
+					500,
+					500
+				],
+				"minMR": 0,
+				"expiry": "2022-07-15T18:23:20.153Z"
+			},
+			{
+				"id": "ReclamationBountyTheft1657909400153",
+				"rewardPool": [
+					"Pattern Mismatch. Results inaccurate."
+				],
+				"type": "Reclaim the Stolen Artifact",
+				"enemyLevels": [
+					10,
+					30
+				],
+				"standingStages": [
+					730,
+					730,
+					730
+				],
+				"minMR": 1,
+				"expiry": "2022-07-15T18:23:20.153Z"
+			},
+			{
+				"id": "AttritionBountyCap1657909400153",
+				"rewardPool": [
+					"Pattern Mismatch. Results inaccurate."
+				],
+				"type": "Capture Their Leader",
+				"enemyLevels": [
+					20,
+					40
+				],
+				"standingStages": [
+					670,
+					670,
+					670,
+					990
+				],
+				"minMR": 2,
+				"expiry": "2022-07-15T18:23:20.153Z"
+			},
+			{
+				"id": "AssassinateBountyCap1657909400153",
+				"rewardPool": [
+					"Pattern Mismatch. Results inaccurate."
+				],
+				"type": "Capture the New Grineer Commander",
+				"enemyLevels": [
+					30,
+					50
+				],
+				"standingStages": [
+					590,
+					590,
+					590,
+					590,
+					1160
+				],
+				"minMR": 3,
+				"expiry": "2022-07-15T18:23:20.153Z"
+			},
+			{
+				"id": "AttritionBountyLib1657909400153",
+				"rewardPool": [
+					"Pattern Mismatch. Results inaccurate."
+				],
+				"type": "Weaken the Grineer Foothold",
+				"enemyLevels": [
+					40,
+					60
+				],
+				"standingStages": [
+					760,
+					760,
+					760,
+					760,
+					1490
+				],
+				"minMR": 5,
+				"expiry": "2022-07-15T18:23:20.153Z"
+			},
+			{
+				"id": "SabotageBountySab1657909400153",
+				"rewardPool": [
+					"Pattern Mismatch. Results inaccurate."
+				],
+				"type": "Sabotage Bounty",
+				"enemyLevels": [
+					100,
+					100
+				],
+				"standingStages": [
+					840,
+					840,
+					840,
+					840,
+					1660
+				],
+				"minMR": 10,
+				"expiry": "2022-07-15T18:23:20.153Z"
+			},
+			{
+				"id": "AssassinateBountyAss1657909400153",
+				"rewardPool": [
+					"Pattern Mismatch. Results inaccurate."
+				],
+				"type": "Rise and Fall (Narmer)",
+				"enemyLevels": [
+					50,
+					70
+				],
+				"standingStages": [
+					830,
+					830,
+					830,
+					830,
+					1620
+				],
+				"minMR": 0,
+				"expiry": "2022-07-15T17:33:20.153Z",
+				"timeBound": "day"
+			}
+		],
+		"eta": "55m 30s"
+	},
+	{
+		"id": "1657909400153EntratiSyndicate",
+		"activation": "2022-07-15T15:53:21.279Z",
+		"startString": "-1h 34m 28s",
+		"expiry": "2022-07-15T18:23:20.153Z",
+		"active": true,
+		"syndicate": "Entrati",
+		"syndicateKey": "Entrati",
+		"nodes": [],
+		"jobs": [
+			{
+				"id": "DeimosExcavateBounty1657909400153",
+				"rewardPool": [
+					"Pattern Mismatch. Results inaccurate."
+				],
+				"type": "Core Samples",
+				"enemyLevels": [
+					5,
+					15
+				],
+				"standingStages": [
+					5,
+					5,
+					5
+				],
+				"minMR": 0,
+				"expiry": "2022-07-15T18:23:20.153Z"
+			},
+			{
+				"id": "DeimosAreaDefenseBounty1657909400153",
+				"rewardPool": [
+					"Pattern Mismatch. Results inaccurate."
+				],
+				"type": "Reclaim What's Ours",
+				"enemyLevels": [
+					15,
+					25
+				],
+				"standingStages": [
+					11,
+					11,
+					11
+				],
+				"minMR": 1,
+				"expiry": "2022-07-15T18:23:20.153Z"
+			},
+			{
+				"id": "DeimosEndlessExcavateBounty1657909400153",
+				"rewardPool": [
+					"Pattern Mismatch. Results inaccurate."
+				],
+				"type": "Strip Mining (Endless)",
+				"enemyLevels": [
+					25,
+					30
+				],
+				"standingStages": [
+					14,
+					14,
+					14
+				],
+				"minMR": 5,
+				"expiry": "2022-07-15T18:23:20.153Z"
+			},
+			{
+				"id": "DeimosKeyPiecesBounty1657909400153",
+				"rewardPool": [
+					"Pattern Mismatch. Results inaccurate."
+				],
+				"type": "Salvage",
+				"enemyLevels": [
+					30,
+					40
+				],
+				"standingStages": [
+					17,
+					17,
+					17,
+					25
+				],
+				"minMR": 2,
+				"expiry": "2022-07-15T18:23:20.153Z"
+			},
+			{
+				"id": "DeimosAssassinateBounty1657909400153",
+				"rewardPool": [
+					"Pattern Mismatch. Results inaccurate."
+				],
+				"type": "Cleanse the Land",
+				"enemyLevels": [
+					40,
+					60
+				],
+				"standingStages": [
+					22,
+					22,
+					22,
+					22,
+					44
+				],
+				"minMR": 3,
+				"expiry": "2022-07-15T18:23:20.153Z"
+			},
+			{
+				"id": "DeimosGrnSurvivorBounty1657909400153",
+				"rewardPool": [
+					"Pattern Mismatch. Results inaccurate."
+				],
+				"type": "Brutale Gewalt",
+				"enemyLevels": [
+					100,
+					100
+				],
+				"standingStages": [
+					25,
+					25,
+					25,
+					25,
+					50
+				],
+				"minMR": 10,
+				"expiry": "2022-07-15T18:23:20.153Z"
+			},
+			{
+				"id": "1657909400153",
+				"rewardPool": [
+					"Pattern Mismatch. Results inaccurate."
+				],
+				"type": "Isolation Vault Chamber B",
+				"enemyLevels": [
+					30,
+					40
+				],
+				"standingStages": [
+					2,
+					2,
+					2,
+					4
+				],
+				"minMR": 5,
+				"isVault": true,
+				"locationTag": "ChamberB",
+				"expiry": "2022-07-15T18:23:20.153Z"
+			},
+			{
+				"id": "1657909400153",
+				"rewardPool": [
+					"Pattern Mismatch. Results inaccurate."
+				],
+				"type": "Isolation Vault Chamber A",
+				"enemyLevels": [
+					40,
+					50
+				],
+				"standingStages": [
+					4,
+					4,
+					4,
+					5
+				],
+				"minMR": 5,
+				"isVault": true,
+				"locationTag": "ChamberA",
+				"expiry": "2022-07-15T18:23:20.153Z"
+			},
+			{
+				"id": "1657909400153",
+				"rewardPool": [
+					"Pattern Mismatch. Results inaccurate."
+				],
+				"type": "Isolation Vault Chamber C",
+				"enemyLevels": [
+					50,
+					60
+				],
+				"standingStages": [
+					5,
+					5,
+					5,
+					7
+				],
+				"minMR": 5,
+				"isVault": true,
+				"locationTag": "ChamberC",
+				"expiry": "2022-07-15T18:23:20.153Z"
+			}
+		],
+		"eta": "55m 30s"
+	},
+	{
+		"id": "1657909400153SolarisSyndicate",
+		"activation": "2022-07-15T15:53:21.279Z",
+		"startString": "-1h 34m 28s",
+		"expiry": "2022-07-15T18:23:20.153Z",
+		"active": true,
+		"syndicate": "Solaris United",
+		"syndicateKey": "Solaris United",
+		"nodes": [],
+		"jobs": [
+			{
+				"id": "VenusWetworkJobSpy1657909400153",
+				"rewardPool": [
+					"Pattern Mismatch. Results inaccurate."
+				],
+				"type": "Falling Star",
+				"enemyLevels": [
+					5,
+					15
+				],
+				"standingStages": [
+					370,
+					370,
+					370
+				],
+				"minMR": 0,
+				"expiry": "2022-07-15T18:23:20.153Z"
+			},
+			{
+				"id": "VenusChaosJobAssassinate1657909400153",
+				"rewardPool": [
+					"Pattern Mismatch. Results inaccurate."
+				],
+				"type": "Scorched Earth",
+				"enemyLevels": [
+					10,
+					30
+				],
+				"standingStages": [
+					620,
+					620,
+					620
+				],
+				"minMR": 1,
+				"expiry": "2022-07-15T18:23:20.153Z"
+			},
+			{
+				"id": "VenusArtifactJobAmbush1657909400153",
+				"rewardPool": [
+					"Pattern Mismatch. Results inaccurate."
+				],
+				"type": "Courier Ambush",
+				"enemyLevels": [
+					20,
+					40
+				],
+				"standingStages": [
+					580,
+					580,
+					580,
+					860
+				],
+				"minMR": 2,
+				"expiry": "2022-07-15T18:23:20.153Z"
+			},
+			{
+				"id": "VenusIntelJobRecovery1657909400153",
+				"rewardPool": [
+					"Pattern Mismatch. Results inaccurate."
+				],
+				"type": "Proof of Life",
+				"enemyLevels": [
+					30,
+					50
+				],
+				"standingStages": [
+					560,
+					560,
+					560,
+					560,
+					1110
+				],
+				"minMR": 3,
+				"expiry": "2022-07-15T18:23:20.153Z"
+			},
+			{
+				"id": "VenusArtifactJobRecovery1657909400153",
+				"rewardPool": [
+					"Pattern Mismatch. Results inaccurate."
+				],
+				"type": "Blood Relics",
+				"enemyLevels": [
+					40,
+					60
+				],
+				"standingStages": [
+					740,
+					740,
+					740,
+					740,
+					1450
+				],
+				"minMR": 5,
+				"expiry": "2022-07-15T18:23:20.153Z"
+			},
+			{
+				"id": "VenusTheftJobExcavation1657909400153",
+				"rewardPool": [
+					"Pattern Mismatch. Results inaccurate."
+				],
+				"type": "Resource Theft",
+				"enemyLevels": [
+					100,
+					100
+				],
+				"standingStages": [
+					840,
+					840,
+					840,
+					840,
+					1660
+				],
+				"minMR": 10,
+				"expiry": "2022-07-15T18:23:20.153Z"
+			},
+			{
+				"id": "NarmerVenusCullJobAssassinate1657909400153",
+				"rewardPool": [
+					"Pattern Mismatch. Results inaccurate."
+				],
+				"type": "Master's Voice (Narmer)",
+				"enemyLevels": [
+					50,
+					70
+				],
+				"standingStages": [
+					780,
+					780,
+					780,
+					780,
+					1530
+				],
+				"minMR": 0,
+				"expiry": "2022-07-15T18:23:20.153Z",
+				"timeBoound": "night"
+			}
+		],
+		"eta": "55m 30s"
+	},
+	{
+		"id": "1657909400153ZarimanSyndicate",
+		"activation": "2022-07-15T15:53:21.279Z",
+		"startString": "-1h 34m 28s",
+		"expiry": "2022-07-15T18:23:20.153Z",
+		"active": true,
+		"syndicate": "ZarimanSyndicate",
+		"syndicateKey": "ZarimanSyndicate",
+		"nodes": [],
+		"jobs": [],
+		"eta": "55m 30s"
+	},
+	{
+		"id": "1657987140000ArbitersSyndicate",
+		"activation": "2022-07-15T15:59:02.064Z",
+		"startString": "-1h 28m 47s",
+		"expiry": "2022-07-16T15:59:00.000Z",
+		"active": true,
+		"syndicate": "Arbiters of Hexis",
+		"syndicateKey": "Arbiters of Hexis",
+		"nodes": [
+			"Alator (Mars)",
+			"Cervantes (Earth)",
+			"Formido (Deimos)",
+			"Kiliken (Venus)",
+			"Amalthea (Jupiter)",
+			"Oceanum (Pluto)",
+			"Mot (Void)"
+		],
+		"jobs": [],
+		"eta": "22h 31m 10s"
+	},
+	{
+		"id": "1657987140000CephalonSudaSyndicate",
+		"activation": "2022-07-15T15:59:02.064Z",
+		"startString": "-1h 28m 47s",
+		"expiry": "2022-07-16T15:59:00.000Z",
+		"active": true,
+		"syndicate": "Cephalon Suda",
+		"syndicateKey": "Cephalon Suda",
+		"nodes": [
+			"Elion (Mercury)",
+			"V Prime (Venus)",
+			"Ultor (Mars)",
+			"Pallas (Ceres)",
+			"Acheron (Pluto)",
+			"Kappa (Sedna)",
+			"Laomedeia (Neptune)"
+		],
+		"jobs": [],
+		"eta": "22h 31m 10s"
+	},
+	{
+		"id": "1657987140000EventSyndicate",
+		"activation": "2022-07-15T15:59:02.064Z",
+		"startString": "-1h 28m 47s",
+		"expiry": "2022-07-16T15:59:00.000Z",
+		"active": true,
+		"syndicate": "Operations Syndikat",
+		"syndicateKey": "Operations Syndicate",
+		"nodes": [],
+		"jobs": [],
+		"eta": "22h 31m 10s"
+	},
+	{
+		"id": "1657987140000NecraloidSyndicate",
+		"activation": "2022-07-15T15:59:02.064Z",
+		"startString": "-1h 28m 47s",
+		"expiry": "2022-07-16T15:59:00.000Z",
+		"active": true,
+		"syndicate": "Necraloid",
+		"syndicateKey": "Necraloid",
+		"nodes": [],
+		"jobs": [],
+		"eta": "22h 31m 10s"
+	},
+	{
+		"id": "1657987140000NewLokaSyndicate",
+		"activation": "2022-07-15T15:59:02.064Z",
+		"startString": "-1h 28m 47s",
+		"expiry": "2022-07-16T15:59:00.000Z",
+		"active": true,
+		"syndicate": "New Loka",
+		"syndicateKey": "New Loka",
+		"nodes": [
+			"Linea (Venus)",
+			"Suisei (Mercury)",
+			"Sharpless (Phobos)",
+			"Paimon (Europa)",
+			"Neso (Neptune)",
+			"Ares (Mars)",
+			"Mantle (Earth)"
+		],
+		"jobs": [],
+		"eta": "22h 31m 10s"
+	},
+	{
+		"id": "1657987140000PerrinSyndicate",
+		"activation": "2022-07-15T15:59:02.064Z",
+		"startString": "-1h 28m 47s",
+		"expiry": "2022-07-16T15:59:00.000Z",
+		"active": true,
+		"syndicate": "Perrin Sequence",
+		"syndicateKey": "Perrin Sequence",
+		"nodes": [
+			"Cytherean (Venus)",
+			"Spear (Mars)",
+			"Ludi (Ceres)",
+			"M Prime (Mercury)",
+			"Umbriel (Uranus)",
+			"Rusalka (Sedna)",
+			"Roche (Phobos)"
+		],
+		"jobs": [],
+		"eta": "22h 31m 10s"
+	},
+	{
+		"id": "1657987140000QuillsSyndicate",
+		"activation": "2022-07-15T15:59:02.064Z",
+		"startString": "-1h 28m 47s",
+		"expiry": "2022-07-16T15:59:00.000Z",
+		"active": true,
+		"syndicate": "Quills",
+		"syndicateKey": "Quills",
+		"nodes": [],
+		"jobs": [],
+		"eta": "22h 31m 10s"
+	},
+	{
+		"id": "1657987140000RadioLegion2Syndicate",
+		"activation": "2022-07-15T15:59:02.064Z",
+		"startString": "-1h 28m 47s",
+		"expiry": "2022-07-16T15:59:00.000Z",
+		"active": true,
+		"syndicate": "RadioLegion2Syndicate",
+		"syndicateKey": "RadioLegion2Syndicate",
+		"nodes": [],
+		"jobs": [],
+		"eta": "22h 31m 10s"
+	},
+	{
+		"id": "1657987140000RadioLegion3Syndicate",
+		"activation": "2022-07-15T15:59:02.064Z",
+		"startString": "-1h 28m 47s",
+		"expiry": "2022-07-16T15:59:00.000Z",
+		"active": true,
+		"syndicate": "RadioLegion3Syndicate",
+		"syndicateKey": "RadioLegion3Syndicate",
+		"nodes": [],
+		"jobs": [],
+		"eta": "22h 31m 10s"
+	},
+	{
+		"id": "1657987140000RadioLegionIntermission2Syndicate",
+		"activation": "2022-07-15T15:59:02.064Z",
+		"startString": "-1h 28m 47s",
+		"expiry": "2022-07-16T15:59:00.000Z",
+		"active": true,
+		"syndicate": "RadioLegionIntermission2Syndicate",
+		"syndicateKey": "RadioLegionIntermission2Syndicate",
+		"nodes": [],
+		"jobs": [],
+		"eta": "22h 31m 10s"
+	},
+	{
+		"id": "1657987140000RadioLegionIntermission3Syndicate",
+		"activation": "2022-07-15T15:59:02.064Z",
+		"startString": "-1h 28m 47s",
+		"expiry": "2022-07-16T15:59:00.000Z",
+		"active": true,
+		"syndicate": "RadioLegionIntermission3Syndicate",
+		"syndicateKey": "RadioLegionIntermission3Syndicate",
+		"nodes": [],
+		"jobs": [],
+		"eta": "22h 31m 10s"
+	},
+	{
+		"id": "1657987140000RadioLegionIntermission4Syndicate",
+		"activation": "2022-07-15T15:59:02.064Z",
+		"startString": "-1h 28m 47s",
+		"expiry": "2022-07-16T15:59:00.000Z",
+		"active": true,
+		"syndicate": "RadioLegionIntermission4Syndicate",
+		"syndicateKey": "RadioLegionIntermission4Syndicate",
+		"nodes": [],
+		"jobs": [],
+		"eta": "22h 31m 10s"
+	},
+	{
+		"id": "1657987140000RadioLegionIntermission5Syndicate",
+		"activation": "2022-07-15T15:59:02.064Z",
+		"startString": "-1h 28m 47s",
+		"expiry": "2022-07-16T15:59:00.000Z",
+		"active": true,
+		"syndicate": "RadioLegionIntermission5Syndicate",
+		"syndicateKey": "RadioLegionIntermission5Syndicate",
+		"nodes": [],
+		"jobs": [],
+		"eta": "22h 31m 10s"
+	},
+	{
+		"id": "1657987140000RadioLegionIntermission6Syndicate",
+		"activation": "2022-07-15T15:59:02.064Z",
+		"startString": "-1h 28m 47s",
+		"expiry": "2022-07-16T15:59:00.000Z",
+		"active": true,
+		"syndicate": "RadioLegionIntermission6Syndicate",
+		"syndicateKey": "RadioLegionIntermission6Syndicate",
+		"nodes": [],
+		"jobs": [],
+		"eta": "22h 31m 10s"
+	},
+	{
+		"id": "1657987140000RadioLegionIntermissionSyndicate",
+		"activation": "2022-07-15T15:59:02.064Z",
+		"startString": "-1h 28m 47s",
+		"expiry": "2022-07-16T15:59:00.000Z",
+		"active": true,
+		"syndicate": "RadioLegionIntermissionSyndicate",
+		"syndicateKey": "RadioLegionIntermissionSyndicate",
+		"nodes": [],
+		"jobs": [],
+		"eta": "22h 31m 10s"
+	},
+	{
+		"id": "1657987140000RadioLegionSyndicate",
+		"activation": "2022-07-15T15:59:02.064Z",
+		"startString": "-1h 28m 47s",
+		"expiry": "2022-07-16T15:59:00.000Z",
+		"active": true,
+		"syndicate": "RadioLegionSyndicate",
+		"syndicateKey": "RadioLegionSyndicate",
+		"nodes": [],
+		"jobs": [],
+		"eta": "22h 31m 10s"
+	},
+	{
+		"id": "1657987140000RedVeilSyndicate",
+		"activation": "2022-07-15T15:59:02.064Z",
+		"startString": "-1h 28m 47s",
+		"expiry": "2022-07-16T15:59:00.000Z",
+		"active": true,
+		"syndicate": "Red Veil",
+		"syndicateKey": "Red Veil",
+		"nodes": [
+			"Odin (Mercury)",
+			"E Gate (Venus)",
+			"Calypso (Saturn)",
+			"Vallis (Mars)",
+			"Callisto (Jupiter)",
+			"Shklovsky (Phobos)",
+			"Sorath (Europa)"
+		],
+		"jobs": [],
+		"eta": "22h 31m 10s"
+	},
+	{
+		"id": "1657987140000SteelMeridianSyndicate",
+		"activation": "2022-07-15T15:59:02.064Z",
+		"startString": "-1h 28m 47s",
+		"expiry": "2022-07-16T15:59:00.000Z",
+		"active": true,
+		"syndicate": "Steel Meridian",
+		"syndicateKey": "Steel Meridian",
+		"nodes": [
+			"Arval (Mars)",
+			"Pantheon (Mercury)",
+			"Carme (Jupiter)",
+			"Tessera (Venus)",
+			"Saxis (Eris)",
+			"Outer Terminus (Pluto)",
+			"Marid (Sedna)"
+		],
+		"jobs": [],
+		"eta": "22h 31m 10s"
+	},
+	{
+		"id": "1657987140000VentKidsSyndicate",
+		"activation": "2022-07-15T15:59:02.064Z",
+		"startString": "-1h 28m 47s",
+		"expiry": "2022-07-16T15:59:00.000Z",
+		"active": true,
+		"syndicate": "Schacht-Kinder",
+		"syndicateKey": "Vent Kids",
+		"nodes": [],
+		"jobs": [],
+		"eta": "22h 31m 10s"
+	},
+	{
+		"id": "1657987140000VoxSyndicate",
+		"activation": "2022-07-15T15:59:02.064Z",
+		"startString": "-1h 28m 47s",
+		"expiry": "2022-07-16T15:59:00.000Z",
+		"active": true,
+		"syndicate": "Vox Solaris",
+		"syndicateKey": "Vox Solaris",
+		"nodes": [],
+		"jobs": [],
+		"eta": "22h 31m 10s"
+	}
+]

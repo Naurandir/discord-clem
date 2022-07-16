@@ -38,9 +38,9 @@ public class UpdatePipelinePush extends Push {
 
     @Override
     MessageData doNewPush(GatewayDiscordClient client, WarframeState warframeState, Snowflake channelId) {
-        voidTraderChangeNotify(warframeState, client, channelId);
-        alertsChangeNotify(warframeState, client, channelId);
-        eventsChangeNotify(warframeState, client, channelId);
+//        voidTraderChangeNotify(warframeState, client, channelId);
+//        alertsChangeNotify(warframeState, client, channelId);
+//        eventsChangeNotify(warframeState, client, channelId);
         return null;
     }
     

@@ -1,0 +1,24 @@
+[
+	{
+		"start": "2022-07-11T18:00:00.000Z",
+		"end": "2022-07-17T18:00:00.000Z",
+		"upgrade": "Mission Kill XP",
+		"operation": "ist multipliziert mit",
+		"operationSymbol": "x",
+		"upgradeOperationValue": 2,
+		"expired": false,
+		"eta": "2d 38m 10s",
+		"desc": "2x Mission Kill XP for 2d 38m 10s"
+	},
+	{
+		"start": "2022-07-15T15:00:00.000Z",
+		"end": "2022-07-17T15:00:00.000Z",
+		"upgrade": "Ressourcen Dropmenge",
+		"operation": "ist multipliziert mit",
+		"operationSymbol": "x",
+		"upgradeOperationValue": 2,
+		"expired": false,
+		"eta": "1d 21h 38m 10s",
+		"desc": "2x Ressourcen Dropmenge for 1d 21h 38m 10s"
+	}
+]

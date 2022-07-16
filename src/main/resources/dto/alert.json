@@ -1,47 +1,135 @@
 [
 	{
-		"id": "62c48b3a77cfa1da8e09a7fd",
-		"activation": "2022-07-11T13:00:00.000Z",
-		"startString": "-29m 42s",
-		"expiry": "2022-07-14T15:00:00.000Z",
+		"id": "62c48b8e5d6c4432ac0da741",
+		"activation": "2022-07-13T15:00:00.000Z",
+		"startString": "-2d 2h 13m 49s",
+		"expiry": "2022-07-16T15:00:00.000Z",
 		"active": true,
 		"mission": {
 			"description": "Gift From The Lotus",
-			"node": "V Prime (Venus)",
-			"nodeKey": "V Prime (Venus)",
-			"type": "Survival",
-			"typeKey": "Survival",
-			"faction": "Corpus",
+			"node": "Everest (Earth)",
+			"nodeKey": "Everest (Earth)",
+			"type": "Excavation",
+			"typeKey": "Excavation",
+			"faction": "Grineer",
 			"reward": {
 				"items": [],
 				"countedItems": [
 					{
-						"count": 1,
-						"type": "Orokin Catalyst",
-						"key": "Orokin Catalyst"
+						"count": 5,
+						"type": "Sentient Shard Brilliant Item",
+						"key": "Sentient Shard Brilliant Item"
 					}
 				],
-				"credits": 20000,
-				"asString": "Orokin Catalyst + 20000cr",
-				"itemString": "Orokin Catalyst",
-				"thumbnail": "https://i.imgur.com/C4X9NWm.png",
-				"color": 6855389
+				"credits": 30000,
+				"asString": "5 Sentient Shard Brilliant Item + 30000cr",
+				"itemString": "5 Sentient Shard Brilliant Item",
+				"thumbnail": "",
+				"color": 5198940
 			},
-			"minEnemyLevel": 20,
-			"maxEnemyLevel": 30,
-			"maxWaveNum": 10,
+			"minEnemyLevel": 30,
+			"maxEnemyLevel": 40,
+			"maxWaveNum": 5,
 			"nightmare": false,
 			"archwingRequired": false,
 			"isSharkwing": false,
-			"levelOverride": "Corpus Ship Survival Raid",
-			"enemySpec": "Corpus Ship Survival A",
+			"levelOverride": "Grineer Forest Excavation",
+			"enemySpec": "Forest Grineer Excavation A",
 			"advancedSpawners": [],
 			"requiredItems": [],
 			"levelAuras": []
 		},
-		"eta": "3d 1h 30m 17s",
+		"eta": "21h 46m 10s",
 		"rewardTypes": [
-			"catalyst"
+			"other"
+		],
+		"tag": "LotusGift"
+	},
+	{
+		"id": "62c48bb177cfa1da8e09a800",
+		"activation": "2022-07-14T15:00:00.000Z",
+		"startString": "-1d 2h 13m 49s",
+		"expiry": "2022-07-17T15:00:00.000Z",
+		"active": true,
+		"mission": {
+			"description": "Gift From The Lotus",
+			"node": "Nimus (Eris)",
+			"nodeKey": "Nimus (Eris)",
+			"type": "Survival",
+			"typeKey": "Survival",
+			"faction": "Infested",
+			"reward": {
+				"items": [],
+				"countedItems": [
+					{
+						"count": 3,
+						"type": "Forma",
+						"key": "Forma"
+					}
+				],
+				"credits": 40000,
+				"asString": "3 Forma + 40000cr",
+				"itemString": "3 Forma",
+				"thumbnail": "https://i.imgur.com/2b0FT3D.png",
+				"color": 11638087
+			},
+			"minEnemyLevel": 40,
+			"maxEnemyLevel": 50,
+			"maxWaveNum": 10,
+			"nightmare": false,
+			"archwingRequired": false,
+			"isSharkwing": false,
+			"levelOverride": "Infested Corpus Ship Survival",
+			"enemySpec": "Invested Survival",
+			"advancedSpawners": [],
+			"requiredItems": [],
+			"levelAuras": []
+		},
+		"eta": "1d 21h 46m 10s",
+		"rewardTypes": [
+			"forma"
+		],
+		"tag": "LotusGift"
+	},
+	{
+		"id": "62c48bd51bfb905ddd03b1ce",
+		"activation": "2022-07-15T15:00:00.000Z",
+		"startString": "-2h 13m 49s",
+		"expiry": "2022-07-18T15:00:00.000Z",
+		"active": true,
+		"mission": {
+			"description": "Gift From The Lotus",
+			"node": "Belenus (Void)",
+			"nodeKey": "Belenus (Void)",
+			"type": "Defense",
+			"typeKey": "Defense",
+			"faction": "Orokin",
+			"reward": {
+				"items": [
+					"Umbra Forma Blueprint"
+				],
+				"countedItems": [],
+				"credits": 50000,
+				"asString": "Umbra Forma Blueprint + 50000cr",
+				"itemString": "Umbra Forma Blueprint",
+				"thumbnail": "https://i.imgur.com/2b0FT3D.png",
+				"color": 11638087
+			},
+			"minEnemyLevel": 50,
+			"maxEnemyLevel": 60,
+			"maxWaveNum": 10,
+			"nightmare": false,
+			"archwingRequired": false,
+			"isSharkwing": false,
+			"levelOverride": "Orokin Tower Defense",
+			"enemySpec": "Orokin Defense Squad B",
+			"advancedSpawners": [],
+			"requiredItems": [],
+			"levelAuras": []
+		},
+		"eta": "2d 21h 46m 10s",
+		"rewardTypes": [
+			"forma"
 		],
 		"tag": "LotusGift"
 	}

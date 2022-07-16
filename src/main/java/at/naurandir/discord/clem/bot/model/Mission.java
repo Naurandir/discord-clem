@@ -1,8 +1,7 @@
 package at.naurandir.discord.clem.bot.model;
 
 import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.Embeddable;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,25 +11,21 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-@Entity
-@Table(name = "mission")
-public class Mission extends DbEntity {
+@Embeddable
+public class Mission {
     
-    @Column(length = 50)
+    @Column(length = 50, nullable = false)
     private String node;
     
-    @Column(length = 30)
+    @Column(length = 30, nullable = false)
     private String faction;
     
-    @Column
+    @Column(nullable = false)
     private Integer maxEnemyLevel;
     
-    @Column
+    @Column(nullable = false)
     private Integer minEnemyLevel;
     
-    @Column(length = 30)
+    @Column(length = 30, nullable = false)
     private String type;
-    
-    @Column(length = 255)
-    private String description;
 }
