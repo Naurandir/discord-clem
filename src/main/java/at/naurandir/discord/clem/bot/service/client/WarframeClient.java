@@ -14,9 +14,7 @@ import at.naurandir.discord.clem.bot.service.client.dto.market.MarketOrdersResul
 import at.naurandir.discord.clem.bot.service.client.dto.overframe.OverframeBuildDTO;
 import at.naurandir.discord.clem.bot.service.client.dto.overframe.OverframeDTO;
 import at.naurandir.discord.clem.bot.service.client.dto.overframe.OverframeItemDTO;
-import at.naurandir.discord.clem.bot.service.client.dto.overframe.OverframeItemTierDTO;
 import at.naurandir.discord.clem.bot.service.client.dto.overframe.OverframeItemTierListDTO;
-import at.naurandir.discord.clem.bot.service.client.dto.worldstate.AlertDTO;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import java.io.IOException;
@@ -46,7 +44,7 @@ import org.jsoup.select.Elements;
 @Slf4j
 public class WarframeClient {
     
-    Gson gson = new Gson();
+    private Gson gson = new Gson();
     
     public <T> T getData(String url, Map<String, String> headers, Class<T> clazz) throws IOException {
         try (CloseableHttpClient httpClient = getClient()) {
@@ -63,7 +61,7 @@ public class WarframeClient {
         }
     }
     
-    public List<AlertDTO> getListData(String url, Map<String, String> headers) throws IOException {
+    public <T> List<T> getListData(String url, Map<String, String> headers, Class<T> clazz) throws IOException {
         try (CloseableHttpClient httpClient = getClient()) {
             HttpGet httpGet = new HttpGet(url);
             for (Map.Entry<String, String> header : headers.entrySet()) {
@@ -73,8 +71,9 @@ public class WarframeClient {
             try (CloseableHttpResponse response = httpClient.execute(httpGet)) {
                 log.info("getData: received http status [{}] for url [{}]", response.getStatusLine(), url);
                 String jsonString = getHttpContent(response);
-                
-                Type clazzType = new TypeToken<List<AlertDTO>>(){}.getType();
+
+                //Type clazzType = new TypeToken<List<T>>(){}.getType();
+                Type clazzType = TypeToken.getParameterized(List.class, clazz).getType();
                 return gson.fromJson(jsonString, clazzType);
             }
         }

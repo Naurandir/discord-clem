@@ -2,7 +2,10 @@
 package at.naurandir.discord.clem.bot.service;
 
 import at.naurandir.discord.clem.bot.service.command.Command;
+import at.naurandir.discord.clem.bot.service.push.AlertsPush;
 import at.naurandir.discord.clem.bot.service.push.Push;
+import at.naurandir.discord.clem.bot.service.push.VoidTraderPush;
+import at.naurandir.discord.clem.bot.service.push.WorldCyclePush;
 import discord4j.core.DiscordClient;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.message.MessageCreateEvent;
@@ -50,6 +53,9 @@ public class BotService {
     
     @Autowired
     private WorldCycleService worldCycleService;
+    
+    @Autowired
+    private VoidTraderService voidTraderService;
     
     private GatewayDiscordClient client;
     
@@ -152,7 +158,7 @@ public class BotService {
     public void refreshWorldState() {
         try {
             worldStateService.refreshWorldState();
-            pushes.forEach(push -> push.push(client, worldStateService.getWarframeState()));
+            //pushes.forEach(push -> push.push(client, worldStateService.getWarframeState()));
         } catch (Exception ex) {
             log.error("refreshWorldState: update throwed exception: ", ex);
         }
@@ -204,22 +210,38 @@ public class BotService {
             alertService.syncAlerts();
             log.debug("syncAlertService: syncing done.");
             
-            pushes.forEach(push -> push.push(client, worldStateService.getWarframeState()));
+            pushes.stream().filter(push -> push.getClass().equals(AlertsPush.class))
+                    .forEach(push -> push.push(client, worldStateService.getWarframeState()));
         } catch (Exception ex) {
             log.error("syncAlertService: sync throwed exception: ", ex);
         }
     }
     
-    @Scheduled(fixedRate = 60 * 1_000)
+    @Scheduled(initialDelay = 60 * 1_000, fixedRate = 60 * 1_000)
     public void syncWorldCycles() {
         try {
             log.debug("syncWorldCycles: syncing...");
             worldCycleService.syncCycles();
             log.debug("syncWorldCycles: syncing done.");
             
-            pushes.forEach(push -> push.push(client, worldStateService.getWarframeState()));
+            pushes.stream().filter(push -> push.getClass().equals(WorldCyclePush.class))
+                    .forEach(push -> push.push(client, worldStateService.getWarframeState()));
         } catch (Exception ex) {
             log.error("syncWorldCycles: sync throwed exception: ", ex);
+        }
+    }
+    
+    @Scheduled(initialDelay = 60 * 1_000, fixedRate = 60 * 1_000)
+    public void syncVoidTrader() {
+        try {
+            log.debug("syncVoidTrader: syncing...");
+            voidTraderService.syncVoidTrader();
+            log.debug("syncVoidTrader: syncing done.");
+            
+            pushes.stream().filter(push -> push.getClass().equals(VoidTraderPush.class))
+                    .forEach(push -> push.push(client, worldStateService.getWarframeState()));
+        } catch (Exception ex) {
+            log.error("syncVoidTrader: sync throwed exception: ", ex);
         }
     }
 }

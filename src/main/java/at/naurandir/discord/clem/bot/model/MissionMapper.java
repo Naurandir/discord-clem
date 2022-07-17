@@ -11,4 +11,15 @@ import org.mapstruct.Mapper;
 public interface MissionMapper {
 
     Mission missionDtoToMission(MissionDTO dto);
+    
+    default Mission toMission(String node, String missionType, String faction) {
+        Mission mission = new Mission();
+        mission.setFaction(faction);
+        mission.setNode(node);
+        mission.setMinEnemyLevel(0);
+        mission.setMaxEnemyLevel(0);
+        mission.setType(missionType);
+        
+        return mission;
+    }
 }

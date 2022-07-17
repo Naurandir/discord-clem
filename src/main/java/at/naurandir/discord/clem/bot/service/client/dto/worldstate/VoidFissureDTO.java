@@ -15,6 +15,7 @@ import lombok.ToString;
 @EqualsAndHashCode
 public class VoidFissureDTO {
 
+    private String id;
     private String node;
     private Boolean expired;
     private String missionType;

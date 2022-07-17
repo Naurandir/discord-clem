@@ -23,7 +23,7 @@ import org.springframework.stereotype.Service;
 public class AlertService {
     
     @Autowired
-    private AlertMapper mapper;
+    private AlertMapper alertMapper;
     
     @Autowired
     private AlertRepository alertRepository;
@@ -37,7 +37,7 @@ public class AlertService {
     private final WarframeClient warframeClient = new WarframeClient();
     
     public void syncAlerts() throws IOException {
-        List<AlertDTO> currentAlerts = warframeClient.getListData(apiUrl, apiHeaders);
+        List<AlertDTO> currentAlerts = warframeClient.getListData(apiUrl, apiHeaders, AlertDTO.class);
         List<Alert> dbAlerts = alertRepository.findByEndDateIsNull();
         
         LocalDateTime now = LocalDateTime.now();
@@ -53,7 +53,7 @@ public class AlertService {
             }
             
             log.debug("syncAlerts: alert [{}] not existing, adding to database...", alert.getId());
-            Alert newAlert = mapper.alertDtoToAlert(alert);
+            Alert newAlert = alertMapper.alertDtoToAlert(alert);
             
             newAlert.setStartDate(now);
             newAlert.setModifyDate(now);

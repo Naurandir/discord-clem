@@ -1,8 +1,9 @@
 package at.naurandir.discord.clem.bot.service.push;
 
 import at.naurandir.discord.clem.bot.model.WarframeState;
-import at.naurandir.discord.clem.bot.service.client.dto.worldstate.VoidTraderDTO;
-import at.naurandir.discord.clem.bot.service.client.dto.worldstate.VoidTraderDTO.VoidTraderInventoryDTO;
+import at.naurandir.discord.clem.bot.model.trader.VoidTrader;
+import at.naurandir.discord.clem.bot.model.trader.VoidTraderItem;
+import at.naurandir.discord.clem.bot.service.VoidTraderService;
 import at.naurandir.discord.clem.bot.utils.LocalDateTimeUtil;
 import discord4j.common.util.Snowflake;
 import discord4j.core.GatewayDiscordClient;
@@ -16,7 +17,9 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -28,17 +31,21 @@ import org.springframework.stereotype.Component;
 @Component
 public class VoidTraderPush extends Push {
     
+    @Autowired
+    VoidTraderService voidTraderService;
+    
     @Value("#{'${discord.clem.push.channels.void-trader}'.split(',')}")
     private List<String> interestingChannels;
     
     private static final String TITLE = "Void Trader Deals";
     private static final String DESCRIPTION_ACTIVE = "Baro Ki'Teer is currently at ***{location}***. Will leave in {days}d {hours}h {minutes}m.";
     private static final String DESCRIPTION_INACTIVE = "Baro Ki'Teer is currently in the Void. Return in {days}d {hours}h {minutes}m.";
+    private static final String DESCRIPTION_NOT_EXISTING = "Baro Ki'Teer is currently in the Void.";
     private static final String ITEM_DESCRIPTION = " *ducats:* {ducats}\n *credits:* {credits}";
 
     @Override
     MessageData doNewPush(GatewayDiscordClient client, WarframeState warframeState, Snowflake channelId) {
-        EmbedCreateSpec embed = generateEmbed(warframeState);
+        EmbedCreateSpec embed = generateEmbed(voidTraderService.getVoidTrader());
 
         return client.rest().getChannelById(channelId)
                     .createMessage(embed.asRequest())
@@ -48,7 +55,7 @@ public class VoidTraderPush extends Push {
     @Override
     void doUpdatePush(RestMessage message, WarframeState warframeState) {
         MessageEditRequest editRequest = MessageEditRequest.builder()
-                .embedOrNull(generateEmbed(warframeState).asRequest())
+                .embedOrNull(generateEmbed(voidTraderService.getVoidTrader()).asRequest())
                 .build();
         message.edit(editRequest).subscribe();
     }
@@ -71,22 +78,35 @@ public class VoidTraderPush extends Push {
         return true;
     }
     
-    private EmbedCreateSpec generateEmbed(WarframeState warframeState) {
-        VoidTraderDTO voidTrader = warframeState.getVoidTrader();
+    private EmbedCreateSpec generateEmbed(Optional<VoidTrader> voidTraderOpt) {
         
+        if (voidTraderOpt.isEmpty()) {
+            return EmbedCreateSpec.builder()
+                .color(Color.CYAN)
+                .title(TITLE)
+                .description(DESCRIPTION_NOT_EXISTING)
+                .thumbnail("https://static.wikia.nocookie.net/warframe/images/a/a7/TennoCon2020BaroCropped.png/revision/latest?cb=20200712232455")
+                .timestamp(Instant.now())
+                .build();
+        }
+
+        VoidTrader voidTrader = voidTraderOpt.get();
+        LocalDateTime now = LocalDateTime.now();
         String description;
-        if (voidTrader.getActive()) {
-            Duration diffTimeExpiry = LocalDateTimeUtil.getDiffTime(LocalDateTime.now(), voidTrader.getExpiry());
+        
+        if (now.isAfter(voidTrader.getActivation()) && now.isBefore(voidTrader.getExpiry())) {
+            Duration diffTimeExpiry = LocalDateTimeUtil.getDiffTime(now, voidTrader.getExpiry());
             description = DESCRIPTION_ACTIVE.replace("{location}", voidTrader.getLocation())
                     .replace("{days}", String.valueOf(diffTimeExpiry.toDays()))
                     .replace("{hours}", String.valueOf(diffTimeExpiry.toHoursPart()))
                     .replace("{minutes}", String.valueOf(diffTimeExpiry.toMinutesPart()));
         } else {
-            Duration diffTimeActiveAgain = LocalDateTimeUtil.getDiffTime(LocalDateTime.now(), voidTrader.getActivation());
+            Duration diffTimeActiveAgain = LocalDateTimeUtil.getDiffTime(now, voidTrader.getActivation());
             description = DESCRIPTION_INACTIVE.replace("{days}", String.valueOf(diffTimeActiveAgain.toDays()))
                     .replace("{hours}", String.valueOf(diffTimeActiveAgain.toHoursPart()))
                     .replace("{minutes}", String.valueOf(diffTimeActiveAgain.toMinutesPart()));
         }
+        
         Builder embedBuilder = EmbedCreateSpec.builder()
                 .color(Color.CYAN)
                 .title(TITLE)
@@ -94,11 +114,11 @@ public class VoidTraderPush extends Push {
                 .thumbnail("https://static.wikia.nocookie.net/warframe/images/a/a7/TennoCon2020BaroCropped.png/revision/latest?cb=20200712232455")
                 .timestamp(Instant.now());
         
-        for (VoidTraderInventoryDTO inventory : voidTrader.getInventory()) {
-            
-            embedBuilder.addField(inventory.getItem(), 
-                    ITEM_DESCRIPTION.replace("{ducats}", String.valueOf(inventory.getDucats()))
-                                    .replace("{credits}", String.valueOf(inventory.getCredits())), 
+        log.debug("generateEmbed: got [{}] items from Void Trader", voidTrader.getInventory().size());
+        for (VoidTraderItem item : voidTrader.getInventory()) {
+            embedBuilder.addField(item.getItem(), 
+                    ITEM_DESCRIPTION.replace("{ducats}", String.valueOf(item.getDucats()))
+                                    .replace("{credits}", String.valueOf(item.getCredits())), 
                     true);
         }
         

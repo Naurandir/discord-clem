@@ -4,7 +4,6 @@ import at.naurandir.discord.clem.bot.model.Mission;
 import at.naurandir.discord.clem.bot.model.MissionMapper;
 import at.naurandir.discord.clem.bot.service.client.dto.worldstate.AlertDTO;
 import at.naurandir.discord.clem.bot.service.client.dto.worldstate.MissionDTO;
-import java.util.List;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
@@ -47,7 +46,7 @@ public abstract class AlertMapper {
     }
     
     @Named("getMission")
-    public Mission getRewards(MissionDTO missionDto) {
+    public Mission getMission(MissionDTO missionDto) {
         return missionMapper.missionDtoToMission(missionDto);
     }
 }
