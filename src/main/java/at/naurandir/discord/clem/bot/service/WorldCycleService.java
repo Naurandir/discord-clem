@@ -16,6 +16,7 @@ import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 /**
@@ -49,6 +50,7 @@ public class WorldCycleService {
     
     private final WarframeClient warframeClient = new WarframeClient();
 
+    @Scheduled(cron = "${discord.clem.cycle.scheduler.cron}")
     void syncCycles() throws IOException {
         List<Cycle> dbCycles = getCycles();
         EarthCycleDTO currentEarthCycle = warframeClient.getData(apiEarthUrl, apiHeaders, EarthCycleDTO.class);

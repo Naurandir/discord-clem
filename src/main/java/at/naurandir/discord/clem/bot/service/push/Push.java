@@ -22,14 +22,18 @@ import lombok.extern.slf4j.Slf4j;
 public abstract class Push {
     
     private final Map<Snowflake, Long> channelMessageIdMapping = new HashMap<>();
+    private GatewayDiscordClient client;
     
-    abstract MessageData doNewPush(GatewayDiscordClient client, WarframeState warframeState, Snowflake channelId);
-    abstract void doUpdatePush(RestMessage message, WarframeState warframeState);
+    abstract MessageData doNewPush(Snowflake channelId);
+    abstract void doUpdatePush(RestMessage message);
     abstract List<String> getInterestingChannels();
     abstract boolean isOwnMessage(MessageData messageData);
     abstract boolean isSticky();
+    abstract void refresh();
     
     public void init(GatewayDiscordClient client) {
+        this.client = client;
+        
         try {
           for (String channelId : getInterestingChannels()) { 
             Snowflake channelSnowflakeId = Snowflake.of(channelId);
@@ -85,28 +89,32 @@ public abstract class Push {
         channelMessageIdMapping.remove(event.getMessage().get().getChannelId());
     }
     
-    public void push(GatewayDiscordClient client, WarframeState warframeState) {
+    public void push() {
         try {
             for (String channelId : getInterestingChannels()) {
                 Snowflake channelSnowflake = Snowflake.of(channelId);
                 if (!isSticky()) {
                     log.debug("push: new push as [{}] is not sticky.", this.getClass().getSimpleName());
-                    doNewPush(client, warframeState, channelSnowflake);
+                    doNewPush(channelSnowflake);
                 } else if (channelMessageIdMapping.get(channelSnowflake) == null) {
                     log.debug("push: new push in channel [{}] as [{}] is sticky and no message found", 
                             channelId, this.getClass().getSimpleName());
-                    MessageData message = doNewPush(client, warframeState, channelSnowflake);
+                    MessageData message = doNewPush(channelSnowflake);
                     channelMessageIdMapping.put(channelSnowflake, message.id().asLong());
                 } else {
                     Snowflake messageSnowflake = Snowflake.of(channelMessageIdMapping.get(channelSnowflake));
                     log.info("push: update channel [{}] as [{}] sticky, expected older message [{}] found", 
                                 channelId, this.getClass().getSimpleName(), messageSnowflake);
-                    doUpdatePush(RestMessage.create(client.getRestClient(), channelSnowflake, messageSnowflake), warframeState);
+                    doUpdatePush(RestMessage.create(client.getRestClient(), channelSnowflake, messageSnowflake));
                 }
                 log.debug("push: finished push for [{}]", this.getClass());
             }
         } catch (Exception ex) {
             log.error("push: something at push went wrong: ", ex);
         }
+    }
+    
+    GatewayDiscordClient getClient() {
+        return client;
     }
 }

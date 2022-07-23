@@ -1,8 +1,8 @@
 package at.naurandir.discord.clem.bot.service.command;
 
-import at.naurandir.discord.clem.bot.model.WarframeState;
-import at.naurandir.discord.clem.bot.service.client.dto.droptable.MissionDTO;
-import at.naurandir.discord.clem.bot.service.client.dto.droptable.RewardDTO;
+import at.naurandir.discord.clem.bot.model.mission.Mission;
+import at.naurandir.discord.clem.bot.model.mission.MissionReward;
+import at.naurandir.discord.clem.bot.service.MissionService;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.util.Color;
@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
@@ -23,6 +24,9 @@ import reactor.core.publisher.Mono;
 @Slf4j
 @Component
 public class MissionDropCommand implements Command {
+    
+    @Autowired
+    private MissionService missionService;
     
     private static final String TITLE = "Found Missions dropping '{item}'";
     private static final String DESCRIPTION = "Missions with possiblity to drop '{item}'. Note that Enemy Drops are not considered.\n\n";
@@ -40,7 +44,7 @@ public class MissionDropCommand implements Command {
     }
 
     @Override
-    public Mono<Void> handle(MessageCreateEvent event, WarframeState warframeState) {
+    public Mono<Void> handle(MessageCreateEvent event) {
         String item = getItem(event.getMessage().getContent());
         
         if (item.length() < 3) {
@@ -49,7 +53,7 @@ public class MissionDropCommand implements Command {
                 .then();
         }
         
-        List<MissionDTO> missionsWithItem = getMissionsWithItem(item, warframeState);
+        List<Mission> missionsWithItem = getMissionsWithItem(item);
         log.debug("handle: found [{}] missions for [{}]", missionsWithItem.size(), item);
         
         return event.getMessage().getChannel()
@@ -63,18 +67,15 @@ public class MissionDropCommand implements Command {
         return StringUtils.join(words, " ").trim();
     }
 
-    private List<MissionDTO> getMissionsWithItem(String item, WarframeState warframeState) {
-        List<MissionDTO> missionsWithItem = new ArrayList<>();
+    private List<Mission> getMissionsWithItem(String item) {
+        List<Mission> allMissions = missionService.getMissions();
+        List<Mission> missionsWithItem = new ArrayList<>();
         
-        for (MissionDTO mission : warframeState.getMissions()) {
-            boolean isAnyItemInMission = mission.getRewardsRotationA().stream()
-                        .anyMatch(rotReward -> rotReward.getReward().toLowerCase().contains(item.toLowerCase())) ||
-                    mission.getRewardsRotationB().stream()
-                        .anyMatch(rotReward -> rotReward.getReward().toLowerCase().contains(item.toLowerCase())) ||
-                    mission.getRewardsRotationC().stream()
-                        .anyMatch(rotReward -> rotReward.getReward().toLowerCase().contains(item.toLowerCase())) ||
-                    mission.getRewardsRotationGeneral().stream()
-                        .anyMatch(rotReward -> rotReward.getReward().toLowerCase().contains(item.toLowerCase()));
+        
+        for (Mission mission : allMissions) {
+            
+            boolean isAnyItemInMission = mission.getAllRewards().stream()
+                    .anyMatch(reward -> reward.getName().toLowerCase().contains(item.toLowerCase()));
             
             if (isAnyItemInMission) {
                 missionsWithItem.add(mission);
@@ -84,49 +85,49 @@ public class MissionDropCommand implements Command {
         return missionsWithItem;
     }
     
-    private void addMissionMessages(MissionDTO mission, String item, List<String> missionMessages) {
-        List<RewardDTO> rewardsWithItemGeneral = mission.getRewardsRotationGeneral().stream()
-                .filter(reward -> reward.getReward().toLowerCase().contains(item.toLowerCase()))
+    private void addMissionMessages(Mission mission, String item, List<String> missionMessages) {
+        List<MissionReward> rewardsWithItemGeneral = mission.getGeneralRewards().stream()
+                .filter(reward -> reward.getName().toLowerCase().contains(item.toLowerCase()))
                 .collect(Collectors.toList());
         
-        List<RewardDTO> rewardsWithItemRotationA = mission.getRewardsRotationA().stream()
-                .filter(reward -> reward.getReward().toLowerCase().contains(item.toLowerCase()))
+        List<MissionReward> rewardsWithItemRotationA = mission.getRotationARewards().stream()
+                .filter(reward -> reward.getName().toLowerCase().contains(item.toLowerCase()))
                 .collect(Collectors.toList());
         
-        List<RewardDTO> rewardsWithItemRotationB = mission.getRewardsRotationB().stream()
-                .filter(reward -> reward.getReward().toLowerCase().contains(item.toLowerCase()))
+        List<MissionReward> rewardsWithItemRotationB = mission.getRotationBRewards().stream()
+                .filter(reward -> reward.getName().toLowerCase().contains(item.toLowerCase()))
                 .collect(Collectors.toList());
         
-        List<RewardDTO> rewardsWithItemRotationC = mission.getRewardsRotationC().stream()
-                .filter(reward -> reward.getReward().toLowerCase().contains(item.toLowerCase()))
+        List<MissionReward> rewardsWithItemRotationC = mission.getRotationCRewards().stream()
+                .filter(reward -> reward.getName().toLowerCase().contains(item.toLowerCase()))
                 .collect(Collectors.toList());
         
         rewardsWithItemGeneral.forEach(reward -> missionMessages.add(MISSION_MESSAGE
                 .replace("{title}", mission.getName())
-                .replace("{item}", reward.getReward())
+                .replace("{item}", reward.getName())
                 .replace(" {rotation}","")
-                .replace("{dropChance}", String.valueOf(reward.getChance().get(0)))));
+                .replace("{dropChance}", String.valueOf(reward.getChance()))));
         
         rewardsWithItemRotationA.forEach(reward -> missionMessages.add(MISSION_MESSAGE
                 .replace("{title}", mission.getName())
-                .replace("{item}", reward.getReward())
+                .replace("{item}", reward.getName())
                 .replace("{rotation}","Rotation A")
-                .replace("{dropChance}", String.valueOf(reward.getChance().get(0)))));
+                .replace("{dropChance}", String.valueOf(reward.getChance()))));
         
         rewardsWithItemRotationB.forEach(reward -> missionMessages.add(MISSION_MESSAGE
                 .replace("{title}", mission.getName())
-                .replace("{item}", reward.getReward())
+                .replace("{item}", reward.getName())
                 .replace("{rotation}","Rotation B")
-                .replace("{dropChance}", String.valueOf(reward.getChance().get(0)))));
+                .replace("{dropChance}", String.valueOf(reward.getChance()))));
         
         rewardsWithItemRotationC.forEach(reward -> missionMessages.add(MISSION_MESSAGE
                 .replace("{title}", mission.getName())
-                .replace("{item}", reward.getReward())
+                .replace("{item}", reward.getName())
                 .replace("{rotation}","Rotation C")
-                .replace("{dropChance}", String.valueOf(reward.getChance().get(0)))));
+                .replace("{dropChance}", String.valueOf(reward.getChance()))));
     }
 
-    private EmbedCreateSpec generateEmbed(String item, List<MissionDTO> missionsWithItem) {
+    private EmbedCreateSpec generateEmbed(String item, List<Mission> missionsWithItem) {
         StringBuilder descriptionBuilder = new StringBuilder(DESCRIPTION.replace("{item}", item));
         List<String> missionMessages = new ArrayList<>();
         

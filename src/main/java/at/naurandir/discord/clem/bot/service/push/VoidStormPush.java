@@ -1,11 +1,10 @@
 
 package at.naurandir.discord.clem.bot.service.push;
 
-import at.naurandir.discord.clem.bot.model.WarframeState;
-import at.naurandir.discord.clem.bot.service.client.dto.worldstate.VoidFissureDTO;
+import at.naurandir.discord.clem.bot.model.fissure.VoidFissure;
+import at.naurandir.discord.clem.bot.service.VoidFissureService;
 import at.naurandir.discord.clem.bot.utils.LocalDateTimeUtil;
 import discord4j.common.util.Snowflake;
-import discord4j.core.GatewayDiscordClient;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.discordjson.json.MessageData;
 import discord4j.discordjson.json.MessageEditRequest;
@@ -16,7 +15,9 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 /**
@@ -29,6 +30,9 @@ public class VoidStormPush extends Push {
     
     @Value("#{'${discord.clem.push.channels.fissures}'.split(',')}")
     private List<String> interestingChannels;
+    
+    @Autowired
+    private VoidFissureService voidFissureService;
 
     private static final String TITLE = "Current Void Storms";
     private static final String DESCRIPTION = "Currently active void storms.";
@@ -37,18 +41,18 @@ public class VoidStormPush extends Push {
             + " *expire:* {hours}h {minutes}m";
 
     @Override
-    MessageData doNewPush(GatewayDiscordClient client, WarframeState warframeState, Snowflake channelId) {
-        EmbedCreateSpec embed = generateEmbed(warframeState);
+    MessageData doNewPush(Snowflake channelId) {
+        EmbedCreateSpec embed = generateEmbed(voidFissureService.getStormVoidFissures());
 
-        return client.rest().getChannelById(channelId)
+        return getClient().rest().getChannelById(channelId)
                     .createMessage(embed.asRequest())
                     .block(Duration.ofSeconds(10L));
     }
 
     @Override
-    void doUpdatePush(RestMessage message, WarframeState warframeState) {
+    void doUpdatePush(RestMessage message) {
         MessageEditRequest editRequest = MessageEditRequest.builder()
-                .embedOrNull(generateEmbed(warframeState).asRequest())
+                .embedOrNull(generateEmbed(voidFissureService.getStormVoidFissures()).asRequest())
                 .build();
 
         message.edit(editRequest).subscribe();
@@ -74,31 +78,39 @@ public class VoidStormPush extends Push {
         return true;
     }
 
-    private EmbedCreateSpec generateEmbed(WarframeState warframeState) {  
+    private EmbedCreateSpec generateEmbed(List<VoidFissure> voidFissures) {  
         EmbedCreateSpec.Builder embedBuilder = EmbedCreateSpec.builder()
                 .color(Color.YELLOW)
                 .title(TITLE)
                 .description(DESCRIPTION)
                 .thumbnail("https://static.wikia.nocookie.net/warframe/images/0/0e/VoidProjectionsGoldD.png/revision/latest?cb=20160709035734")
                 .timestamp(Instant.now());
+        
+        LocalDateTime now = LocalDateTime.now();
 
-        for (VoidFissureDTO fissure : warframeState.getFissures()) {
+        for (VoidFissure fissure : voidFissures) {
 
-            if (fissure.getExpired() || !fissure.getIsStorm()) {
+            if (now.isBefore(fissure.getActivation()) || now.isAfter(fissure.getExpiry())) {
                 continue;
             }
 
             Duration diffTime = LocalDateTimeUtil.getDiffTime(LocalDateTime.now(), fissure.getExpiry());
 
-            embedBuilder.addField(fissure.getNode(), 
+            embedBuilder.addField(fissure.getFissureMission().getNode(), 
                     STORM_DESCRIPTION.replace("{tier}", fissure.getTier())
-                                     .replace("{enemyType}", fissure.getEnemy())
-                                     .replace("{missionType}", fissure.getMissionType())
+                                     .replace("{enemyType}", fissure.getFissureMission().getFaction())
+                                     .replace("{missionType}", fissure.getFissureMission().getType())
                                      .replace("{hours}", String.valueOf(diffTime.toHours()))
                                      .replace("{minutes}", String.valueOf(diffTime.toMinutesPart())), 
                     true);
         }
 
         return embedBuilder.build();
+    }
+
+    @Scheduled(initialDelay = 60 * 1_000, fixedRate = 60 * 1_000)
+    @Override
+    void refresh() {
+        push();
     }
 }

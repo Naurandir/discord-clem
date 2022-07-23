@@ -2,7 +2,7 @@ package at.naurandir.discord.clem.bot.model.trader;
 
 import at.naurandir.discord.clem.bot.model.DbEntity;
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -32,5 +32,5 @@ public class VoidTrader extends DbEntity {
     private String location;
     
     @OneToMany(mappedBy="voidTrader", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private List<VoidTraderItem> inventory;
+    private Set<VoidTraderItem> inventory;
 }

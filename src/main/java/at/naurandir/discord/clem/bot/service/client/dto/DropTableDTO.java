@@ -1,6 +1,6 @@
 package at.naurandir.discord.clem.bot.service.client.dto;
 
-import at.naurandir.discord.clem.bot.service.client.dto.droptable.MissionDTO;
+import at.naurandir.discord.clem.bot.service.client.dto.droptable.MissionDropTableDTO;
 import at.naurandir.discord.clem.bot.service.client.dto.droptable.RelicDTO;
 import java.util.List;
 import lombok.EqualsAndHashCode;
@@ -19,5 +19,5 @@ import lombok.ToString;
 public class DropTableDTO {
     
     private List<RelicDTO> relics;
-    private List<MissionDTO> missions;
+    private List<MissionDropTableDTO> missions;
 }

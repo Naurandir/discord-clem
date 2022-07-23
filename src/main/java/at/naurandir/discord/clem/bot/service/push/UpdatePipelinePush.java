@@ -14,6 +14,7 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import nonapi.io.github.classgraph.utils.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 /**
@@ -37,7 +38,7 @@ public class UpdatePipelinePush extends Push {
     private static final String VOID_TRADER_GONE = "***Void Trader:***\nBaro Ki'Teer went back into the void.";
 
     @Override
-    MessageData doNewPush(GatewayDiscordClient client, WarframeState warframeState, Snowflake channelId) {
+    MessageData doNewPush(Snowflake channelId) {
 //        voidTraderChangeNotify(warframeState, client, channelId);
 //        alertsChangeNotify(warframeState, client, channelId);
 //        eventsChangeNotify(warframeState, client, channelId);
@@ -113,7 +114,7 @@ public class UpdatePipelinePush extends Push {
     }
     
     @Override
-    void doUpdatePush(RestMessage message, WarframeState warframeState) {
+    void doUpdatePush(RestMessage message) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
@@ -130,5 +131,11 @@ public class UpdatePipelinePush extends Push {
     @Override
     boolean isSticky() {
         return false;
+    }
+
+    @Scheduled(initialDelay = 60 * 1_000, fixedRate = 60 * 1_000)
+    @Override
+    void refresh() {
+        push();
     }
 }

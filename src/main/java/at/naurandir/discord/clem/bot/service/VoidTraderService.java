@@ -9,12 +9,13 @@ import at.naurandir.discord.clem.bot.service.client.WarframeClient;
 import at.naurandir.discord.clem.bot.service.client.dto.worldstate.VoidTraderDTO;
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 /**
@@ -42,6 +43,7 @@ public class VoidTraderService {
     
     private final WarframeClient warframeClient = new WarframeClient();
     
+    @Scheduled(cron = "${discord.clem.void_trader.scheduler.cron}")
     void syncVoidTrader() throws IOException {
         VoidTraderDTO currentVoidTrader = warframeClient.getData(apiUrl, apiHeaders, VoidTraderDTO.class);
         Optional<VoidTrader> voidTraderOpt = voidTraderRepository.findByExternalId(currentVoidTrader.getId());
@@ -60,8 +62,8 @@ public class VoidTraderService {
 
     private void addVoidTrader(VoidTraderDTO currentVoidTrader) {
         VoidTrader newVoidTrader = voidTraderMapper.voidTraderDtoToVoidTrader(currentVoidTrader);
-        List<VoidTraderItem> inventory = newVoidTrader.getInventory();
-        newVoidTrader.setInventory(List.of());
+        Set<VoidTraderItem> inventory = newVoidTrader.getInventory();
+        newVoidTrader.setInventory(Set.of());
         
         VoidTrader dbVoidTrader = voidTraderRepository.save(newVoidTrader); // persist void trader      
         

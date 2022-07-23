@@ -12,6 +12,7 @@ import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 /**
@@ -36,6 +37,7 @@ public class AlertService {
     
     private final WarframeClient warframeClient = new WarframeClient();
     
+    @Scheduled(cron = "${discord.clem.alert.scheduler.cron}")
     public void syncAlerts() throws IOException {
         List<AlertDTO> currentAlerts = warframeClient.getListData(apiUrl, apiHeaders, AlertDTO.class);
         List<Alert> dbAlerts = alertRepository.findByEndDateIsNull();
@@ -61,16 +63,6 @@ public class AlertService {
             if (now.isAfter(newAlert.getExpiry())) {
                 newAlert.setEndDate(now);
             }
-            
-            // add mission
-//            Mission alertMission = new Mission();
-//            alertMission.setNode(alert.getMission().getNode());
-//            alertMission.setType(alert.getMission().getType());
-//            alertMission.setFaction(alert.getMission().getFaction());
-//            alertMission.setMinEnemyLevel(alert.getMission().getMinEnemyLevel());
-//            alertMission.setMaxEnemyLevel(alert.getMission().getMaxEnemyLevel());
-//            
-//            newAlert.setAlertMission(alertMission);
             
             newAlert = alertRepository.save(newAlert);
             log.info("syncAlerts: alert [{}] added to database, db id [{}]", alert.getId(), newAlert.getId());

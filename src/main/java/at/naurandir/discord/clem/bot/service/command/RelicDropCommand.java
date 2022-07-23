@@ -1,9 +1,11 @@
 package at.naurandir.discord.clem.bot.service.command;
 
-import at.naurandir.discord.clem.bot.model.WarframeState;
-import at.naurandir.discord.clem.bot.service.client.dto.droptable.MissionDTO;
-import at.naurandir.discord.clem.bot.service.client.dto.droptable.RelicDTO;
-import at.naurandir.discord.clem.bot.service.client.dto.droptable.RewardDTO;
+import at.naurandir.discord.clem.bot.model.mission.Mission;
+import at.naurandir.discord.clem.bot.model.mission.MissionReward;
+import at.naurandir.discord.clem.bot.model.relic.Relic;
+import at.naurandir.discord.clem.bot.model.relic.RelicDrop;
+import at.naurandir.discord.clem.bot.service.MissionService;
+import at.naurandir.discord.clem.bot.service.RelicService;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.util.Color;
@@ -13,9 +15,11 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
@@ -26,6 +30,12 @@ import reactor.core.publisher.Mono;
 @Slf4j
 @Component
 public class RelicDropCommand implements Command {
+    
+    @Autowired
+    private RelicService relicService;
+    
+    @Autowired
+    private MissionService missionService;
     
     private static final String RELIC_SEARCH_TITLE = "Relics with '{item}' Drop";
     private static final String RELIC_SEARCH_DESCRIPTION = "Relics that drop desired item, note some can be vaulted.";
@@ -47,7 +57,7 @@ public class RelicDropCommand implements Command {
     }
 
     @Override
-    public Mono<Void> handle(MessageCreateEvent event, WarframeState warframeState) {
+    public Mono<Void> handle(MessageCreateEvent event) {
         String item = getItem(event.getMessage().getContent());
         
         if (item.length() < 3) {
@@ -56,11 +66,12 @@ public class RelicDropCommand implements Command {
                 .then();
         }
         
+        List<Relic> relics = relicService.getRelics();
         log.info("handle: searching in [{}] relics with input [{}]", 
-                warframeState.getRelics().size(), item);
+                relics.size(), item);
         
-        List<RelicDTO> relicsWithItem = getRelicsWithItem(item, warframeState);
-        List<MissionDTO> missionsWithRelics = getMissionsWithRelics(relicsWithItem, warframeState);
+        List<Relic> relicsWithItem = getRelicsWithItem(item, relics);
+        List<Mission> missionsWithRelics = getMissionsWithRelics(relicsWithItem);
         log.debug("handle: found [{}] relics and [{}] missions", relicsWithItem.size(), missionsWithRelics.size());
         
         Map<String, String> relicMessages = getRelicMessages(relicsWithItem, item);
@@ -79,31 +90,26 @@ public class RelicDropCommand implements Command {
         return StringUtils.join(words, " ").trim();
     }
 
-    private List<RelicDTO> getRelicsWithItem(String item, WarframeState warframeState) {
-        return warframeState.getRelics().stream()
+    private List<Relic> getRelicsWithItem(String item, List<Relic> relics) {
+        return relics.stream()
                 .filter(relic -> rewardContainsItem(relic.getDrops(), item))
                 .collect(Collectors.toList());
     }
 
-    private boolean rewardContainsItem(List<RewardDTO> rewards, String item) {
-        return rewards.stream().anyMatch(reward -> reward.getReward().toLowerCase().contains(item.toLowerCase()));
+    private boolean rewardContainsItem(Set<RelicDrop> drops, String item) {
+        return drops.stream().anyMatch(drop -> drop.getReward().toLowerCase().contains(item.toLowerCase()));
     }
     
-    private List<MissionDTO> getMissionsWithRelics(List<RelicDTO> relicsWithItem, WarframeState warframeState) {
-        List<MissionDTO> missionsWithRelics = new ArrayList<>();
+    private List<Mission> getMissionsWithRelics(List<Relic> relicsWithItem) {
+        List<Mission> missionsWithRelics = new ArrayList<>();
+        List<Mission> allMissions = missionService.getMissions();
         List<String> relicItemNames = relicsWithItem.stream()
-                .map(relic -> relic.getTier() + " " + relic.getName() + " Relic")
+                .map(relic -> relic.getTier().getTierString() + " " + relic.getName() + " Relic")
                 .collect(Collectors.toList());
         
-        for (MissionDTO mission : warframeState.getMissions()) {
-            boolean isAnyRelicInMission = mission.getRewardsRotationA().stream()
-                        .anyMatch(rotReward -> relicItemNames.contains(rotReward.getReward())) ||
-                    mission.getRewardsRotationB().stream()
-                        .anyMatch(rotReward -> relicItemNames.contains(rotReward.getReward())) ||
-                    mission.getRewardsRotationC().stream()
-                        .anyMatch(rotReward -> relicItemNames.contains(rotReward.getReward())) ||
-                    mission.getRewardsRotationGeneral().stream()
-                        .anyMatch(rotReward -> relicItemNames.contains(rotReward.getReward()));
+        for (Mission mission : allMissions) {           
+            boolean isAnyRelicInMission = mission.getAllRewards().stream()
+                    .anyMatch(reward -> relicItemNames.contains(reward.getName()));
             
             if (isAnyRelicInMission) {
                 missionsWithRelics.add(mission);
@@ -113,64 +119,64 @@ public class RelicDropCommand implements Command {
         return missionsWithRelics;
     }
     
-    private Map<String, String> getRelicMessages(List<RelicDTO> relicsWithItem, String item) {
+    private Map<String, String> getRelicMessages(List<Relic> relicsWithItem, String item) {
         Map<String, String> relicMessages = new HashMap<>();
         
-        for (RelicDTO relic : relicsWithItem) {
-            RewardDTO drop = relic.getDrops().stream()
+        for (Relic relic : relicsWithItem) {
+            RelicDrop drop = relic.getDrops().stream()
                     .filter(reward -> reward.getReward().toLowerCase().contains(item.toLowerCase()))
                     .findFirst().get();
-            relicMessages.putIfAbsent(relic.getTier() + " " + relic.getName(), drop.getReward() + " " + drop.getRarity());
+            relicMessages.putIfAbsent(relic.getTier().getTierString() + " " + relic.getName(), drop.getReward() + " " + drop.getRarity());
         }
         return relicMessages;
     }
 
-    private List<String> getMissionMessages(List<MissionDTO> missionsWithRelics, List<RelicDTO> relicsWithItem) {
+    private List<String> getMissionMessages(List<Mission> missionsWithRelics, List<Relic> relicsWithItem) {
         List<String> missionMessages = new ArrayList<>();
         List<String> relicItemNames = relicsWithItem.stream()
-                .map(relic -> relic.getTier() + " " + relic.getName() + " Relic")
+                .map(relic -> relic.getTier().getTierString() + " " + relic.getName() + " Relic")
                 .collect(Collectors.toList());
         
-        for (MissionDTO mission : missionsWithRelics) {
-            List<RewardDTO> rewardsWithItemGeneral = mission.getRewardsRotationGeneral().stream()
-                    .filter(reward -> relicItemNames.contains(reward.getReward()))
+        for (Mission mission : missionsWithRelics) {
+            List<MissionReward> rewardsWithItemGeneral = mission.getGeneralRewards().stream()
+                    .filter(reward -> relicItemNames.contains(reward.getName()))
                     .collect(Collectors.toList());
             
-            List<RewardDTO> rewardsWithItemRotationA = mission.getRewardsRotationA().stream()
-                    .filter(reward -> relicItemNames.contains(reward.getReward()))
+            List<MissionReward> rewardsWithItemRotationA = mission.getRotationARewards().stream()
+                    .filter(reward -> relicItemNames.contains(reward.getName()))
                     .collect(Collectors.toList());
             
-            List<RewardDTO> rewardsWithItemRotationB = mission.getRewardsRotationB().stream()
-                    .filter(reward -> relicItemNames.contains(reward.getReward()))
+            List<MissionReward> rewardsWithItemRotationB = mission.getRotationBRewards().stream()
+                    .filter(reward -> relicItemNames.contains(reward.getName()))
                     .collect(Collectors.toList());
             
-            List<RewardDTO> rewardsWithItemRotationC = mission.getRewardsRotationC().stream()
-                    .filter(reward -> relicItemNames.contains(reward.getReward()))
+            List<MissionReward> rewardsWithItemRotationC = mission.getRotationCRewards().stream()
+                    .filter(reward -> relicItemNames.contains(reward.getName()))
                     .collect(Collectors.toList());
             
             rewardsWithItemGeneral.forEach(reward -> missionMessages.add(MISSION_DATA
                     .replace("{title}", mission.getName())
-                    .replace("{item}", reward.getReward())
+                    .replace("{item}", reward.getName())
                     .replace(" {rotation}","")
-                    .replace("{dropChance}", String.valueOf(reward.getChance().get(0)))));
+                    .replace("{dropChance}", String.valueOf(reward.getChance()))));
             
             rewardsWithItemRotationA.forEach(reward -> missionMessages.add(MISSION_DATA
                     .replace("{title}", mission.getName())
-                    .replace("{item}", reward.getReward())
+                    .replace("{item}", reward.getName())
                     .replace("{rotation}","Rotation A")
-                    .replace("{dropChance}", String.valueOf(reward.getChance().get(0)))));
+                    .replace("{dropChance}", String.valueOf(reward.getChance()))));
             
             rewardsWithItemRotationB.forEach(reward -> missionMessages.add(MISSION_DATA
                     .replace("{title}", mission.getName())
-                    .replace("{item}", reward.getReward())
+                    .replace("{item}", reward.getName())
                     .replace("{rotation}","Rotation B")
-                    .replace("{dropChance}", String.valueOf(reward.getChance().get(0)))));
+                    .replace("{dropChance}", String.valueOf(reward.getChance()))));
             
             rewardsWithItemRotationC.forEach(reward -> missionMessages.add(MISSION_DATA
                     .replace("{title}", mission.getName())
-                    .replace("{item}", reward.getReward())
+                    .replace("{item}", reward.getName())
                     .replace("{rotation}","Rotation C")
-                    .replace("{dropChance}", String.valueOf(reward.getChance().get(0)))));
+                    .replace("{dropChance}", String.valueOf(reward.getChance()))));
         }
         
         return missionMessages;

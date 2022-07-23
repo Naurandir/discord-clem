@@ -1,12 +1,10 @@
 package at.naurandir.discord.clem.bot.service.push;
 
-import at.naurandir.discord.clem.bot.model.WarframeState;
 import at.naurandir.discord.clem.bot.model.cycle.Cycle;
 import at.naurandir.discord.clem.bot.model.cycle.CycleType;
 import at.naurandir.discord.clem.bot.service.WorldCycleService;
 import at.naurandir.discord.clem.bot.utils.LocalDateTimeUtil;
 import discord4j.common.util.Snowflake;
-import discord4j.core.GatewayDiscordClient;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.discordjson.json.MessageData;
 import discord4j.discordjson.json.MessageEditRequest;
@@ -21,6 +19,7 @@ import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 /**
@@ -49,15 +48,15 @@ public class WorldCyclePush extends Push {
     }
 
     @Override
-    public MessageData doNewPush(GatewayDiscordClient client, WarframeState warframeState, Snowflake channelId) {
+    MessageData doNewPush(Snowflake channelId) {
         EmbedCreateSpec embed = generateEmbed(worldCycleService.getCycles());
 
-        return client.rest().getChannelById(channelId)
+        return getClient().rest().getChannelById(channelId)
                     .createMessage(embed.asRequest()).block(Duration.ofSeconds(10L));
     }
     
     @Override
-    void doUpdatePush(RestMessage message, WarframeState warframeState) {
+    void doUpdatePush(RestMessage message) {
         MessageEditRequest editRequest = MessageEditRequest.builder()
                 .embedOrNull(generateEmbed(worldCycleService.getCycles()).asRequest())
                 .build();
@@ -101,5 +100,11 @@ public class WorldCyclePush extends Push {
         }
         
         return embedBuilder.build();
+    }
+
+    @Scheduled(initialDelay = 60 * 1_000, fixedRate = 30 * 1_000)
+    @Override
+    void refresh() {
+        push();
     }
 }

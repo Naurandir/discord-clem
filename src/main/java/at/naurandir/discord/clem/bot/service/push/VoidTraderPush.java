@@ -1,12 +1,10 @@
 package at.naurandir.discord.clem.bot.service.push;
 
-import at.naurandir.discord.clem.bot.model.WarframeState;
 import at.naurandir.discord.clem.bot.model.trader.VoidTrader;
 import at.naurandir.discord.clem.bot.model.trader.VoidTraderItem;
 import at.naurandir.discord.clem.bot.service.VoidTraderService;
 import at.naurandir.discord.clem.bot.utils.LocalDateTimeUtil;
 import discord4j.common.util.Snowflake;
-import discord4j.core.GatewayDiscordClient;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.core.spec.EmbedCreateSpec.Builder;
 import discord4j.discordjson.json.MessageData;
@@ -21,6 +19,7 @@ import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 /**
@@ -44,16 +43,16 @@ public class VoidTraderPush extends Push {
     private static final String ITEM_DESCRIPTION = " *ducats:* {ducats}\n *credits:* {credits}";
 
     @Override
-    MessageData doNewPush(GatewayDiscordClient client, WarframeState warframeState, Snowflake channelId) {
+    MessageData doNewPush(Snowflake channelId) {
         EmbedCreateSpec embed = generateEmbed(voidTraderService.getVoidTrader());
 
-        return client.rest().getChannelById(channelId)
+        return getClient().rest().getChannelById(channelId)
                     .createMessage(embed.asRequest())
                     .block(Duration.ofSeconds(10L));
     }
 
     @Override
-    void doUpdatePush(RestMessage message, WarframeState warframeState) {
+    void doUpdatePush(RestMessage message) {
         MessageEditRequest editRequest = MessageEditRequest.builder()
                 .embedOrNull(generateEmbed(voidTraderService.getVoidTrader()).asRequest())
                 .build();
@@ -123,5 +122,11 @@ public class VoidTraderPush extends Push {
         }
         
         return embedBuilder.build();
+    }
+    
+    @Scheduled(initialDelay = 60 * 1_000, fixedRate = 60 * 1_000)
+    @Override
+    void refresh() {
+        push();
     }
 }

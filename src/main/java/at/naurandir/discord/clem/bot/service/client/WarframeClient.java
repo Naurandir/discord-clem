@@ -3,8 +3,7 @@ package at.naurandir.discord.clem.bot.service.client;
 import at.naurandir.discord.clem.bot.model.enums.Rarity;
 import at.naurandir.discord.clem.bot.service.client.dto.DropTableDTO;
 import at.naurandir.discord.clem.bot.service.client.dto.MarketDTO;
-import at.naurandir.discord.clem.bot.service.client.dto.WorldStateDTO;
-import at.naurandir.discord.clem.bot.service.client.dto.droptable.MissionDTO;
+import at.naurandir.discord.clem.bot.service.client.dto.droptable.MissionDropTableDTO;
 import at.naurandir.discord.clem.bot.service.client.dto.droptable.RelicDTO;
 import at.naurandir.discord.clem.bot.service.client.dto.droptable.RewardDTO;
 import at.naurandir.discord.clem.bot.service.client.dto.market.MarketItemsDTO;
@@ -36,6 +35,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.springframework.util.StopWatch;
 
 /**
  *
@@ -44,7 +44,26 @@ import org.jsoup.select.Elements;
 @Slf4j
 public class WarframeClient {
     
-    private Gson gson = new Gson();
+    private final Gson gson = new Gson();
+    
+    public String getDataRaw(String url, Map<String, String> headers) throws IOException {
+        try (CloseableHttpClient httpClient = getClient()) {
+            HttpGet httpGet = new HttpGet(url);
+            for (Map.Entry<String, String> header : headers.entrySet()) {
+                httpGet.addHeader(header.getKey(), header.getValue());
+            }
+            
+            StopWatch watch = new StopWatch();
+            watch.start();
+            
+            try (CloseableHttpResponse response = httpClient.execute(httpGet)) {
+                log.info("getDataRaw: received http status [{}] for url [{}]", response.getStatusLine(), url);
+                watch.stop();
+                log.debug("getDataRaw: needed [{}]ms for getting raw data", watch.getTotalTimeMillis());
+                return getHttpContent(response);
+            }
+        }
+    }
     
     public <T> T getData(String url, Map<String, String> headers, Class<T> clazz) throws IOException {
         try (CloseableHttpClient httpClient = getClient()) {
@@ -53,9 +72,16 @@ public class WarframeClient {
                 httpGet.addHeader(header.getKey(), header.getValue());
             }
             
+            StopWatch watch = new StopWatch();
+            watch.start();
+            
             try (CloseableHttpResponse response = httpClient.execute(httpGet)) {
                 log.info("getData: received http status [{}] for url [{}]", response.getStatusLine(), url);
                 String jsonString = getHttpContent(response);
+                
+                watch.stop();
+                log.debug("getData: needed [{}]ms for getting [{}]", watch.getTotalTimeMillis(), clazz);
+                
                 return gson.fromJson(jsonString, clazz);
             }
         }
@@ -68,27 +94,19 @@ public class WarframeClient {
                 httpGet.addHeader(header.getKey(), header.getValue());
             }
             
+            StopWatch watch = new StopWatch();
+            watch.start();
+            
             try (CloseableHttpResponse response = httpClient.execute(httpGet)) {
                 log.info("getData: received http status [{}] for url [{}]", response.getStatusLine(), url);
                 String jsonString = getHttpContent(response);
-
-                //Type clazzType = new TypeToken<List<T>>(){}.getType();
+                
                 Type clazzType = TypeToken.getParameterized(List.class, clazz).getType();
+                
+                watch.stop();
+                log.debug("getListData: needed [{}]ms for getting list of [{}]", watch.getTotalTimeMillis(), clazz);
+                
                 return gson.fromJson(jsonString, clazzType);
-            }
-        }
-    }
-    
-    
-    public WorldStateDTO getCurrentWorldState() throws IOException {
-        try (CloseableHttpClient httpClient = getClient()) {
-            HttpGet httpGet = new HttpGet("https://api.warframestat.us/pc");
-            httpGet.addHeader("Accept-Language", "en");
-            
-            try (CloseableHttpResponse response = httpClient.execute(httpGet)) {
-                log.info("getCurrentWorldState: received http status [{}]", response.getStatusLine());
-                String jsonString = getHttpContent(response);
-                return gson.fromJson(jsonString, WorldStateDTO.class);
             }
         }
     }
@@ -277,7 +295,7 @@ public class WarframeClient {
                 List<RelicDTO> relics = getRelicsHtml(relicElements);
                 
                 Elements missionElements = elements.get(0).select("tr");
-                List<MissionDTO> missions = getMissions(missionElements);
+                List<MissionDropTableDTO> missions = getMissions(missionElements);
                 
                 DropTableDTO dropTable = new DropTableDTO();
                 dropTable.setRelics(relics);
@@ -321,17 +339,17 @@ public class WarframeClient {
         return relics.values().stream().collect(Collectors.toList());
     }
     
-    private List<MissionDTO> getMissions(Elements missionElements) {
+    private List<MissionDropTableDTO> getMissions(Elements missionElements) {
         
-        List<MissionDTO> missions = new ArrayList<>();
-        MissionDTO currentMission = new MissionDTO();
+        List<MissionDropTableDTO> missions = new ArrayList<>();
+        MissionDropTableDTO currentMission = new MissionDropTableDTO();
         missions.add(currentMission);
         String currentRotation = "G";
         
         for (Element element : missionElements) {
             String text = element.text();
             if (text.equals("")) {
-                currentMission = new MissionDTO();
+                currentMission = new MissionDropTableDTO();
                 missions.add(currentMission);
                 currentRotation = "G";
                 continue;

@@ -1,9 +1,9 @@
 package at.naurandir.discord.clem.bot.model.alert;
 
-import at.naurandir.discord.clem.bot.model.Mission;
-import at.naurandir.discord.clem.bot.model.MissionMapper;
+import at.naurandir.discord.clem.bot.model.mission.EmbeddableMission;
+import at.naurandir.discord.clem.bot.model.mission.MissionMapper;
 import at.naurandir.discord.clem.bot.service.client.dto.worldstate.AlertDTO;
-import at.naurandir.discord.clem.bot.service.client.dto.worldstate.MissionDTO;
+import at.naurandir.discord.clem.bot.service.client.dto.worldstate.EmbeddableMissionDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
@@ -46,7 +46,7 @@ public abstract class AlertMapper {
     }
     
     @Named("getMission")
-    public Mission getMission(MissionDTO missionDto) {
-        return missionMapper.missionDtoToMission(missionDto);
+    public EmbeddableMission getMission(EmbeddableMissionDTO missionDto) {
+        return missionMapper.missionDtoToEmbeddableMission(missionDto);
     }
 }

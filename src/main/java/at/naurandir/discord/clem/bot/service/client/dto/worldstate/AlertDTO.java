@@ -10,7 +10,7 @@ import lombok.Data;
 @Data
 public class AlertDTO {
     
-        private MissionDTO mission;
+        private EmbeddableMissionDTO mission;
         private Boolean active;
         private String id;
         private String expiry;

@@ -1,8 +1,9 @@
 package at.naurandir.discord.clem.bot.model.trader;
 
 import at.naurandir.discord.clem.bot.service.client.dto.worldstate.VoidTraderDTO;
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
@@ -33,8 +34,8 @@ public abstract class VoidTraderMapper {
     public abstract VoidTrader voidTraderDtoToVoidTrader(VoidTraderDTO dto);
     
     @Named("getInventory")
-    public List<VoidTraderItem> voidTraderItemDtoToVoidTraderItem(List<VoidTraderDTO.VoidTraderInventoryDTO> inventoryDto) {
-        List<VoidTraderItem> inventory = new ArrayList<>();
+    public Set<VoidTraderItem> voidTraderItemDtoToVoidTraderItem(List<VoidTraderDTO.VoidTraderInventoryDTO> inventoryDto) {
+        Set<VoidTraderItem> inventory = new HashSet<>();
         
         inventoryDto.forEach(dto -> inventory.add(voidTraderItemMapper.voidTraderItemDtoToVoidTraderItem(dto)));
         

@@ -1,6 +1,5 @@
 package at.naurandir.discord.clem.bot.service.command;
 
-import at.naurandir.discord.clem.bot.model.WarframeState;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.util.Color;
@@ -35,7 +34,7 @@ public class HelpCommand implements Command {
     }
 
     @Override
-    public Mono<Void> handle(MessageCreateEvent event, WarframeState warframeState) {
+    public Mono<Void> handle(MessageCreateEvent event) {
         StringBuilder description = new StringBuilder();
         commands.forEach(command -> description.append(COMMAND_DESCRIPTION.replace("{command}", command.getCommandWord())
                         .replace("{description}", command.getDescription())));

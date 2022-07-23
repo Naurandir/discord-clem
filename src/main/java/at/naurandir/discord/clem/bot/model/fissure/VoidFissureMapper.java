@@ -1,7 +1,7 @@
 package at.naurandir.discord.clem.bot.model.fissure;
 
-import at.naurandir.discord.clem.bot.model.Mission;
-import at.naurandir.discord.clem.bot.model.MissionMapper;
+import at.naurandir.discord.clem.bot.model.mission.EmbeddableMission;
+import at.naurandir.discord.clem.bot.model.mission.MissionMapper;
 import at.naurandir.discord.clem.bot.service.client.dto.worldstate.VoidFissureDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -33,7 +33,7 @@ public abstract class VoidFissureMapper {
     public abstract VoidFissure voidFissureDtoToVoidFissure(VoidFissureDTO dto);
     
     @Named("getMission")
-    public Mission getMission(VoidFissureDTO dto) {
-        return missionMapper.toMission(dto.getNode(), dto.getMissionType(), dto.getEnemy());
+    public EmbeddableMission getMission(VoidFissureDTO dto) {
+        return missionMapper.toEmbeddableMission(dto.getNode(), dto.getMissionType(), dto.getEnemy());
     }
 }

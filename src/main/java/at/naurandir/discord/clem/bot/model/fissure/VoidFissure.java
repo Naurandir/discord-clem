@@ -1,7 +1,7 @@
 package at.naurandir.discord.clem.bot.model.fissure;
 
 import at.naurandir.discord.clem.bot.model.DbEntity;
-import at.naurandir.discord.clem.bot.model.Mission;
+import at.naurandir.discord.clem.bot.model.mission.EmbeddableMission;
 import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
@@ -21,7 +21,7 @@ import lombok.Setter;
 public class VoidFissure extends DbEntity {
 
     @Embedded
-    private Mission fissureMission;
+    private EmbeddableMission fissureMission;
     
     @Column(nullable = false)
     private LocalDateTime activation;

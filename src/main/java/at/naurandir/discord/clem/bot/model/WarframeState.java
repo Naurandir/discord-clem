@@ -9,7 +9,7 @@ import at.naurandir.discord.clem.bot.service.client.dto.worldstate.VallisCycleDT
 import at.naurandir.discord.clem.bot.service.client.dto.worldstate.VoidFissureDTO;
 import at.naurandir.discord.clem.bot.service.client.dto.worldstate.VoidTraderDTO;
 import at.naurandir.discord.clem.bot.service.client.dto.WorldStateDTO;
-import at.naurandir.discord.clem.bot.service.client.dto.droptable.MissionDTO;
+import at.naurandir.discord.clem.bot.service.client.dto.droptable.MissionDropTableDTO;
 import at.naurandir.discord.clem.bot.service.client.dto.droptable.RelicDTO;
 import at.naurandir.discord.clem.bot.service.client.dto.market.MarketItemDTO;
 import at.naurandir.discord.clem.bot.service.client.dto.market.MarketLichWeaponDTO;
@@ -51,7 +51,7 @@ public class WarframeState {
     
     // drop table
     private List<RelicDTO> relics;  
-    private List<MissionDTO> missions;
+    private List<MissionDropTableDTO> missions;
     
     // market
     private List<MarketItemDTO> marketItems;
