@@ -12,7 +12,6 @@ import at.naurandir.discord.clem.bot.service.client.dto.droptable.RewardDTO;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -44,6 +43,9 @@ public class MissionService {
     
     @Autowired
     private MissionRewardRepository missionRewardRepository;
+    
+    @Autowired
+    private WarframeClient warframeClient;
 
     @Value("${discord.clem.mission.url}")
     private String apiUrl;
@@ -51,15 +53,14 @@ public class MissionService {
     @Value("#{${discord.clem.mission.headers}}")
     private Map<String, String> apiHeaders;
 
-    private final WarframeClient warframeClient = new WarframeClient();
-
     @Transactional
     @Scheduled(cron = "${discord.clem.mission.scheduler.cron}")
     public void syncMissions() throws IOException {
+        
         List<Mission> missionsDb = missionRepository.findByEndDateIsNull();
         List<String> missionNames = missionsDb.stream().map(mission -> mission.getName()).collect(Collectors.toList());
-        
         List<MissionDropTableDTO> missionDTOs = getMissionDTOs();
+        
         List<String> missionDtoNames = missionDTOs.stream().map(mission -> mission.getName()).collect(Collectors.toList());
         List<MissionDropTableDTO> newMissionDTOs = missionDTOs.stream()
                 .filter(mission -> !missionNames.contains(mission.getName()))
@@ -81,7 +82,7 @@ public class MissionService {
             missionRewards.forEach(reward -> reward.setMission(dbMission));
             missionRewardRepository.saveAll(missionRewards);
             
-            log.info("syncMissions: added new mission [{} - {}]", newMission.getId(), newMission.getName());
+            log.info("syncMissions: added new mission [{} - {}]", dbMission.getId(), dbMission.getName());
         }
         
         // update
@@ -117,6 +118,7 @@ public class MissionService {
 
     private List<MissionDropTableDTO> getMissionDTOs() throws IOException {
         String dropTableString = warframeClient.getDataRaw(apiUrl, apiHeaders);
+        
         Document html = Jsoup.parse(dropTableString);
         Elements elements = html.select("table");
 

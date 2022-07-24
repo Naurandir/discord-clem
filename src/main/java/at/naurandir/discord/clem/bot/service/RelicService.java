@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import javax.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -40,18 +41,22 @@ public class RelicService {
     @Autowired
     private RelicDropRepository relicDropRepository;
     
+    @Autowired
+    private WarframeClient warframeClient;
+    
     @Value( "${discord.clem.relic.url}" )
     private String apiUrl;
     
     @Value("#{${discord.clem.relic.headers}}")
     private Map<String, String> apiHeaders;
     
-    private final WarframeClient warframeClient = new WarframeClient();
-    
+    @Transactional
     @Scheduled(cron = "${discord.clem.relic.scheduler.cron}")
     public void syncRelics() throws IOException {
         List<Relic> relicsDb = relicRepository.findAll();
-        List<String> relicNames = relicsDb.stream().map(relic -> relic.getName() + relic.getTier()).collect(Collectors.toList());
+        List<String> relicNames = relicsDb.stream()
+                .map(relic -> relic.getName() + relic.getTier().getTierString())
+                .collect(Collectors.toList());
         
         Set<RelicDTO> relicDtos = getRelicDTOs();
         List<RelicDTO> newRelicDTOs = relicDtos.stream()
@@ -78,7 +83,7 @@ public class RelicService {
         for (RelicDTO updateRelicDTO : updateRelicDTOs) {
             Relic relicDb = relicsDb.stream()
                     .filter(relic -> relic.getName().equals(updateRelicDTO.getName()) &&
-                                     relic.getTier().equals(updateRelicDTO.getTier()))
+                                     relic.getTier().getTierString().equals(updateRelicDTO.getTier()))
                     .findFirst()
                     .get();
             
@@ -92,9 +97,7 @@ public class RelicService {
             
             relicDb.getDrops().forEach(drop -> drop.setRelic(relicDb));
             relicDropRepository.saveAll(relicDb.getDrops());
-        }
-        relicRepository.saveAll(relicsDb);
-        
+        }        
     }
 
     private Set<RelicDTO> getRelicDTOs() throws IOException {
