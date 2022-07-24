@@ -1,12 +1,9 @@
 package at.naurandir.discord.clem.bot.service;
 
 import at.naurandir.discord.clem.bot.model.item.ItemMapper;
-import at.naurandir.discord.clem.bot.model.item.Warframe;
 import at.naurandir.discord.clem.bot.model.item.Weapon;
-import at.naurandir.discord.clem.bot.repository.WarframeRepository;
 import at.naurandir.discord.clem.bot.repository.WeaponRepository;
 import at.naurandir.discord.clem.bot.service.client.WarframeClient;
-import at.naurandir.discord.clem.bot.service.client.dto.worldstate.WarframeDTO;
 import at.naurandir.discord.clem.bot.service.client.dto.worldstate.WeaponDTO;
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -26,8 +23,8 @@ import org.springframework.stereotype.Service;
  */
 @Slf4j
 @Service
-public class ItemService {
-
+public class WeaponService {
+    
     @Autowired
     private ItemMapper itemMapper;
     
@@ -35,26 +32,16 @@ public class ItemService {
     private WeaponRepository weaponRepository;
     
     @Autowired
-    private WarframeRepository warframeRepository;
+    private WarframeClient warframeClient;
     
-    @Value( "${discord.clem.item.warframe.url}" )
-    private String apiUrlWarframe;
-    
-    @Value( "${discord.clem.item.weapon.url}" )
+    @Value( "${discord.clem.weapon.url}" )
     private String apiUrlWeapon;
     
-    @Value("#{${discord.clem.item.headers}}")
+    @Value("#{${discord.clem.weapon.headers}}")
     private Map<String, String> apiHeaders;
     
-    private final WarframeClient warframeClient = new WarframeClient();
-    
-    @Scheduled(cron = "${discord.clem.item.scheduler.cron}")
-    public void syncItems() throws IOException {
-        syncWeapons();
-        syncWarframes();
-    }
-    
-    private void syncWeapons() throws IOException {
+    @Scheduled(cron = "${discord.clem.weapon.scheduler.cron}")
+    public void syncWeapons() throws IOException {
         List<Weapon> weaponsDb = weaponRepository.findByEndDateIsNull();
         List<String> weaponNames = weaponsDb.stream().map(weapon -> weapon.getUniqueName()).collect(Collectors.toList());
         log.debug("syncWeapons: received [{}] weapons from database.", weaponsDb.size());
@@ -97,51 +84,6 @@ public class ItemService {
             }
         }
         weaponRepository.saveAll(toInactivateWeaponsDb);
-    }
-    
-    private void syncWarframes() throws IOException {
-        List<Warframe> warframesDb = warframeRepository.findByEndDateIsNull();
-        List<String> warframeNames = warframesDb.stream().map(warframe -> warframe.getUniqueName()).collect(Collectors.toList());
-        log.debug("syncWarframes: received [{}] warframes from database.", warframesDb.size());
-        
-        List<WarframeDTO> warframeDTOs = warframeClient.getListData(apiUrlWarframe, apiHeaders, WarframeDTO.class);
-        List<String> warframeDtoNames = warframeDTOs.stream().map(warframe -> warframe.getUniqueName()).collect(Collectors.toList());
-        List<WarframeDTO> newWarframeDTOs = warframeDTOs.stream()
-                .filter(warframe -> !warframeNames.contains(warframe.getUniqueName()))
-                .collect(Collectors.toList());
-        List<WarframeDTO> updateWarframeDTOs = warframeDTOs.stream()
-                .filter(warframe -> warframeNames.contains(warframe.getUniqueName()))
-                .collect(Collectors.toList());
-        log.info("syncWarframes: received [{}] warframes, [{}] are new, [{}] can be updated.", 
-                warframeDTOs.size(), newWarframeDTOs.size(), updateWarframeDTOs.size());
-        
-        // add
-        for (WarframeDTO newWarframeDTO : newWarframeDTOs) {
-            Warframe newWarframe = itemMapper.fromDtoToWarframe(newWarframeDTO);
-            newWarframe = warframeRepository.save(newWarframe);
-            log.info("syncWarframes: added new warframe [{} - {}]", newWarframe.getId(), newWarframe.getName());
-        }
-        
-        // update
-        for (WarframeDTO updateWarframeDTO : updateWarframeDTOs) {
-            Warframe warframeDb = warframesDb.stream()
-                    .filter(warframe -> warframe.getUniqueName().equals(updateWarframeDTO.getUniqueName()))
-                    .findFirst()
-                    .get();
-            
-            itemMapper.updateWarframe(warframeDb, updateWarframeDTO);
-        }
-        warframeRepository.saveAll(warframesDb);
-        
-        // delete
-        List<Warframe> toInactivateWarframesDb = new ArrayList<>();
-        for (Warframe warframeDb : warframesDb) {
-            if (!warframeDtoNames.contains(warframeDb.getName())) {
-                toInactivateWarframesDb.add(warframeDb);
-                warframeDb.setEndDate(LocalDateTime.now());
-            }
-        }
-        warframeRepository.saveAll(toInactivateWarframesDb);
     }
     
 }

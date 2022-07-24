@@ -11,16 +11,16 @@ import org.springframework.boot.test.mock.mockito.MockBean;
  * @author Naurandir
  */
 @SpringBootTest
-public class ItemServiceTest extends BaseServiceTest {
+public class WarframeServiceTest extends BaseServiceTest {
     
     @MockBean
     private BotService botService;
     
     @Autowired
-    private ItemService itemService;
+    private WarframeService warframeService;
 
     @Test
-    public void syncItems() throws IOException {
-        itemService.syncItems();
+    public void syncWarframes() throws IOException {
+        warframeService.syncWarframes();
     }
 }
