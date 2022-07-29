@@ -1,13 +1,10 @@
 package at.naurandir.discord.clem.bot.service;
 
-import at.naurandir.discord.clem.bot.model.item.ItemMapper;
 import at.naurandir.discord.clem.bot.model.item.Warframe;
-import at.naurandir.discord.clem.bot.model.item.Weapon;
+import at.naurandir.discord.clem.bot.model.item.WarframeMapper;
 import at.naurandir.discord.clem.bot.repository.WarframeRepository;
-import at.naurandir.discord.clem.bot.repository.WeaponRepository;
 import at.naurandir.discord.clem.bot.service.client.WarframeClient;
 import at.naurandir.discord.clem.bot.service.client.dto.worldstate.WarframeDTO;
-import at.naurandir.discord.clem.bot.service.client.dto.worldstate.WeaponDTO;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -29,18 +26,19 @@ import org.springframework.stereotype.Service;
 public class WarframeService {
 
     @Autowired
-    private ItemMapper itemMapper;
+    private WarframeMapper warframeMapper;
     
     @Autowired
     private WarframeRepository warframeRepository;
+    
+    @Autowired
+    private WarframeClient warframeClient;
     
     @Value( "${discord.clem.warframe.url}" )
     private String apiUrlWarframe;
     
     @Value("#{${discord.clem.warframe.headers}}")
     private Map<String, String> apiHeaders;
-    
-    private final WarframeClient warframeClient = new WarframeClient();
     
     @Scheduled(cron = "${discord.clem.warframe.scheduler.cron}")
     public void syncWarframes() throws IOException {
@@ -49,6 +47,9 @@ public class WarframeService {
         log.debug("syncWarframes: received [{}] warframes from database.", warframesDb.size());
         
         List<WarframeDTO> warframeDTOs = warframeClient.getListData(apiUrlWarframe, apiHeaders, WarframeDTO.class);
+        warframeDTOs = warframeDTOs.stream()
+                .filter(warframe -> "Warframes".equals(warframe.getCategory()))
+                .collect(Collectors.toList());
         List<String> warframeDtoNames = warframeDTOs.stream().map(warframe -> warframe.getUniqueName()).collect(Collectors.toList());
         List<WarframeDTO> newWarframeDTOs = warframeDTOs.stream()
                 .filter(warframe -> !warframeNames.contains(warframe.getUniqueName()))
@@ -61,7 +62,7 @@ public class WarframeService {
         
         // add
         for (WarframeDTO newWarframeDTO : newWarframeDTOs) {
-            Warframe newWarframe = itemMapper.fromDtoToWarframe(newWarframeDTO);
+            Warframe newWarframe = warframeMapper.fromDtoToWarframe(newWarframeDTO);
             newWarframe = warframeRepository.save(newWarframe);
             log.info("syncWarframes: added new warframe [{} - {}]", newWarframe.getId(), newWarframe.getName());
         }
@@ -73,14 +74,14 @@ public class WarframeService {
                     .findFirst()
                     .get();
             
-            itemMapper.updateWarframe(warframeDb, updateWarframeDTO);
+            warframeMapper.updateWarframe(warframeDb, updateWarframeDTO);
         }
         warframeRepository.saveAll(warframesDb);
         
         // delete
         List<Warframe> toInactivateWarframesDb = new ArrayList<>();
         for (Warframe warframeDb : warframesDb) {
-            if (!warframeDtoNames.contains(warframeDb.getName())) {
+            if (!warframeDtoNames.contains(warframeDb.getUniqueName())) {
                 toInactivateWarframesDb.add(warframeDb);
                 warframeDb.setEndDate(LocalDateTime.now());
             }

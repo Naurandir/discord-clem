@@ -1,7 +1,6 @@
 package at.naurandir.discord.clem.bot.service.client.dto.worldstate;
 
 import java.util.List;
-import java.util.Optional;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;

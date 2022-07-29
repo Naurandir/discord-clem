@@ -1,7 +1,7 @@
 package at.naurandir.discord.clem.bot.service;
 
-import at.naurandir.discord.clem.bot.model.item.ItemMapper;
 import at.naurandir.discord.clem.bot.model.item.Weapon;
+import at.naurandir.discord.clem.bot.model.item.WeaponMapper;
 import at.naurandir.discord.clem.bot.repository.WeaponRepository;
 import at.naurandir.discord.clem.bot.service.client.WarframeClient;
 import at.naurandir.discord.clem.bot.service.client.dto.worldstate.WeaponDTO;
@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -26,7 +27,7 @@ import org.springframework.stereotype.Service;
 public class WeaponService {
     
     @Autowired
-    private ItemMapper itemMapper;
+    private WeaponMapper weaponMapper;
     
     @Autowired
     private WeaponRepository weaponRepository;
@@ -47,6 +48,8 @@ public class WeaponService {
         log.debug("syncWeapons: received [{}] weapons from database.", weaponsDb.size());
         
         List<WeaponDTO> weaponDTOs = warframeClient.getListData(apiUrlWeapon, apiHeaders, WeaponDTO.class);
+        weaponDTOs = weaponDTOs.stream().filter(weapon -> !isEmpty(weapon.getWikiaUrl())).collect(Collectors.toList());
+        
         List<String> weaponDtoNames = weaponDTOs.stream().map(weapon -> weapon.getUniqueName()).collect(Collectors.toList());
         List<WeaponDTO> newWeaponDTOs = weaponDTOs.stream()
                 .filter(weapon -> !weaponNames.contains(weapon.getUniqueName()))
@@ -59,7 +62,7 @@ public class WeaponService {
         
         // add
         for (WeaponDTO newWeaponDTO : newWeaponDTOs) {
-            Weapon newWeapon = itemMapper.fromDtoToWeapon(newWeaponDTO);
+            Weapon newWeapon = weaponMapper.fromDtoToWeapon(newWeaponDTO);
             newWeapon = weaponRepository.save(newWeapon);
             log.info("syncWeapons: added new weapon [{} - {}]", newWeapon.getId(), newWeapon.getName());
         }
@@ -70,15 +73,14 @@ public class WeaponService {
                     .filter(weapon -> weapon.getUniqueName().equals(updateWeaponDTO.getUniqueName()))
                     .findFirst()
                     .get();
-            
-            itemMapper.updateWeapon(weaponDb, updateWeaponDTO);
+            weaponMapper.updateWeapon(weaponDb, updateWeaponDTO);
         }
         weaponRepository.saveAll(weaponsDb);
         
         // inactivate
         List<Weapon> toInactivateWeaponsDb = new ArrayList<>();
         for (Weapon weaponDb : weaponsDb) {
-            if (!weaponDtoNames.contains(weaponDb.getName())) {
+            if (!weaponDtoNames.contains(weaponDb.getUniqueName())) {
                 toInactivateWeaponsDb.add(weaponDb);
                 weaponDb.setEndDate(LocalDateTime.now());
             }

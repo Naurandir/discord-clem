@@ -6,5 +6,5 @@ package at.naurandir.discord.clem.bot.model.enums;
  */
 public enum WeaponType {
 
-    PRIMARY, SECONDARY, MEELE, ARCH_MEELE, ARCH_GUN;
+    PRIMARY, SECONDARY, MELEE, ARCH_MELEE, ARCH_GUN;
 }

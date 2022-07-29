@@ -1,10 +1,14 @@
 package at.naurandir.discord.clem.bot.model.item;
 
 import at.naurandir.discord.clem.bot.model.enums.WeaponType;
+import java.util.Set;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
@@ -57,4 +61,7 @@ public class Weapon extends Item {
     
     @Column
     private String triggerType;
+    
+    @OneToMany(mappedBy="weapon", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private Set<ItemBuild> builds;
 }

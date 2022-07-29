@@ -16,7 +16,16 @@ import lombok.Setter;
 public class Item extends DbEntity {
     
     @Column
+    private String overframeUrlName;
+    
+    @Column
     private String uniqueName;
+    
+    @Column
+    private String wikiaUrl;
+    
+    @Column
+    private String wikiaThumbnail;
     
     @Column
     private Boolean tradable;

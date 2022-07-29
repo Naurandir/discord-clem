@@ -26,7 +26,6 @@ public class WarframeDTO extends ItemDTO {
     private Double sprint;
     private Double sprintSpeed;
     private Integer stamina;
-    private String wikiaUrl;
     private List<WarframeAbilitiesDTO> abilities;
     
 }
