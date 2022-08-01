@@ -57,7 +57,7 @@ public class WarframeServiceTest extends BaseServiceTest {
     
     @Test
     public void shouldSyncNewWarframes() throws IOException {
-        warframeService.syncWarframes();
+        warframeService.sync();
         
         verify(warframeRepository, times(numberOfWarframes)).save(any());
         verify(warframeMapper, times(numberOfWarframes)).fromDtoToWarframe(any());
@@ -68,7 +68,7 @@ public class WarframeServiceTest extends BaseServiceTest {
         when(warframeRepository.findByEndDateIsNull()).thenReturn(List.of(warframe));
         warframe.setUniqueName("/Lotus/Powersuits/Bard/Bard");
         
-        warframeService.syncWarframes();
+        warframeService.sync();
         
         verify(warframeRepository, times(numberOfWarframes - 1)).save(any());
         verify(warframeMapper, times(numberOfWarframes - 1)).fromDtoToWarframe(any());
@@ -79,7 +79,7 @@ public class WarframeServiceTest extends BaseServiceTest {
         when(warframeRepository.findByEndDateIsNull()).thenReturn(List.of(warframe));
         warframe.setName("oldWarframe");
         
-        warframeService.syncWarframes();
+        warframeService.sync();
         
         verify(warframeRepository, times(numberOfWarframes)).save(any());
         verify(warframeMapper, times(numberOfWarframes)).fromDtoToWarframe(any());

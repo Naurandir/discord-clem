@@ -33,7 +33,7 @@ import org.springframework.stereotype.Service;
  */
 @Slf4j
 @Service
-public class MissionService {
+public class MissionService extends SyncService {
 
     @Autowired
     private MissionMapper missionMapper;
@@ -53,9 +53,10 @@ public class MissionService {
     @Value("#{${discord.clem.mission.headers}}")
     private Map<String, String> apiHeaders;
 
+    @Override
     @Transactional
     @Scheduled(cron = "${discord.clem.mission.scheduler.cron}")
-    public void syncMissions() throws IOException {
+    public void sync() throws IOException {
         
         List<Mission> missionsDb = missionRepository.findByEndDateIsNull();
         List<String> missionNames = missionsDb.stream().map(mission -> mission.getName()).collect(Collectors.toList());
@@ -188,5 +189,10 @@ public class MissionService {
 
     public List<Mission> getMissions() {
         return missionRepository.findByEndDateIsNull();
+    }
+    
+    @Override
+    boolean isFirstTimeStartup() {
+        return missionRepository.findByEndDateIsNull().isEmpty();
     }
 }

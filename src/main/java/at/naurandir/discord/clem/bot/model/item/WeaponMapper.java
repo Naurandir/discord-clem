@@ -30,6 +30,7 @@ public interface WeaponMapper extends ItemMapper {
     
     @Mappings({
         @Mapping(target="modifyDate", expression="java(java.time.LocalDateTime.now())"),   
+        @Mapping(target="wikiaThumbnail", expression="java(getThumbnailUrl(toUpdateWeapon, dto.getWikiaThumbnail()))"),
         
         @Mapping(source= "name", target="overframeUrlName", qualifiedByName="getOverframeUrlName"),
         @Mapping(source= "marketCost", target="marketCost", qualifiedByName = "getMarketCost"),
@@ -37,7 +38,7 @@ public interface WeaponMapper extends ItemMapper {
         
         @Mapping(target = "id", ignore = true)
     })
-    void updateWeapon(@MappingTarget Weapon toUpdateWarframe, WeaponDTO dto);
+    void updateWeapon(@MappingTarget Weapon toUpdateWeapon, WeaponDTO dto);
     
     @Named("getWeaponType")
     default WeaponType getWeaponType(String category) {

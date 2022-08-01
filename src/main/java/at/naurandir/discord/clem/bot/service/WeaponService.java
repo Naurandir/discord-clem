@@ -10,7 +10,9 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
+import javax.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +26,7 @@ import org.springframework.stereotype.Service;
  */
 @Slf4j
 @Service
-public class WeaponService {
+public class WeaponService extends SyncService {
     
     @Autowired
     private WeaponMapper weaponMapper;
@@ -41,16 +43,17 @@ public class WeaponService {
     @Value("#{${discord.clem.weapon.headers}}")
     private Map<String, String> apiHeaders;
     
+    @Override
     @Scheduled(cron = "${discord.clem.weapon.scheduler.cron}")
-    public void syncWeapons() throws IOException {
+    public void sync() throws IOException {
         List<Weapon> weaponsDb = weaponRepository.findByEndDateIsNull();
         List<String> weaponNames = weaponsDb.stream().map(weapon -> weapon.getUniqueName()).collect(Collectors.toList());
         log.debug("syncWeapons: received [{}] weapons from database.", weaponsDb.size());
         
         List<WeaponDTO> weaponDTOs = warframeClient.getListData(apiUrlWeapon, apiHeaders, WeaponDTO.class);
         weaponDTOs = weaponDTOs.stream().filter(weapon -> !isEmpty(weapon.getWikiaUrl())).collect(Collectors.toList());
-        
         List<String> weaponDtoNames = weaponDTOs.stream().map(weapon -> weapon.getUniqueName()).collect(Collectors.toList());
+        
         List<WeaponDTO> newWeaponDTOs = weaponDTOs.stream()
                 .filter(weapon -> !weaponNames.contains(weapon.getUniqueName()))
                 .collect(Collectors.toList());
@@ -88,4 +91,28 @@ public class WeaponService {
         weaponRepository.saveAll(toInactivateWeaponsDb);
     }
     
+    public List<Weapon> getWeapons() {
+        return weaponRepository.findByEndDateIsNull();
+    }
+    
+    public List<Weapon> findWeaponsByName(String name) {
+        return weaponRepository.findByNameContainingIgnoreCaseAndEndDateIsNull(name);
+    }
+
+    void updateWikiThumbnail(Weapon weapon, String pictureUrl) {
+        Optional<Weapon> foundWeapon = weaponRepository.findById(weapon.getId());
+        if (foundWeapon.isEmpty()) {
+            log.warn("updateWikiThumbnail: cannot update thumbnail of weapon [{} - {}], as reload of weapon did not work",
+                    weapon.getId(), weapon.getName());
+            return;
+        }
+        
+        foundWeapon.get().setWikiaThumbnail(pictureUrl);
+        weaponRepository.save(foundWeapon.get());
+    }
+    
+    @Override
+    boolean isFirstTimeStartup() {
+        return weaponRepository.findByEndDateIsNull().isEmpty();
+    }
 }

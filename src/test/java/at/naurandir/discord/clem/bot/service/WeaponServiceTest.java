@@ -57,7 +57,7 @@ public class WeaponServiceTest extends BaseServiceTest {
     
     @Test
     public void shouldSyncNewWeapons() throws IOException {
-        weaponService.syncWeapons();
+        weaponService.sync();
         
         verify(weaponRepository, times(numberOfWeapons)).save(any());
         verify(weaponMapper, times(numberOfWeapons)).fromDtoToWeapon(any());
@@ -68,7 +68,7 @@ public class WeaponServiceTest extends BaseServiceTest {
         when(weaponRepository.findByEndDateIsNull()).thenReturn(List.of(weapon));
         weapon.setUniqueName("/Lotus/Weapons/Tenno/LongGuns/SapientPrimary/SapientPrimaryWeapon");
         
-        weaponService.syncWeapons();
+        weaponService.sync();
         
         verify(weaponRepository, times(numberOfWeapons - 1)).save(any());
         verify(weaponMapper, times(numberOfWeapons - 1)).fromDtoToWeapon(any());
@@ -79,7 +79,7 @@ public class WeaponServiceTest extends BaseServiceTest {
         when(weaponRepository.findByEndDateIsNull()).thenReturn(List.of(weapon));
         weapon.setName("oldWeapon");
         
-        weaponService.syncWeapons();
+        weaponService.sync();
         
         verify(weaponRepository, times(numberOfWeapons)).save(any());
         verify(weaponMapper, times(numberOfWeapons)).fromDtoToWeapon(any());

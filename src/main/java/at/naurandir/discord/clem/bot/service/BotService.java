@@ -74,8 +74,10 @@ public class BotService {
     }
     
     private Mono<Void> handleMessage(MessageCreateEvent event) {
-        log.debug("handleMessage: received message create event [{} - {}]", 
+        if (log.isDebugEnabled()) {
+            log.debug("handleMessage: received message create event [{} - {}]", 
                 event.getMessage().getContent(), event.getMessage().getEmbeds());
+        }
         
         if (isOwnBot(event) && isPinnedMessage(event)) {
             event.getMessage()
@@ -91,8 +93,10 @@ public class BotService {
     }
     
     private Mono<Void> handleMessage(MessageDeleteEvent event) {
-        log.debug("handleMessage: received message delete event [{}]", 
+        if (log.isDebugEnabled()) {
+            log.debug("handleMessage: received message delete event [{}]", 
                 event.getMessage());
+        }
         
         if (event.getMessage().isEmpty()) {
             return Flux.empty().then();

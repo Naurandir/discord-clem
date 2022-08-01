@@ -21,7 +21,7 @@ import org.springframework.stereotype.Service;
  */
 @Slf4j
 @Service
-public class AlertService {
+public class AlertService extends SyncService {
     
     @Autowired
     private AlertMapper alertMapper;
@@ -38,8 +38,9 @@ public class AlertService {
     @Value("#{${discord.clem.alert.headers}}")
     private Map<String, String> apiHeaders;
     
+    @Override
     @Scheduled(cron = "${discord.clem.alert.scheduler.cron}")
-    public void syncAlerts() throws IOException {
+    public void sync() throws IOException {
         List<AlertDTO> currentAlerts = warframeClient.getListData(apiUrl, apiHeaders, AlertDTO.class);
         List<Alert> dbAlerts = alertRepository.findByEndDateIsNull();
         LocalDateTime now = LocalDateTime.now();
@@ -78,5 +79,10 @@ public class AlertService {
     
     public List<Alert> getActiveAlerts() {
         return alertRepository.findByEndDateIsNull();
+    }
+
+    @Override
+    boolean isFirstTimeStartup() {
+        return alertRepository.findByEndDateIsNull().isEmpty();
     }
 }

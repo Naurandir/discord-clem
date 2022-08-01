@@ -24,7 +24,7 @@ import org.springframework.stereotype.Service;
  */
 @Slf4j
 @Service
-public class VoidTraderService {
+public class VoidTraderService extends SyncService {
 
     @Autowired
     private VoidTraderMapper voidTraderMapper;
@@ -43,8 +43,9 @@ public class VoidTraderService {
     
     private final WarframeClient warframeClient = new WarframeClient();
     
+    @Override
     @Scheduled(cron = "${discord.clem.void_trader.scheduler.cron}")
-    void syncVoidTrader() throws IOException {
+    public void sync() throws IOException {
         VoidTraderDTO currentVoidTrader = warframeClient.getData(apiUrl, apiHeaders, VoidTraderDTO.class);
         Optional<VoidTrader> voidTraderOpt = voidTraderRepository.findByExternalId(currentVoidTrader.getId());
         
@@ -89,5 +90,10 @@ public class VoidTraderService {
     
     public Optional<VoidTrader> getVoidTrader() {
         return voidTraderRepository.findByEndDateIsNull();
+    }
+    
+    @Override
+    boolean isFirstTimeStartup() {
+        return voidTraderRepository.findByEndDateIsNull().isEmpty();
     }
 }

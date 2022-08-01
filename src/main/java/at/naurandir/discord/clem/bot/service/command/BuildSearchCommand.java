@@ -1,8 +1,8 @@
 package at.naurandir.discord.clem.bot.service.command;
 
-import at.naurandir.discord.clem.bot.model.WarframeState;
-import at.naurandir.discord.clem.bot.service.client.dto.overframe.OverframeDTO;
-import at.naurandir.discord.clem.bot.service.client.dto.overframe.OverframeItemDTO;
+import at.naurandir.discord.clem.bot.model.item.Item;
+import at.naurandir.discord.clem.bot.service.WarframeService;
+import at.naurandir.discord.clem.bot.service.WeaponService;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.util.Color;
@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
@@ -24,9 +25,15 @@ import reactor.core.publisher.Mono;
 @Component
 public class BuildSearchCommand implements Command {
     
+    @Autowired
+    private WarframeService warframeService;
+    
+    @Autowired
+    private WeaponService weaponService;
+    
     private static final String DESCRIPTION = "List of found Overframe Builds";
     private static final String EMBED_TITLE = "***{title}***";
-    private static final String EMBED_DESCRIPTION = "{url}\n {forma} - {guide} ({votes})";
+    private static final String EMBED_DESCRIPTION = "{url}\n {forma} - {guide} ({votes} Votes)";
     
     private static final String TITLE_NOT_FOUND = "No Warframe / Weapon found";
     private static final String DESCRIPTION_NOT_FOUND = "No Warframe / Weapon could be found to given Search. Please look if the input is misspelled.";
@@ -39,7 +46,7 @@ public class BuildSearchCommand implements Command {
     @Override
     public String getDescription() {
         return "Shows current top build for given warframe / weapon from overframe.\n"
-                + "Note it shows only max 5 different warframe / items with similar name and best 5 builds of them. \n"
+                + "Note it shows only max 5 different items with similar name and best 5 builds of them. \n"
                 + "Usage: *<bot-prefix> build-search <item>*.";
     }
 
@@ -52,7 +59,7 @@ public class BuildSearchCommand implements Command {
                 .then();
         }
         
-        List<OverframeItemDTO> foundItems = getBuildItems(item, warframeState.getOverframeBuilds());
+        List<Item> foundItems = getBuildItems(item);
         log.debug("handle: found [{}] items for given input [{}]", foundItems.size(), item);
         
         if (foundItems.isEmpty()) {
@@ -72,51 +79,40 @@ public class BuildSearchCommand implements Command {
         String[] words = Arrays.copyOfRange(splitted, 2, splitted.length);
         return StringUtils.join(words, " ").trim();
     }
-
-    private List<OverframeItemDTO> getBuildItems(String item, OverframeDTO overframeBuilds) {
-        List<OverframeItemDTO> items = new ArrayList<>();
+    
+    private List<Item> getBuildItems(String name) {
+        List<Item> items = new ArrayList<>();
         
-        items.addAll(overframeBuilds.getWarframes().stream()
-                .filter(foundItem -> foundItem.getName().toLowerCase().contains(item.toLowerCase()))
-                .collect(Collectors.toList()));
-        
-        items.addAll(overframeBuilds.getPrimaryWeapons().stream()
-                .filter(foundItem -> foundItem.getName().toLowerCase().contains(item.toLowerCase()))
-                .collect(Collectors.toList()));
-        
-        items.addAll(overframeBuilds.getSecondaryWeapons().stream()
-                .filter(foundItem -> foundItem.getName().toLowerCase().contains(item.toLowerCase()))
-                .collect(Collectors.toList()));
-        
-        items.addAll(overframeBuilds.getMeeleWeapons().stream()
-                .filter(foundItem -> foundItem.getName().toLowerCase().contains(item.toLowerCase()))
-                .collect(Collectors.toList()));
+        items.addAll(warframeService.findWarframesByName(name));
+        items.addAll(weaponService.findWeaponsByName(name));
         
         return items.stream()
                 .limit(5)
                 .collect(Collectors.toList());
     }
 
-    private EmbedCreateSpec[] getEmbeddedResult(List<OverframeItemDTO> foundItems) {
+    private EmbedCreateSpec[] getEmbeddedResult(List<Item> foundItems) {
         List<EmbedCreateSpec> embeds = new ArrayList<>();
         
-        for (OverframeItemDTO foundItem : foundItems) {
+        for (Item foundItem : foundItems) {
             EmbedCreateSpec.Builder builder = EmbedCreateSpec.builder()
                 .color(Color.ENDEAVOUR)
                 .title(foundItem.getName())
                 .description(DESCRIPTION)
-                .thumbnail(foundItem.getPictureUrl())
+                .thumbnail(foundItem.getWikiaThumbnail())
                 .timestamp(Instant.now());
             
-            foundItem.getBuilds().stream().limit(5).forEach(build -> builder.addField(
-                    EMBED_TITLE
+            foundItem.getBuilds().stream().sorted((build1, build2) -> build2.getVotes() - build1.getVotes())
+                    .limit(5)
+                    .forEach(build -> builder.addField(
+                        EMBED_TITLE
                             .replace("{title}", build.getTitle()),
-                    EMBED_DESCRIPTION
+                        EMBED_DESCRIPTION
                             .replace("{url}", build.getUrl())
                             .replace("{forma}", build.getFormasUsed())
-                            .replace("{votes}", build.getVotes())
+                            .replace("{votes}", String.valueOf(build.getVotes()))
                             .replace("{guide}", build.getGuideLength()),
-                    true));
+                        true));
             
             embeds.add(builder.build());
         }

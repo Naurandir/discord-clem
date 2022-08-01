@@ -21,7 +21,7 @@ import org.springframework.stereotype.Service;
  */
 @Slf4j
 @Service
-public class VoidFissureService {
+public class VoidFissureService extends SyncService {
     
     @Autowired
     private VoidFissureMapper voidFissureMapper;
@@ -37,8 +37,9 @@ public class VoidFissureService {
     
     private final WarframeClient warframeClient = new WarframeClient();
     
+    @Override
     @Scheduled(cron = "${discord.clem.void_fissure.scheduler.cron}")
-    public void syncFissures() throws IOException {
+    public void sync() throws IOException {
         List<VoidFissureDTO> currentFissures = warframeClient.getListData(apiUrl, apiHeaders, VoidFissureDTO.class);
         List<VoidFissure> fissuresDb = voidFissureRepository.findByEndDateIsNull();
         
@@ -84,5 +85,11 @@ public class VoidFissureService {
     
     public List<VoidFissure> getStormVoidFissures() {
         return voidFissureRepository.findByEndDateIsNullAndIsStorm(true);
+    }
+    
+    @Override
+    boolean isFirstTimeStartup() {
+        return voidFissureRepository.findByEndDateIsNullAndIsStorm(false).isEmpty() &&
+                voidFissureRepository.findByEndDateIsNullAndIsStorm(true).isEmpty();
     }
 }

@@ -58,7 +58,7 @@ public class AlertServiceTest extends BaseServiceTest {
     
     @Test
     public void shouldSyncNewAlerts() throws IOException {
-        alertService.syncAlerts();
+        alertService.sync();
         
         verify(alertRepository, times(numberOfAlers)).save(any());
         verify(alertMapper, times(numberOfAlers)).alertDtoToAlert(any());
@@ -69,7 +69,7 @@ public class AlertServiceTest extends BaseServiceTest {
         when(alertRepository.findByEndDateIsNull()).thenReturn(List.of(alert));
         alert.setExternalId("62c48b8e5d6c4432ac0da741");
         
-        alertService.syncAlerts();
+        alertService.sync();
         
         verify(alertRepository, times(numberOfAlers - 1)).save(any());
         verify(alertMapper, times(numberOfAlers - 1)).alertDtoToAlert(any());
@@ -81,7 +81,7 @@ public class AlertServiceTest extends BaseServiceTest {
         alert.setExternalId("oldId");
         alert.setExpiry(LocalDateTime.now().minusDays(1));
         
-        alertService.syncAlerts();
+        alertService.sync();
         
         verify(alertRepository, times(numberOfAlers + 1)).save(any());
         verify(alertMapper, times(numberOfAlers)).alertDtoToAlert(any());

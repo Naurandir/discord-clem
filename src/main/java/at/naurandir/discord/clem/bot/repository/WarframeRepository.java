@@ -11,5 +11,8 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface WarframeRepository extends CrudRepository<Warframe, Long> {
+    
     List<Warframe> findByEndDateIsNull();
+    
+    List<Warframe> findByNameContainingIgnoreCaseAndEndDateIsNull(String name);
 }

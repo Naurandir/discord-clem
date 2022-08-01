@@ -11,5 +11,8 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface WeaponRepository extends CrudRepository<Weapon, Long> {  
+    
     List<Weapon> findByEndDateIsNull();
+    
+    List<Weapon> findByNameContainingIgnoreCaseAndEndDateIsNull(String name);
 }

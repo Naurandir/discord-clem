@@ -2,6 +2,8 @@ package at.naurandir.discord.clem.bot.service.command;
 
 import at.naurandir.discord.clem.bot.model.WarframeState;
 import at.naurandir.discord.clem.bot.model.enums.OnlineStatus;
+import at.naurandir.discord.clem.bot.model.market.MarketLichWeapon;
+import at.naurandir.discord.clem.bot.service.MarketService;
 import at.naurandir.discord.clem.bot.service.client.WarframeClient;
 import at.naurandir.discord.clem.bot.service.client.dto.market.MarketLichAuctionDTO;
 import at.naurandir.discord.clem.bot.service.client.dto.market.MarketLichWeaponDTO;
@@ -20,6 +22,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
@@ -30,6 +33,9 @@ import reactor.core.publisher.Mono;
 @Slf4j
 @Component
 public class MarketLichSearchCommand implements Command {
+    
+    @Autowired
+    private MarketService marketService;
     
     private static final String DESCRIPTION = "List of found Lich Auctions";
     
@@ -52,8 +58,6 @@ public class MarketLichSearchCommand implements Command {
     private static final String AUCTION_BASE_URL = "https://warframe.market/auction/";
     
     private static final String INVALID_ELEMENT = "Invalid_Element";
-    
-    private final WarframeClient warframeClient = new WarframeClient();
     
     private final List<String> elements = List.of("impact", "heat", "cold", "electricity", "toxin", "magnetic", "radiation");
     private final Map<String, String> elementEmojis = Map.of(
@@ -95,7 +99,7 @@ public class MarketLichSearchCommand implements Command {
                 .then();
         }
         
-        List<MarketLichWeaponDTO> foundLichWeapons = getLichWeapons(item, warframeState.getMarketLichWeapons());
+        List<MarketLichWeapon> foundLichWeapons = getLichWeapons(item);
         log.debug("handle: found [{}] lich weapons for given input [{}]", foundLichWeapons.size(), item);
         
         if (foundLichWeapons.isEmpty()) {
@@ -104,7 +108,7 @@ public class MarketLichSearchCommand implements Command {
                 .then();
         }
         
-        Map<MarketLichWeaponDTO, List<MarketLichAuctionDTO>> foundLichAuctions = getAuctions(foundLichWeapons, selectedElement);
+        Map<MarketLichWeapon, List<MarketLichAuctionDTO>> foundLichAuctions = getAuctions(foundLichWeapons, selectedElement);
         
         EmbedCreateSpec[] embeddedMessages = getEmbeddedResult(foundLichAuctions);
         return event.getMessage().getChannel()
@@ -140,23 +144,19 @@ public class MarketLichSearchCommand implements Command {
         return StringUtils.join(words, " ").trim();
     }
     
-    private List<MarketLichWeaponDTO> getLichWeapons(String item, List<MarketLichWeaponDTO> marketLichWeapons) {
-        return marketLichWeapons.stream()
-                .filter(weapon -> weapon.getItemName().contains(item))
+    private List<MarketLichWeapon> getLichWeapons(String item) {
+        return marketService.getMarketLichWeapons(item).stream()
+                .limit(3)
                 .collect(Collectors.toList());
     }
     
-    private Map<MarketLichWeaponDTO, List<MarketLichAuctionDTO>> getAuctions(List<MarketLichWeaponDTO> marketLichWeapons, 
+    private Map<MarketLichWeapon, List<MarketLichAuctionDTO>> getAuctions(List<MarketLichWeapon> marketLichWeapons, 
             Optional<String> element) {
-        Map<MarketLichWeaponDTO, List<MarketLichAuctionDTO>> lichAuctions = new HashMap<>();
+        Map<MarketLichWeapon, List<MarketLichAuctionDTO>> lichAuctions = new HashMap<>();
         
-        // maximum 3 items will be analysed
-        List<MarketLichWeaponDTO> interestingWeapons = marketLichWeapons.stream().limit(3).collect(Collectors.toList());
-        
-        for (MarketLichWeaponDTO lichWeapon : interestingWeapons) {
+        for (MarketLichWeapon lichWeapon : marketLichWeapons) {
             try {
-                List<MarketLichAuctionDTO> foundAuctions = warframeClient.getCurrentLichAuctions(lichWeapon.getUrlName(), element)
-                        .getPayload().get("auctions");
+                List<MarketLichAuctionDTO> foundAuctions = marketService.getCurrentLichAuctions(lichWeapon, element);
                 
                 foundAuctions = foundAuctions.stream()
                         .filter(auction -> !auction.getClosed() && auction.getVisible())
@@ -177,15 +177,15 @@ public class MarketLichSearchCommand implements Command {
         return lichAuctions;
     }
 
-    private EmbedCreateSpec[] getEmbeddedResult(Map<MarketLichWeaponDTO, List<MarketLichAuctionDTO>> foundLichAuctions) {
+    private EmbedCreateSpec[] getEmbeddedResult(Map<MarketLichWeapon, List<MarketLichAuctionDTO>> foundLichAuctions) {
         List<EmbedCreateSpec> embeds = new ArrayList<>();
         EmbedCreateSpec[] embedArray = new EmbedCreateSpec[foundLichAuctions.size()];
         
-        for (Map.Entry<MarketLichWeaponDTO, List<MarketLichAuctionDTO>> entry : foundLichAuctions.entrySet()) {
+        for (Map.Entry<MarketLichWeapon, List<MarketLichAuctionDTO>> entry : foundLichAuctions.entrySet()) {
             
             EmbedCreateSpec.Builder builder = EmbedCreateSpec.builder()
                 .color(Color.RUST)
-                .title(entry.getKey().getItemName())
+                .title(entry.getKey().getName())
                 .description(DESCRIPTION)
                 .thumbnail(ASSETS_BASE_URL + entry.getKey().getThumb())
                 .timestamp(Instant.now());

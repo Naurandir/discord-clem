@@ -17,7 +17,5 @@ import lombok.ToString;
 public class OverframeDTO {
     
     private List<OverframeItemDTO> warframes;
-    private List<OverframeItemDTO> primaryWeapons;
-    private List<OverframeItemDTO> secondaryWeapons;
-    private List<OverframeItemDTO> meeleWeapons;
+    private List<OverframeItemDTO> weapons;
 }

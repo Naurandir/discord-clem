@@ -36,6 +36,7 @@ public interface WarframeMapper extends ItemMapper {
     
     @Mappings({
         @Mapping(target="modifyDate", expression="java(java.time.LocalDateTime.now())"),  
+        @Mapping(target="wikiaThumbnail", expression="java(getThumbnailUrl(toUpdateWarframe, dto.getWikiaThumbnail()))"),
         
         @Mapping(source= "name", target="overframeUrlName", qualifiedByName="getOverframeUrlName"),
         @Mapping(source= "marketCost", target="marketCost", qualifiedByName = "getMarketCost"),

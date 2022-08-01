@@ -1,10 +1,9 @@
 package at.naurandir.discord.clem.bot.service.command;
 
-import at.naurandir.discord.clem.bot.model.WarframeState;
 import at.naurandir.discord.clem.bot.model.enums.OnlineStatus;
 import at.naurandir.discord.clem.bot.model.enums.OrderType;
-import at.naurandir.discord.clem.bot.service.client.WarframeClient;
-import at.naurandir.discord.clem.bot.service.client.dto.market.MarketItemDTO;
+import at.naurandir.discord.clem.bot.model.market.MarketItem;
+import at.naurandir.discord.clem.bot.service.MarketService;
 import at.naurandir.discord.clem.bot.service.client.dto.market.MarketOrderDTO;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.spec.EmbedCreateSpec;
@@ -20,6 +19,7 @@ import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
@@ -31,10 +31,11 @@ import reactor.core.publisher.Mono;
 @Component
 public class MarketSearchCommand implements Command {
     
+    @Autowired
+    private MarketService marketService;
+    
     private static final String BUY_DESCRIPTION = "***{platinum} Platinum*** User *{user}* (Reputation {reputation})\n`/w {user} Hi! I want to buy: {item} for {platinum} platinum. Greetings :)`\n\n";
     private static final String ASSETS_BASE_URL = "https://warframe.market/static/assets/";
-    
-    private final WarframeClient warframeClient = new WarframeClient();
     
     @Override
     public String getCommandWord() {
@@ -57,9 +58,8 @@ public class MarketSearchCommand implements Command {
                 .then();
         }
         
-        List<MarketItemDTO> foundMarketItems = getMarketItems(item, warframeState.getMarketItems());
-        
-        Map<MarketItemDTO, List<MarketOrderDTO>> foundSellOrders = getSellOrders(foundMarketItems);
+        List<MarketItem> foundMarketItems = getMarketItems(item);
+        Map<MarketItem, List<MarketOrderDTO>> foundSellOrders = getSellOrders(foundMarketItems);
         
         EmbedCreateSpec[] embeddedMessages = getEmbeddedResult(foundSellOrders);
         return event.getMessage().getChannel()
@@ -73,31 +73,28 @@ public class MarketSearchCommand implements Command {
         return StringUtils.join(words, " ").trim();
     }
 
-    private List<MarketItemDTO> getMarketItems(String item, List<MarketItemDTO> marketItems) {
-        return marketItems.stream()
-                .filter(marketItem -> marketItem.getItemName().contains(item))
+    private List<MarketItem> getMarketItems(String item) {
+        return marketService.getMarketItems(item).stream()
+                .limit(5)
                 .collect(Collectors.toList());
     }
 
-    private Map<MarketItemDTO, List<MarketOrderDTO>> getSellOrders(List<MarketItemDTO> foundMarketItems) {
-        Map<MarketItemDTO, List<MarketOrderDTO>> itemOrders = new HashMap<>();
+    private Map<MarketItem, List<MarketOrderDTO>> getSellOrders(List<MarketItem> foundItems) {
+        Map<MarketItem, List<MarketOrderDTO>> itemOrders = new HashMap<>();
         
-        // maximum 5 items will be analysed
-        List<MarketItemDTO> interestingItems = foundMarketItems.stream().limit(5).collect(Collectors.toList());
-        
-        for (MarketItemDTO marketItem : interestingItems) {
+        for (MarketItem marketItem : foundItems) {
             try {
-                List<MarketOrderDTO> foundOrders = warframeClient.getCurrentOrders(marketItem.getUrlName()).getPayload().getOrders();
-            
-            foundOrders = foundOrders.stream()
-                    .filter(order -> order.getOrderType() == OrderType.SELL && order.getVisible())
-                    .filter(order -> order.getUser().getStatus() == OnlineStatus.INGAME || 
-                                     order.getUser().getStatus() == OnlineStatus.ONLINE)
-                    .sorted((order1, order2) -> order1.getPlatinum().compareTo(order2.getPlatinum()))
-                    .limit(5)
-                    .collect(Collectors.toList());
-            
-            itemOrders.put(marketItem, foundOrders);
+                List<MarketOrderDTO> foundOrders = marketService.getCurrentOrders(marketItem);
+
+                foundOrders = foundOrders.stream()
+                        .filter(order -> order.getOrderType() == OrderType.SELL && order.getVisible())
+                        .filter(order -> order.getUser().getStatus() == OnlineStatus.INGAME
+                        || order.getUser().getStatus() == OnlineStatus.ONLINE)
+                        .sorted((order1, order2) -> order1.getPlatinum().compareTo(order2.getPlatinum()))
+                        .limit(5)
+                        .collect(Collectors.toList());
+
+                itemOrders.put(marketItem, foundOrders);
             } catch (IOException ex) {
                 log.error("getSellOrders: coud not receive sell order for [{}], error: ", marketItem, ex);
             }
@@ -106,14 +103,14 @@ public class MarketSearchCommand implements Command {
         return itemOrders;
     }
 
-    private EmbedCreateSpec[] getEmbeddedResult(Map<MarketItemDTO, List<MarketOrderDTO>> foundSellOrders) {
+    private EmbedCreateSpec[] getEmbeddedResult(Map<MarketItem, List<MarketOrderDTO>> foundSellOrders) {
         List<EmbedCreateSpec> embeds = new ArrayList<>();
         EmbedCreateSpec[] embedArray = new EmbedCreateSpec[foundSellOrders.size()];
         
-        for (Entry<MarketItemDTO, List<MarketOrderDTO>> entry : foundSellOrders.entrySet()) {
+        for (Entry<MarketItem, List<MarketOrderDTO>> entry : foundSellOrders.entrySet()) {
             StringBuilder description = new StringBuilder("");
             
-            entry.getValue().forEach(order -> description.append(BUY_DESCRIPTION.replace("{item}", entry.getKey().getItemName())
+            entry.getValue().forEach(order -> description.append(BUY_DESCRIPTION.replace("{item}", entry.getKey().getName())
                 .replace("{platinum}", String.valueOf(order.getPlatinum()))
                 .replace("{platinum}", String.valueOf(order.getPlatinum()))
                 .replace("{user}", order.getUser().getName())
@@ -122,7 +119,7 @@ public class MarketSearchCommand implements Command {
             
             EmbedCreateSpec embed= EmbedCreateSpec.builder()
                 .color(Color.DEEP_SEA)
-                .title(entry.getKey().getItemName())
+                .title(entry.getKey().getName())
                 .description(description.toString())
                 .thumbnail(ASSETS_BASE_URL + entry.getKey().getThumb())
                 .timestamp(Instant.now())

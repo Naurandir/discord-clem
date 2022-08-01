@@ -1,6 +1,7 @@
 package at.naurandir.discord.clem.bot.model.item;
 
 import at.naurandir.discord.clem.bot.model.DbEntity;
+import java.util.Set;
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
 import lombok.Getter;
@@ -13,7 +14,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @MappedSuperclass
-public class Item extends DbEntity {
+public abstract class Item extends DbEntity {
     
     @Column
     private String overframeUrlName;
@@ -32,4 +33,6 @@ public class Item extends DbEntity {
     
     @Column
     private Double marketCost;
+    
+    public abstract Set<ItemBuild> getBuilds();
 }

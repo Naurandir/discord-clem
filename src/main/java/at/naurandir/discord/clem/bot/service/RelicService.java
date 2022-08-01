@@ -30,7 +30,7 @@ import org.springframework.stereotype.Service;
  */
 @Slf4j
 @Service
-public class RelicService {
+public class RelicService extends SyncService {
 
     @Autowired
     private RelicMapper relicMapper;
@@ -50,9 +50,10 @@ public class RelicService {
     @Value("#{${discord.clem.relic.headers}}")
     private Map<String, String> apiHeaders;
     
+    @Override
     @Transactional
     @Scheduled(cron = "${discord.clem.relic.scheduler.cron}")
-    public void syncRelics() throws IOException {
+    public void sync() throws IOException {
         List<Relic> relicsDb = relicRepository.findAll();
         List<String> relicNames = relicsDb.stream()
                 .map(relic -> relic.getName() + relic.getTier().getTierString())
@@ -145,5 +146,10 @@ public class RelicService {
     
     public List<Relic> getRelics() {
         return relicRepository.findByEndDateIsNull();
+    }
+    
+    @Override
+    boolean isFirstTimeStartup() {
+        return relicRepository.findByEndDateIsNull().isEmpty();
     }
 }

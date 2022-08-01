@@ -17,7 +17,7 @@ public class OverframeBuildDTO {
     
     private String title;
     private String url;
-    private String votes;
+    private Integer votes;
     private String formasUsed;
     private String guideLength;
 }

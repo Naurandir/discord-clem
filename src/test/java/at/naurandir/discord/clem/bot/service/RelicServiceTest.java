@@ -7,15 +7,12 @@ import at.naurandir.discord.clem.bot.model.relic.RelicDrop;
 import at.naurandir.discord.clem.bot.model.relic.RelicMapper;
 import at.naurandir.discord.clem.bot.repository.RelicDropRepository;
 import at.naurandir.discord.clem.bot.repository.RelicRepository;
-import at.naurandir.discord.clem.bot.service.client.dto.droptable.RelicDTO;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -80,7 +77,7 @@ public class RelicServiceTest extends BaseServiceTest {
     
     @Test
     public void shouldSyncNewRelics() throws IOException {
-        relicService.syncRelics();
+        relicService.sync();
         
         verify(relicRepository, times(numberOfRelics)).save(any());
         verify(relicMapper, times(numberOfRelics)).fromDtoToRelic(any());
@@ -92,7 +89,7 @@ public class RelicServiceTest extends BaseServiceTest {
         relic.setName("E2");
         relic.setTier(RelicTier.NEO);
         
-        relicService.syncRelics();
+        relicService.sync();
         
         verify(relicMapper, times(1)).updateRelic(any(), any());
         verify(relicMapper, times(numberOfRelics - 1)).fromDtoToRelic(any());

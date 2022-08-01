@@ -34,7 +34,7 @@ public class ItemBuild extends DbEntity {
     private String url;
     
     @Column
-    private String votes;
+    private Integer votes;
     
     @Column
     private String formasUsed;

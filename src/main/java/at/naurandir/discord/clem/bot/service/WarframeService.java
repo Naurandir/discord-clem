@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +24,7 @@ import org.springframework.stereotype.Service;
  */
 @Slf4j
 @Service
-public class WarframeService {
+public class WarframeService extends SyncService {
 
     @Autowired
     private WarframeMapper warframeMapper;
@@ -40,8 +41,9 @@ public class WarframeService {
     @Value("#{${discord.clem.warframe.headers}}")
     private Map<String, String> apiHeaders;
     
+    @Override
     @Scheduled(cron = "${discord.clem.warframe.scheduler.cron}")
-    public void syncWarframes() throws IOException {
+    public void sync() throws IOException {
         List<Warframe> warframesDb = warframeRepository.findByEndDateIsNull();
         List<String> warframeNames = warframesDb.stream().map(warframe -> warframe.getUniqueName()).collect(Collectors.toList());
         log.debug("syncWarframes: received [{}] warframes from database.", warframesDb.size());
@@ -87,5 +89,30 @@ public class WarframeService {
             }
         }
         warframeRepository.saveAll(toInactivateWarframesDb);
+    }
+    
+    public List<Warframe> getWarframes() {
+        return warframeRepository.findByEndDateIsNull();
+    }
+    
+    public List<Warframe> findWarframesByName(String name) {
+        return warframeRepository.findByNameContainingIgnoreCaseAndEndDateIsNull(name);
+    }
+    
+    void updateWikiThumbnail(Warframe warframe, String pictureUrl) {
+        Optional<Warframe> foundWarframe = warframeRepository.findById(warframe.getId());
+        if (foundWarframe.isEmpty()) {
+            log.warn("updateWikiThumbnail: cannot update thumbnail of warframe [{} - {}], as reload of warframe did not work",
+                    warframe.getId(), warframe.getName());
+            return;
+        }
+        
+        foundWarframe.get().setWikiaThumbnail(pictureUrl);
+        warframeRepository.save(foundWarframe.get());
+    }
+    
+    @Override
+    boolean isFirstTimeStartup() {
+        return warframeRepository.findByEndDateIsNull().isEmpty();
     }
 }

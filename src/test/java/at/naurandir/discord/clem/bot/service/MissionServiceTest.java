@@ -70,7 +70,7 @@ public class MissionServiceTest extends BaseServiceTest {
     
     @Test
     public void shouldSyncNewMissions() throws IOException {
-        missionService.syncMissions();
+        missionService.sync();
         
         verify(missionMapper, times(numberOfMissions)).missionDtoToMission(any());
     }
@@ -80,7 +80,7 @@ public class MissionServiceTest extends BaseServiceTest {
         when(missionRepository.findByEndDateIsNull()).thenReturn(List.of(mission));
         mission.setName("Venus/Bifrost Echo (Skirmish)");
         
-        missionService.syncMissions();
+        missionService.sync();
         
         verify(missionMapper, times(1)).updateMission(any(), any());
         Assertions.assertTrue(() -> mission.getEndDate() == null);
@@ -91,7 +91,7 @@ public class MissionServiceTest extends BaseServiceTest {
         when(missionRepository.findByEndDateIsNull()).thenReturn(List.of(mission));
         mission.setName("An Old Mission");
         
-        missionService.syncMissions();
+        missionService.sync();
         
         verify(missionMapper, times(numberOfMissions)).missionDtoToMission(any());
         verify(missionMapper, times(0)).updateMission(any(), any());

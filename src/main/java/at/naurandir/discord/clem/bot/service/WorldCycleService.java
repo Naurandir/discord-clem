@@ -25,7 +25,7 @@ import org.springframework.stereotype.Service;
  */
 @Slf4j
 @Service
-public class WorldCycleService {
+public class WorldCycleService extends SyncService {
     
     @Autowired
     private CycleMapper cycleMapper;
@@ -50,8 +50,9 @@ public class WorldCycleService {
     
     private final WarframeClient warframeClient = new WarframeClient();
 
+    @Override
     @Scheduled(cron = "${discord.clem.cycle.scheduler.cron}")
-    void syncCycles() throws IOException {
+    public void sync() throws IOException {
         List<Cycle> dbCycles = getCycles();
         EarthCycleDTO currentEarthCycle = warframeClient.getData(apiEarthUrl, apiHeaders, EarthCycleDTO.class);
         CetusCycleDTO currentCetusCycle = warframeClient.getData(apiCetusUrl, apiHeaders, CetusCycleDTO.class);
@@ -129,5 +130,10 @@ public class WorldCycleService {
     
     public List<Cycle> getCycles() {
         return cycleRepository.findAll();
+    }
+    
+    @Override
+    boolean isFirstTimeStartup() {
+        return cycleRepository.findAll().isEmpty();
     }
 }

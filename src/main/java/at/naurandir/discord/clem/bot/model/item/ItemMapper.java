@@ -26,4 +26,12 @@ public interface ItemMapper {
         
         return name.toLowerCase().replace(" ", "-").replace("-&-", "-");
     }
+    
+    default String getThumbnailUrl(Item item, String newUrl) {
+        if (!StringUtils.isEmpty(item.getWikiaThumbnail()) && StringUtils.isEmpty(newUrl)) {
+            return item.getWikiaThumbnail(); // we keep the old name
+        }
+        
+        return newUrl;
+    }
 }
