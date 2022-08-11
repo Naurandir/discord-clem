@@ -2,6 +2,7 @@ package at.naurandir.discord.clem.bot.service.push;
 
 import at.naurandir.discord.clem.bot.model.cycle.Cycle;
 import at.naurandir.discord.clem.bot.model.cycle.CycleType;
+import at.naurandir.discord.clem.bot.model.enums.PushType;
 import at.naurandir.discord.clem.bot.service.WorldCycleService;
 import at.naurandir.discord.clem.bot.utils.LocalDateTimeUtil;
 import discord4j.common.util.Snowflake;
@@ -48,11 +49,12 @@ public class WorldCyclePush extends Push {
     }
 
     @Override
-    MessageData doNewPush(Snowflake channelId) {
+    void doNewPush(Snowflake channelId) {
         EmbedCreateSpec embed = generateEmbed(worldCycleService.getCycles());
 
-        return getClient().rest().getChannelById(channelId)
-                    .createMessage(embed.asRequest()).block(Duration.ofSeconds(10L));
+        getClient().rest().getChannelById(channelId)
+                .createMessage(embed.asRequest())
+                .subscribe();
     }
     
     @Override
@@ -61,11 +63,6 @@ public class WorldCyclePush extends Push {
                 .embedOrNull(generateEmbed(worldCycleService.getCycles()).asRequest())
                 .build();
         message.edit(editRequest).subscribe();
-    }
-    
-    @Override
-    List<String> getInterestingChannels() {
-        return interestingChannels;
     }
     
     @Override
@@ -79,6 +76,11 @@ public class WorldCyclePush extends Push {
     @Override
     public boolean isSticky() {
         return true;
+    }
+    
+    @Override
+    PushType getPushType() {
+        return PushType.WORLD_CYCLE_PUSH;
     }
     
     private EmbedCreateSpec generateEmbed(List<Cycle> cycles) {    

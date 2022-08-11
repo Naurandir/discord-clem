@@ -20,6 +20,9 @@ public abstract class Item extends DbEntity {
     private String overframeUrlName;
     
     @Column
+    private String marketUrlName;
+    
+    @Column
     private String uniqueName;
     
     @Column
@@ -29,10 +32,10 @@ public abstract class Item extends DbEntity {
     private String wikiaThumbnail;
     
     @Column
-    private Boolean tradable;
+    private Double marketCost;
     
     @Column
-    private Double marketCost;
+    private MarketType marketType;
     
     public abstract Set<ItemBuild> getBuilds();
 }

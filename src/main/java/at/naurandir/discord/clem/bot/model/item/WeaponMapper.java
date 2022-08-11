@@ -1,6 +1,7 @@
 package at.naurandir.discord.clem.bot.model.item;
 
 import at.naurandir.discord.clem.bot.model.enums.WeaponType;
+import at.naurandir.discord.clem.bot.service.client.dto.market.MarketItemDTO;
 import at.naurandir.discord.clem.bot.service.client.dto.worldstate.WeaponDTO;
 import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.Mapper;
@@ -39,6 +40,13 @@ public interface WeaponMapper extends ItemMapper {
         @Mapping(target = "id", ignore = true)
     })
     void updateWeapon(@MappingTarget Weapon toUpdateWeapon, WeaponDTO dto);
+    
+    @Mappings({
+        @Mapping(target="modifyDate", expression="java(java.time.LocalDateTime.now())"),  
+        
+        @Mapping(source= "urlName", target="marketUrlName")
+    })
+    void addMarketInfo(@MappingTarget Weapon toUpdateWeapon, MarketItemDTO dto);
     
     @Named("getWeaponType")
     default WeaponType getWeaponType(String category) {

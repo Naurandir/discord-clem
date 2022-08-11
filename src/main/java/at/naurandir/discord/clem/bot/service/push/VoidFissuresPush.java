@@ -1,5 +1,6 @@
 package at.naurandir.discord.clem.bot.service.push;
 
+import at.naurandir.discord.clem.bot.model.enums.PushType;
 import at.naurandir.discord.clem.bot.model.fissure.VoidFissure;
 import at.naurandir.discord.clem.bot.service.VoidFissureService;
 import at.naurandir.discord.clem.bot.utils.LocalDateTimeUtil;
@@ -41,12 +42,12 @@ public class VoidFissuresPush extends Push {
             + " *expire:* {hours}h {minutes}m";
 
     @Override
-    MessageData doNewPush(Snowflake channelId) {
+    void doNewPush(Snowflake channelId) {
         EmbedCreateSpec embed = generateEmbed(voidFissureService.getNormalVoidFissures());
 
-        return getClient().rest().getChannelById(channelId)
+        getClient().rest().getChannelById(channelId)
                     .createMessage(embed.asRequest())
-                    .block(Duration.ofSeconds(10L));
+                    .subscribe();
     }
 
     @Override
@@ -56,11 +57,6 @@ public class VoidFissuresPush extends Push {
                 .build();
 
         message.edit(editRequest).subscribe();
-    }
-
-    @Override
-    List<String> getInterestingChannels() {
-        return interestingChannels;
     }
 
     @Override
@@ -76,6 +72,11 @@ public class VoidFissuresPush extends Push {
     @Override
     boolean isSticky() {
         return true;
+    }
+    
+    @Override
+    PushType getPushType() {
+        return PushType.VOID_FISSURE_PUSH;
     }
 
     private EmbedCreateSpec generateEmbed(List<VoidFissure> voidFissures) {  

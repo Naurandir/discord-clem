@@ -110,7 +110,7 @@ public class BotService {
         return Flux.empty().then();
     }
     
-    public Mono<Void> handleEvent(MessageCreateEvent event, String prefix) {
+    private Mono<Void> handleEvent(MessageCreateEvent event, String prefix) {
         if (event.getMember().isPresent() && event.getMember().get().isBot()) {
             return Flux.empty().then();
         }
@@ -135,5 +135,9 @@ public class BotService {
     
     private boolean isPinnedMessage(MessageCreateEvent event) {
         return event.getMessage().getType().equals(Message.Type.CHANNEL_PINNED_MESSAGE);
+    }
+    
+    public GatewayDiscordClient getClient() {
+        return client;
     }
 }

@@ -1,6 +1,6 @@
 package at.naurandir.discord.clem.bot.service.push;
 
-import at.naurandir.discord.clem.bot.model.WarframeState;
+import at.naurandir.discord.clem.bot.model.enums.PushType;
 import at.naurandir.discord.clem.bot.service.client.dto.worldstate.AlertDTO;
 import at.naurandir.discord.clem.bot.service.client.dto.worldstate.EventDTO;
 import at.naurandir.discord.clem.bot.utils.LocalDateTimeUtil;
@@ -38,89 +38,84 @@ public class UpdatePipelinePush extends Push {
     private static final String VOID_TRADER_GONE = "***Void Trader:***\nBaro Ki'Teer went back into the void.";
 
     @Override
-    MessageData doNewPush(Snowflake channelId) {
+    void doNewPush(Snowflake channelId) {
 //        voidTraderChangeNotify(warframeState, client, channelId);
 //        alertsChangeNotify(warframeState, client, channelId);
 //        eventsChangeNotify(warframeState, client, channelId);
-        return null;
+        return;
     }
     
-    private void voidTraderChangeNotify(WarframeState warframeState, GatewayDiscordClient client, Snowflake channelId) {
-        if (warframeState.isVoidTraderStateChanged() && warframeState.getVoidTrader().getActive()) {
-            Duration diffTimeExpiry = LocalDateTimeUtil.getDiffTime(LocalDateTime.now(), warframeState.getVoidTrader().getExpiry());
-            String message = VOID_TRADER_HERE.replace("{location}", warframeState.getVoidTrader().getLocation())
-                    .replace("{days}", String.valueOf(diffTimeExpiry.toDays()))
-                    .replace("{hours}", String.valueOf(diffTimeExpiry.toHoursPart()))
-                    .replace("{minutes}", String.valueOf(diffTimeExpiry.toMinutesPart()));
-            
-            client.rest().getChannelById(channelId)
-                    .createMessage(message)
-                    .subscribe();
-        } else if (warframeState.isVoidTraderStateChanged()) {
-            client.rest().getChannelById(channelId)
-                    .createMessage(VOID_TRADER_GONE)
-                    .subscribe();
-        }
-    }
-
-    private void alertsChangeNotify(WarframeState warframeState, GatewayDiscordClient client, Snowflake channelId) {
-        if (warframeState.getAlerts().isEmpty() && !warframeState.getOldAlertIds().isEmpty()) {
-            client.rest().getChannelById(channelId)
-                    .createMessage(ALERTS_GONE)
-                    .subscribe();
-        }
-        
-        for (AlertDTO alert : warframeState.getAlerts()) {
-            if (!alert.getActive()) {
-                continue;
-            }
-            
-            if (warframeState.getOldAlertIds().contains(alert.getId())) {
-                continue;
-            }
-            
-            String alertMessage = "*" + alert.getMission() + "* - " + StringUtils.join(", ", alert.getRewardTypes()) +"\n";
-            
-            client.rest().getChannelById(channelId)
-                        .createMessage(ALERT_EXISTING.replace("{alert}", alertMessage))
-                        .subscribe();
-            
-        }
-    }
-    
-    private void eventsChangeNotify(WarframeState warframeState, GatewayDiscordClient client, Snowflake channelId) {
-        if (warframeState.getEvents().isEmpty() && !warframeState.getOldEventIds().isEmpty()) {
-            client.rest().getChannelById(channelId)
-                    .createMessage(EVENTS_GONE)
-                    .subscribe();
-        }
-        
-        for (EventDTO event : warframeState.getEvents()) {
-            if (!event.getActive()) {
-                continue;
-            }
-            
-            if (warframeState.getOldEventIds().contains(event.getId())) {
-                continue;
-            }
-            
-            String eventMessage = "*" + event.getDescription() + "* - " + event.getTooltip() + "\n";
-            
-            client.rest().getChannelById(channelId)
-                        .createMessage(EVENT_EXISTING.replace("{event}", eventMessage))
-                        .subscribe();
-            
-        }
-    }
+//    private void voidTraderChangeNotify(GatewayDiscordClient client, Snowflake channelId) {
+//        if (warframeState.isVoidTraderStateChanged() && warframeState.getVoidTrader().getActive()) {
+//            Duration diffTimeExpiry = LocalDateTimeUtil.getDiffTime(LocalDateTime.now(), warframeState.getVoidTrader().getExpiry());
+//            String message = VOID_TRADER_HERE.replace("{location}", warframeState.getVoidTrader().getLocation())
+//                    .replace("{days}", String.valueOf(diffTimeExpiry.toDays()))
+//                    .replace("{hours}", String.valueOf(diffTimeExpiry.toHoursPart()))
+//                    .replace("{minutes}", String.valueOf(diffTimeExpiry.toMinutesPart()));
+//            
+//            client.rest().getChannelById(channelId)
+//                    .createMessage(message)
+//                    .subscribe();
+//        } else if (warframeState.isVoidTraderStateChanged()) {
+//            client.rest().getChannelById(channelId)
+//                    .createMessage(VOID_TRADER_GONE)
+//                    .subscribe();
+//        }
+//    }
+//
+//    private void alertsChangeNotify(GatewayDiscordClient client, Snowflake channelId) {
+//        if (warframeState.getAlerts().isEmpty() && !warframeState.getOldAlertIds().isEmpty()) {
+//            client.rest().getChannelById(channelId)
+//                    .createMessage(ALERTS_GONE)
+//                    .subscribe();
+//        }
+//        
+//        for (AlertDTO alert : warframeState.getAlerts()) {
+//            if (!alert.getActive()) {
+//                continue;
+//            }
+//            
+//            if (warframeState.getOldAlertIds().contains(alert.getId())) {
+//                continue;
+//            }
+//            
+//            String alertMessage = "*" + alert.getMission() + "* - " + StringUtils.join(", ", alert.getRewardTypes()) +"\n";
+//            
+//            client.rest().getChannelById(channelId)
+//                        .createMessage(ALERT_EXISTING.replace("{alert}", alertMessage))
+//                        .subscribe();
+//            
+//        }
+//    }
+//    
+//    private void eventsChangeNotify(GatewayDiscordClient client, Snowflake channelId) {
+//        if (warframeState.getEvents().isEmpty() && !warframeState.getOldEventIds().isEmpty()) {
+//            client.rest().getChannelById(channelId)
+//                    .createMessage(EVENTS_GONE)
+//                    .subscribe();
+//        }
+//        
+//        for (EventDTO event : warframeState.getEvents()) {
+//            if (!event.getActive()) {
+//                continue;
+//            }
+//            
+//            if (warframeState.getOldEventIds().contains(event.getId())) {
+//                continue;
+//            }
+//            
+//            String eventMessage = "*" + event.getDescription() + "* - " + event.getTooltip() + "\n";
+//            
+//            client.rest().getChannelById(channelId)
+//                        .createMessage(EVENT_EXISTING.replace("{event}", eventMessage))
+//                        .subscribe();
+//            
+//        }
+//    }
     
     @Override
     void doUpdatePush(RestMessage message) {
         throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    List<String> getInterestingChannels() {
-        return interestingChannels;
     }
 
     @Override
@@ -131,6 +126,11 @@ public class UpdatePipelinePush extends Push {
     @Override
     boolean isSticky() {
         return false;
+    }
+    
+    @Override
+    PushType getPushType() {
+        return PushType.UPDATE_PIPELINE;
     }
 
     @Scheduled(initialDelay = 60 * 1_000, fixedRate = 60 * 1_000)

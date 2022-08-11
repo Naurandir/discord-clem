@@ -1,5 +1,6 @@
 package at.naurandir.discord.clem.bot.service.push;
 
+import at.naurandir.discord.clem.bot.model.enums.PushType;
 import at.naurandir.discord.clem.bot.model.trader.VoidTrader;
 import at.naurandir.discord.clem.bot.model.trader.VoidTraderItem;
 import at.naurandir.discord.clem.bot.service.VoidTraderService;
@@ -43,12 +44,12 @@ public class VoidTraderPush extends Push {
     private static final String ITEM_DESCRIPTION = " *ducats:* {ducats}\n *credits:* {credits}";
 
     @Override
-    MessageData doNewPush(Snowflake channelId) {
+    void doNewPush(Snowflake channelId) {
         EmbedCreateSpec embed = generateEmbed(voidTraderService.getVoidTrader());
 
-        return getClient().rest().getChannelById(channelId)
+        getClient().rest().getChannelById(channelId)
                     .createMessage(embed.asRequest())
-                    .block(Duration.ofSeconds(10L));
+                    .subscribe();
     }
 
     @Override
@@ -57,11 +58,6 @@ public class VoidTraderPush extends Push {
                 .embedOrNull(generateEmbed(voidTraderService.getVoidTrader()).asRequest())
                 .build();
         message.edit(editRequest).subscribe();
-    }
-
-    @Override
-    List<String> getInterestingChannels() {
-        return interestingChannels;
     }
 
     @Override
@@ -75,6 +71,11 @@ public class VoidTraderPush extends Push {
     @Override
     boolean isSticky() {
         return true;
+    }
+    
+    @Override
+    PushType getPushType() {
+        return PushType.VOID_TRADER_PUSH;
     }
     
     private EmbedCreateSpec generateEmbed(Optional<VoidTrader> voidTraderOpt) {

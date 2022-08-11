@@ -1,6 +1,6 @@
 package at.naurandir.discord.clem.bot.repository;
 
-import at.naurandir.discord.clem.bot.model.Event;
+import at.naurandir.discord.clem.bot.model.event.Event;
 import org.springframework.data.repository.CrudRepository;
 
 /**

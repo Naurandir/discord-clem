@@ -1,6 +1,7 @@
 package at.naurandir.discord.clem.bot.service.push;
 
 import at.naurandir.discord.clem.bot.model.alert.Alert;
+import at.naurandir.discord.clem.bot.model.enums.PushType;
 import at.naurandir.discord.clem.bot.service.AlertService;
 import at.naurandir.discord.clem.bot.utils.LocalDateTimeUtil;
 import discord4j.common.util.Snowflake;
@@ -44,12 +45,12 @@ public class AlertsPush extends Push {
             + " *expires in:* {days}d {hours}h {minutes}m";
 
     @Override
-    MessageData doNewPush(Snowflake channelId) {
+    void doNewPush(Snowflake channelId) {
         EmbedCreateSpec embed = generateEmbed(alertService.getActiveAlerts());
 
-        return getClient().rest().getChannelById(channelId)
+        getClient().rest().getChannelById(channelId)
                     .createMessage(embed.asRequest())
-                    .block(Duration.ofSeconds(10L));
+                    .subscribe();
     }
 
     @Override
@@ -59,11 +60,6 @@ public class AlertsPush extends Push {
                 .build();
         
         message.edit(editRequest).subscribe();
-    }
-
-    @Override
-    List<String> getInterestingChannels() {
-        return interestingChannels;
     }
 
     @Override
@@ -80,6 +76,11 @@ public class AlertsPush extends Push {
     @Override
     boolean isSticky() {
         return true;
+    }
+    
+    @Override
+    PushType getPushType() {
+        return PushType.ALERT_PUSH;
     }
     
     private EmbedCreateSpec generateEmbed(List<Alert> activeAlerts) {

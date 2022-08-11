@@ -1,5 +1,6 @@
 package at.naurandir.discord.clem.bot.model.item;
 
+import at.naurandir.discord.clem.bot.service.client.dto.market.MarketItemDTO;
 import at.naurandir.discord.clem.bot.service.client.dto.worldstate.WarframeDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -44,4 +45,11 @@ public interface WarframeMapper extends ItemMapper {
         @Mapping(target = "id", ignore = true)
     })
     void updateWarframe(@MappingTarget Warframe toUpdateWarframe, WarframeDTO dto);
+    
+    @Mappings({
+        @Mapping(target="modifyDate", expression="java(java.time.LocalDateTime.now())"),  
+        
+        @Mapping(source= "urlName", target="marketUrlName") // private static final String ASSETS_BASE_URL = "https://warframe.market/static/assets/";
+    })
+    void addMarketInfo(@MappingTarget Warframe toUpdateWarframe, MarketItemDTO dto);
 }

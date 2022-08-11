@@ -1,11 +1,11 @@
 package at.naurandir.discord.clem.bot.service;
 
-import at.naurandir.discord.clem.bot.model.market.MarketItem;
-import at.naurandir.discord.clem.bot.model.market.MarketItemMapper;
-import at.naurandir.discord.clem.bot.model.market.MarketLichWeapon;
-import at.naurandir.discord.clem.bot.model.market.MarketLichWeaponMapper;
-import at.naurandir.discord.clem.bot.repository.MarketItemRepository;
-import at.naurandir.discord.clem.bot.repository.MarketLichWeaponRepository;
+import at.naurandir.discord.clem.bot.model.item.Item;
+import at.naurandir.discord.clem.bot.model.item.MarketType;
+import at.naurandir.discord.clem.bot.model.item.Warframe;
+import at.naurandir.discord.clem.bot.model.item.WarframeMapper;
+import at.naurandir.discord.clem.bot.model.item.Weapon;
+import at.naurandir.discord.clem.bot.model.item.WeaponMapper;
 import at.naurandir.discord.clem.bot.service.client.WarframeClient;
 import at.naurandir.discord.clem.bot.service.client.dto.market.MarketItemDTO;
 import at.naurandir.discord.clem.bot.service.client.dto.market.MarketItemsDTO;
@@ -36,16 +36,10 @@ import org.springframework.stereotype.Service;
 public class MarketService extends SyncService {
     
     @Autowired
-    private MarketItemMapper marketItemMapper;
+    private WarframeService warframeService;
     
     @Autowired
-    private MarketItemRepository marketItemRepository;
-    
-    @Autowired
-    private MarketLichWeaponMapper marketLichWeaponMapper;
-    
-    @Autowired
-    private MarketLichWeaponRepository marketLichWeaponRepository;
+    private WeaponService weaponService;
     
     @Autowired
     private WarframeClient warframeClient;
@@ -70,130 +64,98 @@ public class MarketService extends SyncService {
 
     @Override
     public void sync() throws IOException {
-        syncItems();
-        syncLichWeapons();
-    }
-    
-    private void syncItems() throws IOException {
-        List<MarketItem> itemsDb = marketItemRepository.findByEndDateIsNull();
-        List<String> itemNames = itemsDb.stream().map(item -> item.getName()).collect(Collectors.toList());
-        log.debug("syncItems: received [{}] items from database.", itemsDb.size());
+        List<Warframe> warframesDb = warframeService.getWarframes();
+        List<Weapon> weaponsDb = weaponService.getWeapons();
+        
+        log.debug("sync: received [{}] warframes and [{}] weapons from database.", warframesDb.size(), weaponsDb.size());
         
         MarketItemsDTO currentItemsResponse = warframeClient.getData(apiItemUrl, apiHeaders, MarketItemsDTO.class);
         List<MarketItemDTO> currentItems = currentItemsResponse.getPayload().get("items");
-        List<String> itemDtoNames = currentItems.stream().map(item -> item.getItemName()).collect(Collectors.toList());
-        
-        List<MarketItemDTO> newItemDTOs = currentItems.stream()
-                .filter(item -> !itemNames.contains(item.getItemName()))
-                .collect(Collectors.toList());
-        List<MarketItemDTO> updateItemDTOs = currentItems.stream()
-                .filter(item -> itemNames.contains(item.getItemName()))
-                .collect(Collectors.toList());
-        log.info("syncItems: received [{}] items, [{}] are new, [{}] can be updated.", 
-                currentItems.size(), newItemDTOs.size(), updateItemDTOs.size());
-        
-        // add
-        for (MarketItemDTO newItemDTO : newItemDTOs) {
-            MarketItem newMarketItem = marketItemMapper.fromDtoToMarketItem(newItemDTO);
-            newMarketItem = marketItemRepository.save(newMarketItem);
-            log.info("syncItems: added new item [{} - {}]", newMarketItem.getId(), newMarketItem.getName());
-        }
-        
-        // update
-        for (MarketItemDTO updateItemDTO : updateItemDTOs) {
-            MarketItem itemDb = itemsDb.stream()
-                    .filter(item -> item.getName().equals(updateItemDTO.getItemName()))
-                    .findFirst()
-                    .get();
-            marketItemMapper.updateMarketItem(itemDb, updateItemDTO);
-        }
-        marketItemRepository.saveAll(itemsDb);
-        
-        // inactivate
-        List<MarketItem> toInactivateItemsDb = new ArrayList<>();
-        for (MarketItem itemDb : itemsDb) {
-            if (!itemDtoNames.contains(itemDb.getName())) {
-                toInactivateItemsDb.add(itemDb);
-                itemDb.setEndDate(LocalDateTime.now());
-                log.info("syncItems: inactivated item [{} - {}]", itemDb.getId(), itemDb.getName());
-            }
-        }
-        marketItemRepository.saveAll(toInactivateItemsDb);
-    }
-
-    private void syncLichWeapons() throws IOException {
-        List<MarketLichWeapon> lichWeaponsDb = marketLichWeaponRepository.findByEndDateIsNull();
-        List<String> lichWeaponNames = lichWeaponsDb.stream().map(lichWeapon -> lichWeapon.getName()).collect(Collectors.toList());
-        log.debug("syncLichWeapons: received [{}] lichWeapons from database.", lichWeaponsDb.size());
         
         MarketLichWeaponsDTO currentLichWeaponsResponse = warframeClient.getData(apiLichWeaponUrl, apiHeaders, MarketLichWeaponsDTO.class);
         List<MarketLichWeaponDTO> currentLichWeapons = currentLichWeaponsResponse.getPayload().get("weapons");
-        List<String> lichWeaponDtoNames = currentLichWeapons.stream().map(lichWeapon -> lichWeapon.getItemName()).collect(Collectors.toList());
         
-        List<MarketLichWeaponDTO> newLichWeaponDTOs = currentLichWeapons.stream()
-                .filter(lichWeapon -> !lichWeaponNames.contains(lichWeapon.getItemName()))
-                .collect(Collectors.toList());
-        List<MarketLichWeaponDTO> updateLichWeaponDTOs = currentLichWeapons.stream()
-                .filter(lichWeapon -> lichWeaponNames.contains(lichWeapon.getItemName()))
-                .collect(Collectors.toList());
-        log.info("syncLichWeapons: received [{}] lichWeapons, [{}] are new, [{}] can be updated.", 
-                currentLichWeapons.size(), newLichWeaponDTOs.size(), updateLichWeaponDTOs.size());
+        log.debug("sync: received [{}] market items and [{}] lich weapons from market", currentItems.size(), currentLichWeapons.size());
         
-        // add
-        for (MarketLichWeaponDTO newLichWeaponDTO : newLichWeaponDTOs) {
-            MarketLichWeapon newMarketLichWeapon = marketLichWeaponMapper.fromDtoToLichWeapon(newLichWeaponDTO);
-            newMarketLichWeapon = marketLichWeaponRepository.save(newMarketLichWeapon);
-            log.info("syncLichWeapons: added new lichWeapon [{} - {}]", newMarketLichWeapon.getId(), newMarketLichWeapon.getName());
-        }
+        syncItems(warframesDb, weaponsDb, currentItems);
+        syncLichWeapons(weaponsDb, currentLichWeapons);
+    }
+    
+    private void syncItems(List<Warframe> warframesDb, List<Weapon> weaponsDb, List<MarketItemDTO> currentItems) throws IOException {        
+        List<String> warframeNames = warframesDb.stream().map(item -> item.getName()).collect(Collectors.toList());
+        List<String> weaponNames = weaponsDb.stream().map(item -> item.getName()).collect(Collectors.toList());
         
-        // update
-        for (MarketLichWeaponDTO updateLichWeaponDTO : updateLichWeaponDTOs) {
-            MarketLichWeapon lichWeaponDb = lichWeaponsDb.stream()
-                    .filter(lichWeapon -> lichWeapon.getName().equals(updateLichWeaponDTO.getItemName()))
-                    .findFirst()
-                    .get();
-            marketLichWeaponMapper.updateLichWeapon(lichWeaponDb, updateLichWeaponDTO);
-        }
-        marketLichWeaponRepository.saveAll(lichWeaponsDb);
-        
-        // inactivate
-        List<MarketLichWeapon> toInactivateLichWeaponsDb = new ArrayList<>();
-        for (MarketLichWeapon lichWeaponDb : lichWeaponsDb) {
-            if (!lichWeaponDtoNames.contains(lichWeaponDb.getName())) {
-                toInactivateLichWeaponsDb.add(lichWeaponDb);
-                lichWeaponDb.setEndDate(LocalDateTime.now());
-                log.info("syncLichWeapons: inactivated lichWeapon [{} - {}]", lichWeaponDb.getId(), lichWeaponDb.getName());
+        for (Warframe warframe : warframesDb) {
+            MarketItemDTO warframeItem = currentItems.stream()
+                    .filter(currentItem -> warframeNames.contains(currentItem.getItemName()))
+                    .findAny()
+                    .orElse(null);
+            if (warframeItem != null) {
+                warframeService.addMarketData(warframe, warframeItem, MarketType.ITEM);
+                warframeService.save(warframe);
             }
         }
-        marketLichWeaponRepository.saveAll(toInactivateLichWeaponsDb);
+        
+        for (Weapon weapon : weaponsDb) {
+            MarketItemDTO weaponItem = currentItems.stream()
+                    .filter(currentItem -> weaponNames.contains(currentItem.getItemName()))
+                    .findAny()
+                    .orElse(null);
+            if (weaponItem != null) {
+                weaponService.addMarketData(weapon, weaponItem, MarketType.ITEM);
+                weaponService.save(weapon);
+            }
+        }
+    }
+
+    private void syncLichWeapons(List<Weapon> weaponsDb, List<MarketLichWeaponDTO> currentLichWeapons) throws IOException {
+        List<String> weaponNames = weaponsDb.stream().map(item -> item.getName()).collect(Collectors.toList());
+        
+        for (Weapon weapon : weaponsDb) {
+            MarketItemDTO weaponItem = currentLichWeapons.stream()
+                    .filter(currentItem -> weaponNames.contains(currentItem.getItemName()))
+                    .findAny()
+                    .orElse(null);
+            if (weaponItem != null) {
+                weaponService.addMarketData(weapon, weaponItem, MarketType.LICH_WEAPON);
+                weaponService.save(weapon);
+            }
+        }
     }
     
-    public List<MarketItem> getMarketItems(String name) {
-        return marketItemRepository.findByNameContainingIgnoreCaseAndEndDateIsNull(name);
+    public List<Item> getMarketItems(String name) {
+        List<Item> foundMarketItems = new ArrayList<>();
+        
+        warframeService.getWarframesByNameAndMarketType(name, MarketType.ITEM)
+                .forEach(item -> foundMarketItems.add(item));
+        weaponService.getWeaponsByNameAndMarketType(name, MarketType.ITEM)
+                .forEach(item -> foundMarketItems.add(item));
+        
+        return foundMarketItems;
     }
     
-    public List<MarketLichWeapon> getMarketLichWeapons(String name) {
-        return marketLichWeaponRepository.findByNameContainingIgnoreCaseAndEndDateIsNull(name);
+    public List<Weapon> getMarketLichWeapons(String name) {
+        return weaponService.getWeaponsByNameAndMarketType(name, MarketType.LICH_WEAPON);
     }
     
-    public List<MarketOrderDTO> getCurrentOrders(MarketItem marketItem) throws IOException {
+    public List<MarketOrderDTO> getCurrentOrders(Item marketItem) throws IOException {
         MarketOrdersResultDTO result = warframeClient.getData(
-                apiOrderUrl.replace("{itemName}", marketItem.getUrlName()), 
+                apiOrderUrl.replace("{itemName}", marketItem.getMarketUrlName()), 
                 apiHeaders, 
                 MarketOrdersResultDTO.class);
         
         return result.getPayload().getOrders();
     }
     
-    public List<MarketLichAuctionDTO> getCurrentLichAuctions(MarketLichWeapon lichWeapon, Optional<String> element) throws IOException {
+    public List<MarketLichAuctionDTO> getCurrentLichAuctions(Item lichWeapon, Optional<String> element) throws IOException {
         String apiUrl;
         if (element.isPresent()) {
             apiUrl = apiLichAuctionWithElementUrl
-                    .replace("{weaponName}", lichWeapon.getUrlName())
+                    .replace("{weaponName}", lichWeapon.getMarketUrlName())
                     .replace("{element}", element.get());
         } else {
             apiUrl = apiLichAuctionUrl
-                    .replace("{weaponName}", lichWeapon.getUrlName());
+                    .replace("{weaponName}", lichWeapon.getMarketUrlName());
         }
         
         MarketLichAuctionsDTO result = warframeClient.getData(apiUrl, apiHeaders, MarketLichAuctionsDTO.class);
@@ -202,7 +164,7 @@ public class MarketService extends SyncService {
 
     @Override
     boolean isFirstTimeStartup() {
-        return marketItemRepository.findByEndDateIsNull().isEmpty() ||
-               marketLichWeaponRepository.findByEndDateIsNull().isEmpty();
+        return warframeService.getWarframesByMarketType(MarketType.ITEM).isEmpty() ||
+               weaponService.getWeaponsByMarketType(MarketType.LICH_WEAPON).isEmpty();
     }    
 }

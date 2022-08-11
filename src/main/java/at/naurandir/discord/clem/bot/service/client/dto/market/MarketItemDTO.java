@@ -16,9 +16,6 @@ import lombok.ToString;
 @EqualsAndHashCode
 public class MarketItemDTO {
     
-    private String id;
-    private String thumb;
-    
     @SerializedName("url_name")
     private String urlName;
     

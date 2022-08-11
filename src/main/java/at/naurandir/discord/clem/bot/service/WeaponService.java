@@ -1,9 +1,11 @@
 package at.naurandir.discord.clem.bot.service;
 
+import at.naurandir.discord.clem.bot.model.item.MarketType;
 import at.naurandir.discord.clem.bot.model.item.Weapon;
 import at.naurandir.discord.clem.bot.model.item.WeaponMapper;
 import at.naurandir.discord.clem.bot.repository.WeaponRepository;
 import at.naurandir.discord.clem.bot.service.client.WarframeClient;
+import at.naurandir.discord.clem.bot.service.client.dto.market.MarketItemDTO;
 import at.naurandir.discord.clem.bot.service.client.dto.worldstate.WeaponDTO;
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -12,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import javax.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -98,6 +99,14 @@ public class WeaponService extends SyncService {
     public List<Weapon> findWeaponsByName(String name) {
         return weaponRepository.findByNameContainingIgnoreCaseAndEndDateIsNull(name);
     }
+    
+    public List<Weapon> getWeaponsByMarketType(MarketType type) {
+        return weaponRepository.findByMarketTypeAndEndDateIsNull(type);
+    }
+    
+    public List<Weapon> getWeaponsByNameAndMarketType(String name, MarketType type) {
+        return weaponRepository.findByNameContainingIgnoreCaseAndMarketTypeAndEndDateIsNull(name, type);
+    }
 
     void updateWikiThumbnail(Weapon weapon, String pictureUrl) {
         Optional<Weapon> foundWeapon = weaponRepository.findById(weapon.getId());
@@ -114,5 +123,14 @@ public class WeaponService extends SyncService {
     @Override
     boolean isFirstTimeStartup() {
         return weaponRepository.findByEndDateIsNull().isEmpty();
+    }
+
+    void addMarketData(Weapon weapon, MarketItemDTO weaponItem, MarketType marketType) {
+        weaponMapper.addMarketInfo(weapon, weaponItem);
+        weapon.setMarketType(marketType);
+    }
+
+    Weapon save(Weapon weapon) {
+        return weaponRepository.save(weapon);
     }
 }

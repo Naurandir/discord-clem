@@ -1,12 +1,9 @@
 package at.naurandir.discord.clem.bot.service.command;
 
-import at.naurandir.discord.clem.bot.model.WarframeState;
 import at.naurandir.discord.clem.bot.model.enums.OnlineStatus;
-import at.naurandir.discord.clem.bot.model.market.MarketLichWeapon;
+import at.naurandir.discord.clem.bot.model.item.Weapon;
 import at.naurandir.discord.clem.bot.service.MarketService;
-import at.naurandir.discord.clem.bot.service.client.WarframeClient;
 import at.naurandir.discord.clem.bot.service.client.dto.market.MarketLichAuctionDTO;
-import at.naurandir.discord.clem.bot.service.client.dto.market.MarketLichWeaponDTO;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.util.Color;
@@ -54,7 +51,6 @@ public class MarketLichSearchCommand implements Command {
             + "*Start:* {startingPrice} plat\n*Current:* {topBid} plat\n*Direct:* {buyoutPrice} plat\n"
             + "*Element:* {damage}% {damageType}\n*Quirk:* {quirk}\n*Ephemera:* {ephemera}";
     
-    private static final String ASSETS_BASE_URL = "https://warframe.market/static/assets/";
     private static final String AUCTION_BASE_URL = "https://warframe.market/auction/";
     
     private static final String INVALID_ELEMENT = "Invalid_Element";
@@ -99,7 +95,7 @@ public class MarketLichSearchCommand implements Command {
                 .then();
         }
         
-        List<MarketLichWeapon> foundLichWeapons = getLichWeapons(item);
+        List<Weapon> foundLichWeapons = getLichWeapons(item);
         log.debug("handle: found [{}] lich weapons for given input [{}]", foundLichWeapons.size(), item);
         
         if (foundLichWeapons.isEmpty()) {
@@ -108,7 +104,7 @@ public class MarketLichSearchCommand implements Command {
                 .then();
         }
         
-        Map<MarketLichWeapon, List<MarketLichAuctionDTO>> foundLichAuctions = getAuctions(foundLichWeapons, selectedElement);
+        Map<Weapon, List<MarketLichAuctionDTO>> foundLichAuctions = getAuctions(foundLichWeapons, selectedElement);
         
         EmbedCreateSpec[] embeddedMessages = getEmbeddedResult(foundLichAuctions);
         return event.getMessage().getChannel()
@@ -144,17 +140,17 @@ public class MarketLichSearchCommand implements Command {
         return StringUtils.join(words, " ").trim();
     }
     
-    private List<MarketLichWeapon> getLichWeapons(String item) {
+    private List<Weapon> getLichWeapons(String item) {
         return marketService.getMarketLichWeapons(item).stream()
                 .limit(3)
                 .collect(Collectors.toList());
     }
     
-    private Map<MarketLichWeapon, List<MarketLichAuctionDTO>> getAuctions(List<MarketLichWeapon> marketLichWeapons, 
+    private Map<Weapon, List<MarketLichAuctionDTO>> getAuctions(List<Weapon> marketLichWeapons, 
             Optional<String> element) {
-        Map<MarketLichWeapon, List<MarketLichAuctionDTO>> lichAuctions = new HashMap<>();
+        Map<Weapon, List<MarketLichAuctionDTO>> lichAuctions = new HashMap<>();
         
-        for (MarketLichWeapon lichWeapon : marketLichWeapons) {
+        for (Weapon lichWeapon : marketLichWeapons) {
             try {
                 List<MarketLichAuctionDTO> foundAuctions = marketService.getCurrentLichAuctions(lichWeapon, element);
                 
@@ -177,17 +173,17 @@ public class MarketLichSearchCommand implements Command {
         return lichAuctions;
     }
 
-    private EmbedCreateSpec[] getEmbeddedResult(Map<MarketLichWeapon, List<MarketLichAuctionDTO>> foundLichAuctions) {
+    private EmbedCreateSpec[] getEmbeddedResult(Map<Weapon, List<MarketLichAuctionDTO>> foundLichAuctions) {
         List<EmbedCreateSpec> embeds = new ArrayList<>();
         EmbedCreateSpec[] embedArray = new EmbedCreateSpec[foundLichAuctions.size()];
         
-        for (Map.Entry<MarketLichWeapon, List<MarketLichAuctionDTO>> entry : foundLichAuctions.entrySet()) {
+        for (Map.Entry<Weapon, List<MarketLichAuctionDTO>> entry : foundLichAuctions.entrySet()) {
             
             EmbedCreateSpec.Builder builder = EmbedCreateSpec.builder()
                 .color(Color.RUST)
                 .title(entry.getKey().getName())
                 .description(DESCRIPTION)
-                .thumbnail(ASSETS_BASE_URL + entry.getKey().getThumb())
+                .thumbnail(entry.getKey().getWikiaThumbnail())
                 .timestamp(Instant.now());
             
             entry.getValue().forEach(auction -> builder.addField(

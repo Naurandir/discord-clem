@@ -2,7 +2,7 @@ package at.naurandir.discord.clem.bot.service.command;
 
 import at.naurandir.discord.clem.bot.model.enums.OnlineStatus;
 import at.naurandir.discord.clem.bot.model.enums.OrderType;
-import at.naurandir.discord.clem.bot.model.market.MarketItem;
+import at.naurandir.discord.clem.bot.model.item.Item;
 import at.naurandir.discord.clem.bot.service.MarketService;
 import at.naurandir.discord.clem.bot.service.client.dto.market.MarketOrderDTO;
 import discord4j.core.event.domain.message.MessageCreateEvent;
@@ -58,8 +58,8 @@ public class MarketSearchCommand implements Command {
                 .then();
         }
         
-        List<MarketItem> foundMarketItems = getMarketItems(item);
-        Map<MarketItem, List<MarketOrderDTO>> foundSellOrders = getSellOrders(foundMarketItems);
+        List<Item> foundMarketItems = getMarketItems(item);
+        Map<Item, List<MarketOrderDTO>> foundSellOrders = getSellOrders(foundMarketItems);
         
         EmbedCreateSpec[] embeddedMessages = getEmbeddedResult(foundSellOrders);
         return event.getMessage().getChannel()
@@ -73,16 +73,16 @@ public class MarketSearchCommand implements Command {
         return StringUtils.join(words, " ").trim();
     }
 
-    private List<MarketItem> getMarketItems(String item) {
+    private List<Item> getMarketItems(String item) {
         return marketService.getMarketItems(item).stream()
                 .limit(5)
                 .collect(Collectors.toList());
     }
 
-    private Map<MarketItem, List<MarketOrderDTO>> getSellOrders(List<MarketItem> foundItems) {
-        Map<MarketItem, List<MarketOrderDTO>> itemOrders = new HashMap<>();
+    private Map<Item, List<MarketOrderDTO>> getSellOrders(List<Item> foundItems) {
+        Map<Item, List<MarketOrderDTO>> itemOrders = new HashMap<>();
         
-        for (MarketItem marketItem : foundItems) {
+        for (Item marketItem : foundItems) {
             try {
                 List<MarketOrderDTO> foundOrders = marketService.getCurrentOrders(marketItem);
 
@@ -103,11 +103,11 @@ public class MarketSearchCommand implements Command {
         return itemOrders;
     }
 
-    private EmbedCreateSpec[] getEmbeddedResult(Map<MarketItem, List<MarketOrderDTO>> foundSellOrders) {
+    private EmbedCreateSpec[] getEmbeddedResult(Map<Item, List<MarketOrderDTO>> foundSellOrders) {
         List<EmbedCreateSpec> embeds = new ArrayList<>();
         EmbedCreateSpec[] embedArray = new EmbedCreateSpec[foundSellOrders.size()];
         
-        for (Entry<MarketItem, List<MarketOrderDTO>> entry : foundSellOrders.entrySet()) {
+        for (Entry<Item, List<MarketOrderDTO>> entry : foundSellOrders.entrySet()) {
             StringBuilder description = new StringBuilder("");
             
             entry.getValue().forEach(order -> description.append(BUY_DESCRIPTION.replace("{item}", entry.getKey().getName())
@@ -121,7 +121,7 @@ public class MarketSearchCommand implements Command {
                 .color(Color.DEEP_SEA)
                 .title(entry.getKey().getName())
                 .description(description.toString())
-                .thumbnail(ASSETS_BASE_URL + entry.getKey().getThumb())
+                .thumbnail(entry.getKey().getWikiaThumbnail())
                 .timestamp(Instant.now())
                 .build();
             
