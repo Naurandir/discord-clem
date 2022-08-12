@@ -15,11 +15,9 @@ import discord4j.rest.util.Color;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -33,9 +31,6 @@ public class VoidTraderPush extends Push {
     
     @Autowired
     VoidTraderService voidTraderService;
-    
-    @Value("#{'${discord.clem.push.channels.void-trader}'.split(',')}")
-    private List<String> interestingChannels;
     
     private static final String TITLE = "Void Trader Deals";
     private static final String DESCRIPTION_ACTIVE = "Baro Ki'Teer is currently at ***{location}***. Will leave in {days}d {hours}h {minutes}m.";

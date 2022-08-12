@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -32,9 +31,6 @@ public class AlertsPush extends Push {
     
     @Autowired
     private AlertService alertService;
-    
-    @Value("#{'${discord.clem.push.channels.alerts}'.split(',')}")
-    private List<String> interestingChannels;
     
     private static final String TITLE = "Current Alerts";
     private static final String DESCRIPTION = "Currently active alerts.";

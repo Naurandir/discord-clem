@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -33,9 +32,6 @@ public class WorldCyclePush extends Push {
     
     @Autowired
     private WorldCycleService worldCycleService;
-    
-    @Value("#{'${discord.clem.push.channels.worldcycle}'.split(',')}")
-    private List<String> interestingChannels;
     
     private static final String TITLE = "Current World Cycles";
     private static final String STATE_MESSAGE = "{state} for {hours}h {minutes}m.";

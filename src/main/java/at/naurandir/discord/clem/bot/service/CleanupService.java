@@ -3,6 +3,7 @@ package at.naurandir.discord.clem.bot.service;
 import at.naurandir.discord.clem.bot.model.channel.InterestingChannel;
 import discord4j.common.util.Snowflake;
 import discord4j.core.object.entity.Message;
+import discord4j.rest.http.client.ClientException;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +25,7 @@ public class CleanupService {
     @Autowired
     private InterestingChannelService interestingChannelService;
     
-    @Scheduled(cron = "0 * * * * ?")
+    @Scheduled(cron = "${discord.clem.cleanup}")
     public void removeNonExistendStickyPushMessages() {
         List<InterestingChannel> channels = interestingChannelService.getAllChannels();
         
@@ -33,15 +34,15 @@ public class CleanupService {
                 continue;
             }  
             
-            Optional<Message> message = botService.getClient().getMessageById(Snowflake.of(channel.getChannelId()), 
-                        Snowflake.of(channel.getStickyMessageId())).blockOptional();
-            
-            if (message.isPresent()) {
-                continue; // nothing to do
+            try {
+                botService.getClient().getMessageById(Snowflake.of(channel.getChannelId()), 
+                        Snowflake.of(channel.getStickyMessageId())).block();
+            } catch (ClientException ex) {
+                log.error("removeNonExistendStickyPushMessages: did not receive message [{}], reason: {}", 
+                        channel.getStickyMessageId(), ex.getMessage());
+                log.info("removeNonExistendStickyPushMessages: removing sticky message id from channel [{}]", channel);
+                interestingChannelService.removeStickyMessageId(channel);
             }
-            
-            log.info("removeNonExistendStickyPushMessages: removing sticky message id from channel [{}]", channel);
-            interestingChannelService.removeStickyMessageId(channel);
         }
     }
 }

@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
  */
 public abstract class SyncService {
     
-    @Value("${discord.clem.startup.init:false}")
+    @Value("${discord.clem.startup.init:true}")
     boolean doInitAtStartup;
     
     @PostConstruct

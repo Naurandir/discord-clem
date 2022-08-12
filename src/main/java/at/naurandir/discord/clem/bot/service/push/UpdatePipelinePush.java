@@ -1,19 +1,10 @@
 package at.naurandir.discord.clem.bot.service.push;
 
 import at.naurandir.discord.clem.bot.model.enums.PushType;
-import at.naurandir.discord.clem.bot.service.client.dto.worldstate.AlertDTO;
-import at.naurandir.discord.clem.bot.service.client.dto.worldstate.EventDTO;
-import at.naurandir.discord.clem.bot.utils.LocalDateTimeUtil;
 import discord4j.common.util.Snowflake;
-import discord4j.core.GatewayDiscordClient;
 import discord4j.discordjson.json.MessageData;
 import discord4j.rest.entity.RestMessage;
-import java.time.Duration;
-import java.time.LocalDateTime;
-import java.util.List;
 import lombok.extern.slf4j.Slf4j;
-import nonapi.io.github.classgraph.utils.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -24,9 +15,6 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 public class UpdatePipelinePush extends Push {
-    
-    @Value("#{'${discord.clem.push.channels.update}'.split(',')}")
-    private List<String> interestingChannels;
     
     private static final String EVENT_EXISTING = "***New Event:***\n{event}";
     private static final String EVENTS_GONE = "***Events:***\nNo more active Events existing.";
