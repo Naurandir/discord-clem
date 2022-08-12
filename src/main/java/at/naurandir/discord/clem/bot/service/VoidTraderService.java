@@ -53,6 +53,8 @@ public class VoidTraderService extends SyncService {
         
         if (voidTraderOpt.isEmpty()) {
             addVoidTrader(currentVoidTrader);
+        } else if (voidTraderOpt.get().getInventory().isEmpty() && !currentVoidTrader.getInventory().isEmpty()) {
+            addVoidTraderItems(currentVoidTrader, voidTraderOpt.get());
         } else if (now.isAfter(voidTraderOpt.get().getExpiry())) {
             inactivateVoidTrader(voidTraderOpt.get(), now);
         } else {
@@ -73,6 +75,17 @@ public class VoidTraderService extends SyncService {
         
         log.info("addVoidTrader: added void trader [id:{}, externalId:{}, items:{}]",
                 newVoidTrader.getId(), newVoidTrader.getExternalId(), inventory.size());
+    }
+    
+    private void addVoidTraderItems(VoidTraderDTO currentVoidTrader, VoidTrader dbVoidTrader) {
+        Set<VoidTraderItem> inventory = voidTraderMapper.voidTraderItemDtoToVoidTraderItem(currentVoidTrader.getInventory());
+        
+        inventory.forEach(item -> item.setVoidTrader(dbVoidTrader));
+        
+        voidTraderItemRepository.saveAll(inventory);
+        
+        log.info("updateVoidTraderItems: updated void trader items [id:{}, externalId:{}, items:{}]",
+                dbVoidTrader.getId(), dbVoidTrader.getExternalId(), inventory.size());
     }
     
     private void inactivateVoidTrader(VoidTrader voidTraderDb, LocalDateTime now) {
