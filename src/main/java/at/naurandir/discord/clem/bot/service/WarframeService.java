@@ -45,7 +45,16 @@ public class WarframeService extends SyncService {
     
     @Override
     @Scheduled(cron = "${discord.clem.warframe.scheduler.cron}")
-    public void sync() throws IOException {
+    public void sync() {
+        try {
+            doSync();
+        } catch (Exception ex) {
+            log.error("sync:_throwed error: ", ex);
+        }
+    }
+    
+    @Override
+    public void doSync() throws IOException {
         List<Warframe> warframesDb = warframeRepository.findByEndDateIsNull();
         List<String> warframeNames = warframesDb.stream().map(warframe -> warframe.getUniqueName()).collect(Collectors.toList());
         log.debug("syncWarframes: received [{}] warframes from database.", warframesDb.size());

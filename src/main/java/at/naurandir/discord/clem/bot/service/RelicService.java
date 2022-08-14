@@ -53,7 +53,16 @@ public class RelicService extends SyncService {
     @Override
     @Transactional
     @Scheduled(cron = "${discord.clem.relic.scheduler.cron}")
-    public void sync() throws IOException {
+    public void sync() {
+        try {
+            doSync();
+        } catch (Exception ex) {
+            log.error("sync:_throwed error: ", ex);
+        }
+    }
+    
+    @Override
+    public void doSync() throws IOException {
         List<Relic> relicsDb = relicRepository.findAll();
         List<String> relicNames = relicsDb.stream()
                 .map(relic -> relic.getName() + relic.getTier().getTierString())

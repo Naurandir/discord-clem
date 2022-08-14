@@ -52,7 +52,16 @@ public class WorldCycleService extends SyncService {
 
     @Override
     @Scheduled(cron = "${discord.clem.cycle.scheduler.cron}")
-    public void sync() throws IOException {
+    public void sync() {
+        try {
+            doSync();
+        } catch (Exception ex) {
+            log.error("sync:_throwed error: ", ex);
+        }
+    }
+    
+    @Override
+    public void doSync() throws IOException {
         List<Cycle> dbCycles = getCycles();
         EarthCycleDTO currentEarthCycle = warframeClient.getData(apiEarthUrl, apiHeaders, EarthCycleDTO.class);
         CetusCycleDTO currentCetusCycle = warframeClient.getData(apiCetusUrl, apiHeaders, CetusCycleDTO.class);

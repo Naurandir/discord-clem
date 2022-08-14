@@ -46,7 +46,16 @@ public class WeaponService extends SyncService {
     
     @Override
     @Scheduled(cron = "${discord.clem.weapon.scheduler.cron}")
-    public void sync() throws IOException {
+    public void sync() {
+        try {
+            doSync();
+        } catch (Exception ex) {
+            log.error("sync:_throwed error: ", ex);
+        }
+    }
+    
+    @Override
+    public void doSync() throws IOException {
         List<Weapon> weaponsDb = weaponRepository.findByEndDateIsNull();
         List<String> weaponNames = weaponsDb.stream().map(weapon -> weapon.getUniqueName()).collect(Collectors.toList());
         log.debug("syncWeapons: received [{}] weapons from database.", weaponsDb.size());

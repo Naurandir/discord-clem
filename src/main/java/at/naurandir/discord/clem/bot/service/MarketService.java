@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 /**
@@ -63,7 +64,17 @@ public class MarketService extends SyncService {
     private Map<String, String> apiHeaders;
 
     @Override
-    public void sync() throws IOException {
+    @Scheduled(cron = "${discord.clem.market.scheduler.cron}")
+    public void sync() {
+        try {
+            doSync();
+        } catch (Exception ex) {
+            log.error("sync:_throwed error: ", ex);
+        }
+    }
+    
+    @Override
+    public void doSync() throws IOException {
         List<Warframe> warframesDb = warframeService.getWarframes();
         List<Weapon> weaponsDb = weaponService.getWeapons();
         

@@ -24,6 +24,7 @@ public abstract class SyncService {
         }
     }
     
-    public abstract void sync() throws IOException;
+    public abstract void sync();
+    public abstract void doSync() throws IOException;
     abstract boolean isFirstTimeStartup();
 }

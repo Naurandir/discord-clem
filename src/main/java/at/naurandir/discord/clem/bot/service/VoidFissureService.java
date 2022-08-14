@@ -39,7 +39,16 @@ public class VoidFissureService extends SyncService {
     
     @Override
     @Scheduled(cron = "${discord.clem.void_fissure.scheduler.cron}")
-    public void sync() throws IOException {
+    public void sync() {
+        try {
+            doSync();
+        } catch (Exception ex) {
+            log.error("sync:_throwed error: ", ex);
+        }
+    }
+    
+    @Override
+    public void doSync() throws IOException {
         List<VoidFissureDTO> currentFissures = warframeClient.getListData(apiUrl, apiHeaders, VoidFissureDTO.class);
         List<VoidFissure> fissuresDb = voidFissureRepository.findByEndDateIsNull();
         

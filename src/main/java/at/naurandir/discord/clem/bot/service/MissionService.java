@@ -56,7 +56,16 @@ public class MissionService extends SyncService {
     @Override
     @Transactional
     @Scheduled(cron = "${discord.clem.mission.scheduler.cron}")
-    public void sync() throws IOException {
+    public void sync() {
+        try {
+            doSync();
+        } catch (Exception ex) {
+            log.error("sync:_throwed error: ", ex);
+        }
+    }
+    
+    @Override
+    public void doSync() throws IOException {
         
         List<Mission> missionsDb = missionRepository.findByEndDateIsNull();
         List<String> missionNames = missionsDb.stream().map(mission -> mission.getName()).collect(Collectors.toList());

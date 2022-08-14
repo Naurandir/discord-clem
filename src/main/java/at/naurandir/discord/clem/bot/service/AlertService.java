@@ -40,7 +40,16 @@ public class AlertService extends SyncService {
     
     @Override
     @Scheduled(cron = "${discord.clem.alert.scheduler.cron}")
-    public void sync() throws IOException {
+    public void sync() {
+        try {
+            doSync();
+        } catch (Exception ex) {
+            log.error("sync:_throwed error: ", ex);
+        }
+    }
+    
+    @Override
+    public void doSync() throws IOException {
         List<AlertDTO> currentAlerts = warframeClient.getListData(apiUrl, apiHeaders, AlertDTO.class);
         List<Alert> dbAlerts = alertRepository.findByEndDateIsNull();
         LocalDateTime now = LocalDateTime.now();
