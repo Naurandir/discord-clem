@@ -1,11 +1,9 @@
 package at.naurandir.discord.clem.bot.service;
 
-import at.naurandir.discord.clem.bot.model.item.MarketType;
 import at.naurandir.discord.clem.bot.model.item.Warframe;
 import at.naurandir.discord.clem.bot.model.item.WarframeMapper;
 import at.naurandir.discord.clem.bot.repository.WarframeRepository;
 import at.naurandir.discord.clem.bot.service.client.WarframeClient;
-import at.naurandir.discord.clem.bot.service.client.dto.market.MarketItemDTO;
 import at.naurandir.discord.clem.bot.service.client.dto.worldstate.WarframeDTO;
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -106,16 +104,8 @@ public class WarframeService extends SyncService {
         return warframeRepository.findByEndDateIsNull();
     }
     
-    public List<Warframe> getWarframesByMarketType(MarketType type) {
-        return warframeRepository.findByMarketTypeAndEndDateIsNull(type);
-    }
-    
     public List<Warframe> findWarframesByName(String name) {
         return warframeRepository.findByNameContainingIgnoreCaseAndEndDateIsNull(name);
-    }
-    
-    public List<Warframe> getWarframesByNameAndMarketType(String name, MarketType type) {
-        return warframeRepository.findByNameContainingIgnoreCaseAndMarketTypeAndEndDateIsNull(name, type);
     }
     
     void updateWikiThumbnail(Warframe warframe, String pictureUrl) {
@@ -133,11 +123,6 @@ public class WarframeService extends SyncService {
     @Override
     boolean isFirstTimeStartup() {
         return warframeRepository.findByEndDateIsNull().isEmpty();
-    }
-
-    void addMarketData(Warframe warframe, MarketItemDTO warframeItem, MarketType marketType) {
-        warframeMapper.addMarketInfo(warframe, warframeItem);
-        warframe.setMarketType(marketType);
     }
 
     Warframe save(Warframe warframe) {

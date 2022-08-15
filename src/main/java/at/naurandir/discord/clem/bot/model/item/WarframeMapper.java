@@ -29,7 +29,6 @@ public interface WarframeMapper extends ItemMapper {
         @Mapping(target = "fourthAbilityDescription", expression = "java(warframes.getAbilities().get(3).getDescription())"),
         
         @Mapping(source= "name", target="overframeUrlName", qualifiedByName="getOverframeUrlName"),
-        @Mapping(source= "marketCost", target="marketCost", qualifiedByName = "getMarketCost"),
         
         @Mapping(target = "id", ignore = true)
     })
@@ -40,16 +39,8 @@ public interface WarframeMapper extends ItemMapper {
         @Mapping(target="wikiaThumbnail", expression="java(getThumbnailUrl(toUpdateWarframe, dto.getWikiaThumbnail()))"),
         
         @Mapping(source= "name", target="overframeUrlName", qualifiedByName="getOverframeUrlName"),
-        @Mapping(source= "marketCost", target="marketCost", qualifiedByName = "getMarketCost"),
         
         @Mapping(target = "id", ignore = true)
     })
     void updateWarframe(@MappingTarget Warframe toUpdateWarframe, WarframeDTO dto);
-    
-    @Mappings({
-        @Mapping(target="modifyDate", expression="java(java.time.LocalDateTime.now())"),  
-        
-        @Mapping(source= "urlName", target="marketUrlName") // private static final String ASSETS_BASE_URL = "https://warframe.market/static/assets/";
-    })
-    void addMarketInfo(@MappingTarget Warframe toUpdateWarframe, MarketItemDTO dto);
 }

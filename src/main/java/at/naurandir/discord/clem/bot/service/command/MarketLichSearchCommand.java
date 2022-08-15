@@ -1,7 +1,7 @@
 package at.naurandir.discord.clem.bot.service.command;
 
 import at.naurandir.discord.clem.bot.model.enums.OnlineStatus;
-import at.naurandir.discord.clem.bot.model.item.Weapon;
+import at.naurandir.discord.clem.bot.model.item.MarketLichWeapon;
 import at.naurandir.discord.clem.bot.service.MarketService;
 import at.naurandir.discord.clem.bot.service.client.dto.market.MarketLichAuctionDTO;
 import discord4j.core.event.domain.message.MessageCreateEvent;
@@ -34,6 +34,7 @@ public class MarketLichSearchCommand implements Command {
     @Autowired
     private MarketService marketService;
     
+    private static final String ASSETS_BASE_URL = "https://warframe.market/static/assets/";
     private static final String DESCRIPTION = "List of found Lich Auctions";
     
     private static final String TITLE_NOT_FOUND = "No Lich Auctions found";
@@ -95,7 +96,7 @@ public class MarketLichSearchCommand implements Command {
                 .then();
         }
         
-        List<Weapon> foundLichWeapons = getLichWeapons(item);
+        List<MarketLichWeapon> foundLichWeapons = getLichWeapons(item);
         log.debug("handle: found [{}] lich weapons for given input [{}]", foundLichWeapons.size(), item);
         
         if (foundLichWeapons.isEmpty()) {
@@ -104,7 +105,7 @@ public class MarketLichSearchCommand implements Command {
                 .then();
         }
         
-        Map<Weapon, List<MarketLichAuctionDTO>> foundLichAuctions = getAuctions(foundLichWeapons, selectedElement);
+        Map<MarketLichWeapon, List<MarketLichAuctionDTO>> foundLichAuctions = getAuctions(foundLichWeapons, selectedElement);
         
         EmbedCreateSpec[] embeddedMessages = getEmbeddedResult(foundLichAuctions);
         return event.getMessage().getChannel()
@@ -140,17 +141,17 @@ public class MarketLichSearchCommand implements Command {
         return StringUtils.join(words, " ").trim();
     }
     
-    private List<Weapon> getLichWeapons(String item) {
+    private List<MarketLichWeapon> getLichWeapons(String item) {
         return marketService.getMarketLichWeapons(item).stream()
                 .limit(3)
                 .collect(Collectors.toList());
     }
     
-    private Map<Weapon, List<MarketLichAuctionDTO>> getAuctions(List<Weapon> marketLichWeapons, 
+    private Map<MarketLichWeapon, List<MarketLichAuctionDTO>> getAuctions(List<MarketLichWeapon> marketLichWeapons, 
             Optional<String> element) {
-        Map<Weapon, List<MarketLichAuctionDTO>> lichAuctions = new HashMap<>();
+        Map<MarketLichWeapon, List<MarketLichAuctionDTO>> lichAuctions = new HashMap<>();
         
-        for (Weapon lichWeapon : marketLichWeapons) {
+        for (MarketLichWeapon lichWeapon : marketLichWeapons) {
             try {
                 List<MarketLichAuctionDTO> foundAuctions = marketService.getCurrentLichAuctions(lichWeapon, element);
                 
@@ -173,17 +174,17 @@ public class MarketLichSearchCommand implements Command {
         return lichAuctions;
     }
 
-    private EmbedCreateSpec[] getEmbeddedResult(Map<Weapon, List<MarketLichAuctionDTO>> foundLichAuctions) {
+    private EmbedCreateSpec[] getEmbeddedResult(Map<MarketLichWeapon, List<MarketLichAuctionDTO>> foundLichAuctions) {
         List<EmbedCreateSpec> embeds = new ArrayList<>();
         EmbedCreateSpec[] embedArray = new EmbedCreateSpec[foundLichAuctions.size()];
         
-        for (Map.Entry<Weapon, List<MarketLichAuctionDTO>> entry : foundLichAuctions.entrySet()) {
+        for (Map.Entry<MarketLichWeapon, List<MarketLichAuctionDTO>> entry : foundLichAuctions.entrySet()) {
             
             EmbedCreateSpec.Builder builder = EmbedCreateSpec.builder()
                 .color(Color.RUST)
                 .title(entry.getKey().getName())
                 .description(DESCRIPTION)
-                .thumbnail(entry.getKey().getWikiaThumbnail())
+                .thumbnail(ASSETS_BASE_URL + entry.getKey().getThumb())
                 .timestamp(Instant.now());
             
             entry.getValue().forEach(auction -> builder.addField(

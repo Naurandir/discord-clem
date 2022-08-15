@@ -22,7 +22,6 @@ public interface WeaponMapper extends ItemMapper {
         @Mapping(target="startDate", expression="java(java.time.LocalDateTime.now())"),
         
         @Mapping(source= "name", target="overframeUrlName", qualifiedByName="getOverframeUrlName"),
-        @Mapping(source= "marketCost", target="marketCost", qualifiedByName = "getMarketCost"),
         @Mapping(source= "category", target="type", qualifiedByName = "getWeaponType"),
         
         @Mapping(target = "id", ignore = true)
@@ -34,19 +33,11 @@ public interface WeaponMapper extends ItemMapper {
         @Mapping(target="wikiaThumbnail", expression="java(getThumbnailUrl(toUpdateWeapon, dto.getWikiaThumbnail()))"),
         
         @Mapping(source= "name", target="overframeUrlName", qualifiedByName="getOverframeUrlName"),
-        @Mapping(source= "marketCost", target="marketCost", qualifiedByName = "getMarketCost"),
         @Mapping(source= "category", target="type", qualifiedByName = "getWeaponType"),
         
         @Mapping(target = "id", ignore = true)
     })
     void updateWeapon(@MappingTarget Weapon toUpdateWeapon, WeaponDTO dto);
-    
-    @Mappings({
-        @Mapping(target="modifyDate", expression="java(java.time.LocalDateTime.now())"),  
-        
-        @Mapping(source= "urlName", target="marketUrlName")
-    })
-    void addMarketInfo(@MappingTarget Weapon toUpdateWeapon, MarketItemDTO dto);
     
     @Named("getWeaponType")
     default WeaponType getWeaponType(String category) {
