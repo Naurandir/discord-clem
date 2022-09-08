@@ -98,6 +98,13 @@
             <version>${org.springdoc.version}</version>
         </dependency>
         
+        <!-- Monitoring -->
+        <dependency>
+            <groupId>net.bull.javamelody</groupId>
+            <artifactId>javamelody-spring-boot-starter</artifactId>
+            <version>1.91.0</version>
+        </dependency>
+        
         <!-- Helper -->
         <dependency>
             <groupId>org.projectlombok</groupId>
