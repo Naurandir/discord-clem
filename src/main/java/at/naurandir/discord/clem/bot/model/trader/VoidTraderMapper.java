@@ -26,6 +26,7 @@ public abstract class VoidTraderMapper {
         @Mapping(source="expiry", target="expiry", dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"),
         @Mapping(target="modifyDate", expression="java(LocalDateTime.now())"),
         @Mapping(target="startDate", expression="java(LocalDateTime.now())"),
+        @Mapping(target="notified", expression="java(Boolean.FALSE)"),
         
         @Mapping(source= "inventory", target="inventory", qualifiedByName = "getInventory"),
         

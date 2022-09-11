@@ -56,7 +56,7 @@ public class VoidTraderService extends SyncService {
     @Override
     public void doSync() throws IOException {
         VoidTraderDTO currentVoidTrader = warframeClient.getData(apiUrl, apiHeaders, VoidTraderDTO.class);
-        Optional<VoidTrader> voidTraderOpt = voidTraderRepository.findByExternalId(currentVoidTrader.getId());
+        Optional<VoidTrader> voidTraderOpt = voidTraderRepository.findByEndDateIsNull();
         
         LocalDateTime now = LocalDateTime.now();
         

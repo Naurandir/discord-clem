@@ -11,5 +11,4 @@ import org.springframework.data.repository.CrudRepository;
 public interface VoidTraderRepository extends CrudRepository<VoidTrader, Long> {
 
     Optional<VoidTrader> findByEndDateIsNull();
-    Optional<VoidTrader> findByExternalId(String externalId);
 }

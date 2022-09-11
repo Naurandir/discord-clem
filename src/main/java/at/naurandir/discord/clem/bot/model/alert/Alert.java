@@ -1,6 +1,7 @@
 package at.naurandir.discord.clem.bot.model.alert;
 
 import at.naurandir.discord.clem.bot.model.DbEntity;
+import at.naurandir.discord.clem.bot.model.Notifiable;
 import at.naurandir.discord.clem.bot.model.mission.EmbeddableMission;
 import java.time.LocalDateTime;
 import javax.persistence.Column;
@@ -18,7 +19,7 @@ import lombok.Setter;
 @Setter
 @Entity
 @Table(name = "alert")
-public class Alert extends DbEntity {
+public class Alert extends DbEntity implements Notifiable {
     
     @Embedded
     private EmbeddableMission alertMission;
@@ -31,4 +32,12 @@ public class Alert extends DbEntity {
     
     @Column(nullable = false)
     private String rewards;
+    
+    @Column(nullable = true)
+    private Boolean notified;
+
+    @Override
+    public Boolean getIsNotified() {
+        return notified;
+    }
 }
