@@ -1,7 +1,6 @@
 package at.naurandir.discord.clem.bot.model.trader;
 
 import at.naurandir.discord.clem.bot.model.DbEntity;
-import at.naurandir.discord.clem.bot.model.Notifiable;
 import java.time.LocalDateTime;
 import java.util.Set;
 import javax.persistence.CascadeType;
@@ -21,7 +20,7 @@ import lombok.Setter;
 @Setter
 @Entity
 @Table(name = "void_trader")
-public class VoidTrader extends DbEntity implements Notifiable {
+public class VoidTrader extends DbEntity {
 
     @Column(nullable = false)
     private LocalDateTime activation;
@@ -34,12 +33,4 @@ public class VoidTrader extends DbEntity implements Notifiable {
     
     @OneToMany(mappedBy="voidTrader", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Set<VoidTraderItem> inventory;
-    
-    @Column(nullable = true)
-    private Boolean notified;
-
-    @Override
-    public Boolean getIsNotified() {
-        return notified;
-    }
 }

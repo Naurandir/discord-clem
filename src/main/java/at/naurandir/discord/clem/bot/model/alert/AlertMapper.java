@@ -26,7 +26,6 @@ public abstract class AlertMapper {
         @Mapping(source="expiry", target="expiry", dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"),
         @Mapping(target="modifyDate", expression="java(LocalDateTime.now())"),
         @Mapping(target="startDate", expression="java(LocalDateTime.now())"),
-        @Mapping(target="notified", expression="java(Boolean.FALSE)"),
         
         @Mapping(source= "dto", target="name", qualifiedByName = "getAlertName"),
         @Mapping(source="dto", target="rewards", qualifiedByName = "getRewards"),

@@ -13,4 +13,6 @@ import org.springframework.stereotype.Repository;
 public interface AlertRepository extends CrudRepository<Alert, Long> {
     
     List<Alert> findByEndDateIsNull();
+
+    List<Alert> findByEndDateIsNotNull();
 }

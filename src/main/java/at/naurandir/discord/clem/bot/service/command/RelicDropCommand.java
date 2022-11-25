@@ -38,7 +38,7 @@ public class RelicDropCommand implements Command {
     private MissionService missionService;
     
     private static final String RELIC_SEARCH_TITLE = "Relics with '{item}' Drop";
-    private static final String RELIC_SEARCH_DESCRIPTION = "Relics that drop desired item, note some can be vaulted.";
+    private static final String RELIC_SEARCH_DESCRIPTION = "Relics that drop desired item, note some can be vaulted.\n\n";
     private static final String MISSION_SEARCH_TITLE = "Missions with Relic Drop for '{item}'";
     
     private static final String MISSION_DESCRIPTION = "Note that only maximum 20 different mission drops are shown here. For better results precise the input.\n\n";
@@ -183,9 +183,15 @@ public class RelicDropCommand implements Command {
     }
     
     private EmbedCreateSpec generateEmbedRelics(String item, Map<String, String> relicMessages) {
+        StringBuilder descriptionBuilder = new StringBuilder(RELIC_SEARCH_DESCRIPTION);
+        
+        if (relicMessages.isEmpty()) {
+            descriptionBuilder.append("Nothing found in the Search. Maybe the Item was misspelled.");
+        }
+        
         return generateEmbed(RELIC_SEARCH_TITLE.replace("{item}", item), 
-                RELIC_SEARCH_DESCRIPTION, 
-                Color.ORANGE, 
+                descriptionBuilder.toString(), 
+                Color.TAHITI_GOLD, 
                 "https://static.wikia.nocookie.net/warframe/images/0/0e/VoidProjectionsGoldD.png/revision/latest?cb=20160709035734", 
                 relicMessages);
     }
@@ -197,7 +203,7 @@ public class RelicDropCommand implements Command {
             descriptionBuilder.append("Nothing found in the Search. Maybe the Item was misspelled or the found Relics are vaulted.");
         } else {
             missionMessages.stream().limit(20).forEach(entry -> descriptionBuilder.append(entry));
-        };
+        }
         
         return generateEmbed(MISSION_SEARCH_TITLE.replace("{item}", item),
                 descriptionBuilder.toString(),

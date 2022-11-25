@@ -15,4 +15,6 @@ public interface VoidFissureRepository extends CrudRepository<VoidFissure, Long>
     List<VoidFissure> findByEndDateIsNull();
     
     List<VoidFissure> findByEndDateIsNullAndIsStorm(boolean isStorm);
+    
+    List<VoidFissure> findByEndDateIsNotNull();
 }
