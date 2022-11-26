@@ -25,11 +25,12 @@ public class UpdatePipelinePush extends Push {
     
     @Autowired
     private UpdatePipelineService updatePipelineService;
+    
+    private List<Notification> notifications;
 
     @Override
     void doNewPush(Snowflake channelId) {
         
-        List<Notification> notifications = updatePipelineService.getNotifications();
         EmbedCreateSpec.Builder embedBuilder = generateEmbedBuilder();
         
         for (Notification notification : notifications) {
@@ -43,8 +44,6 @@ public class UpdatePipelinePush extends Push {
                 getClient().rest().getChannelById(channelId)
                     .createMessage(embed.asRequest())
                     .subscribe();
-                
-                updatePipelineService.removeNotification(notification); // do not notify again
             } catch (Exception ex) {
                 log.warn("doNewPush: error for notification [{}]: ", notification.getUuid(), ex);
             }
@@ -80,6 +79,8 @@ public class UpdatePipelinePush extends Push {
     @Scheduled(initialDelay = 60 * 1_000, fixedRate = 60 * 1_000)
     @Override
     void refresh() {
+        notifications = updatePipelineService.getNotifications();
+        updatePipelineService.removeNotifications(notifications);
         push();
     }
 }

@@ -37,9 +37,9 @@ public class UpdatePipelineService {
         return currentNotifications;
     }
     
-    public void removeNotification(Notification notification) {
+    public void removeNotifications(List<Notification> notifications) {
         synchronized(toNotifyMessages) {
-            toNotifyMessages.remove(notification);
+            toNotifyMessages.removeAll(notifications);
         }
     }
     
