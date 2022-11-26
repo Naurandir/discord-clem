@@ -20,11 +20,15 @@ public enum PushType {
     }
     
     public static PushType getByValue(String value) {
-            for (PushType type : values()) {
-                if (type.value.equals(value)) {
-                    return type;
-                }
+        for (PushType type : values()) {
+            if (type.value.equals(value)) {
+                return type;
             }
-            throw new IllegalArgumentException("no valid value found for " + value);
         }
+        throw new IllegalArgumentException("no valid value found for " + value);
+    }
+    
+    public String getValue() {
+        return value;
+    }
 }

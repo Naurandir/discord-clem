@@ -19,6 +19,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class UpdatePipelineService {
     
+    // TODO: make notification an entity, save "activationTime" when it should be earliest notified, let the push service get only the one with activationTime <= now time
+    
     private static final String ALERT_TOPIC = "New Alert in Warframe!";
     private static final String ALERT_THUMBNAIL = "https://cutewallpaper.org/21/warframe-desktop-icon/Warframe-Alerts-7.2.1-Download-APK-for-Android-Aptoide.png";
     private static final String ALERT_TEXT =  "*type:* {type}\n"

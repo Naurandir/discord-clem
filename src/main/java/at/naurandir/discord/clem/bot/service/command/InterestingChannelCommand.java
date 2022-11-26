@@ -5,12 +5,18 @@ import at.naurandir.discord.clem.bot.model.enums.PushType;
 import at.naurandir.discord.clem.bot.service.InterestingChannelService;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Member;
+import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.rest.util.Color;
 import discord4j.rest.util.Permission;
 import discord4j.rest.util.PermissionSet;
+import java.time.Instant;
+import java.util.Arrays;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.Streams;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
@@ -34,7 +40,12 @@ public class InterestingChannelCommand implements Command {
 
     @Override
     public String getDescription() {
-        return "";
+        return "Register or Unregister a Channel that Clem should use for Push Events.\n"
+                + "Usage: *<bot-prefix> channel {register|unregister} <type>*.\n"
+                + "Existing Types: {" + Arrays.stream(PushType.values())
+                        .map(type -> type.getValue())
+                        .collect(Collectors.toList()) 
+                + "}";
     }
 
     @Override
@@ -92,11 +103,31 @@ public class InterestingChannelCommand implements Command {
     }
     
     private Mono<Void> handleWrongPermissions(MessageCreateEvent event) {
-        return null; // message with missing permissions
+        EmbedCreateSpec embed = EmbedCreateSpec.builder()
+                .color(Color.RED)
+                .title("Register / Unregister")
+                .description("Registered failed, as the user does not have Admin or Moderator Permissions.")
+                .thumbnail("https://i.imgur.com/Jkq5UIF.png")
+                .timestamp(Instant.now())
+                .build();
+        
+        return event.getMessage().getChannel()
+                .flatMap(ch -> ch.createMessage(embed))
+                .then();
     }
     
     private Mono<Void> handleWrongUsage(MessageCreateEvent event) {
-        return null; // message with wrong usage info
+        EmbedCreateSpec embed = EmbedCreateSpec.builder()
+                .color(Color.RED)
+                .title("Register / Unregister")
+                .description("Registered failed, please use the command as described: `prefix command <register|unregister> <pushType>`")
+                .thumbnail("https://i.imgur.com/Jkq5UIF.png")
+                .timestamp(Instant.now())
+                .build();
+        
+        return event.getMessage().getChannel()
+                .flatMap(ch -> ch.createMessage(embed))
+                .then();
     }
 
     private Mono<Void> handleRegister(MessageCreateEvent event, PushType pushType, Member member) {
@@ -106,7 +137,17 @@ public class InterestingChannelCommand implements Command {
                 member.getDisplayName());
         log.info("handleRegister: created or updated channel [{}]", channel);
         
-        return null; // embed with channel info
+        EmbedCreateSpec embed = EmbedCreateSpec.builder()
+                .color(Color.GREEN)
+                .title("Register")
+                .description("Registered {type} successfully added.".replace("{type}", pushType.toString()))
+                .thumbnail("https://i.imgur.com/Jkq5UIF.png")
+                .timestamp(Instant.now())
+                .build();
+        
+        return event.getMessage().getChannel()
+                .flatMap(ch -> ch.createMessage(embed))
+                .then();
     }
 
     private Mono<Void> handleUnregister(MessageCreateEvent event, PushType pushType) {
@@ -123,7 +164,17 @@ public class InterestingChannelCommand implements Command {
         interestingChannelService.deleteChannel(channel);
         log.info("handleUnregister: channel [{}] deleted", channel);
         
-        return null; // message with unregister worked
+        EmbedCreateSpec embed = EmbedCreateSpec.builder()
+                .color(Color.MEDIUM_SEA_GREEN)
+                .title("Unregister")
+                .description("Unregisterd {type} successfully for this channel.".replace("{type}", pushType.toString()))
+                .thumbnail("https://i.imgur.com/Jkq5UIF.png")
+                .timestamp(Instant.now())
+                .build();
+        
+        return event.getMessage().getChannel()
+                .flatMap(ch -> ch.createMessage(embed))
+                .then();
     }
     
     @Getter
