@@ -32,6 +32,9 @@ public class AlertService extends SyncService {
     @Autowired
     private WarframeClient warframeClient;
     
+    @Autowired
+    private UpdatePipelineService updatePipelineService;
+    
     @Value( "${discord.clem.alert.url}" )
     private String apiUrl;
     
@@ -72,6 +75,8 @@ public class AlertService extends SyncService {
             
             newAlert = alertRepository.save(newAlert);
             log.info("syncAlerts: added new alert [{} - {}]", newAlert.getId(), newAlert.getExternalId());
+            
+            updatePipelineService.addAlertNotify(newAlert);
         }
         
         // inactivate old alerts

@@ -26,7 +26,7 @@ public class LoggingAspect {
         watch.stop();
 
         if (watch.getTotalTimeMillis() > 5_000) {
-            log.warn("logScheduledExecutionTime: took [{}]ms to execute task [{}]", joinPoint);
+            log.warn("logScheduledExecutionTime: took [{}]ms to execute task [{}]", watch.getTotalTimeMillis(), joinPoint);
         }
 
         return proceed;
