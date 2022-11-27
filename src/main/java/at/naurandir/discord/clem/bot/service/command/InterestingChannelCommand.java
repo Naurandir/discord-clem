@@ -42,10 +42,9 @@ public class InterestingChannelCommand implements Command {
     public String getDescription() {
         return "Register or Unregister a Channel that Clem should use for Push Events.\n"
                 + "Usage: *<bot-prefix> channel {register|unregister} <type>*.\n"
-                + "Existing Types: {" + Arrays.stream(PushType.values())
+                + "Existing Types: " + Arrays.stream(PushType.values())
                         .map(type -> type.getValue())
-                        .collect(Collectors.toList()) 
-                + "}";
+                        .collect(Collectors.toList());
     }
 
     @Override

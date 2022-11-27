@@ -82,10 +82,19 @@ public class ItemBuildService extends SyncService {
     @Override
     public void doSync() throws IOException {
         try {
+            log.debug("doSync: start receiving overframe builds");
             OverframeDTO overframe = getCurrentBuilds();
-        
-        syncWarframeBuilds(overframe);
-        syncWeaponBuilds(overframe);
+            log.debug("doSync: received [{}] warframes and [{}] weapons from overframe",
+                    overframe.getWarframes().size(), overframe.getWeapons().size());
+            
+            log.debug("doSync: start saving overframe warframe builds");
+            syncWarframeBuilds(overframe);
+            log.debug("doSync: saved [{}] warframes from overframe",
+                    overframe.getWarframes().size());
+            log.debug("doSync: start saving overframe weapon builds");
+            syncWeaponBuilds(overframe);
+            log.debug("doSync: saved [{}] weapons from overframe",
+                    overframe.getWeapons().size());
         } catch (Exception ex) {
             log.error("sync throwed exception: ", ex);
         }
@@ -104,12 +113,14 @@ public class ItemBuildService extends SyncService {
             
             // update thumbnail if missing
             if (!isEmpty(overframeItem.getPictureUrl()) && isEmpty(weapon.getWikiaThumbnail())) {
+                log.debug("syncWeaponBuilds: updating thumbnail of [{}]", weapon.getName());
                 weaponService.updateWikiThumbnail(weapon, overframeItem.getPictureUrl());
             }
             
             // remove builds
             Set<ItemBuild> oldBuilds = itemBuildRepository.findByWeaponAndEndDateIsNull(weapon);
             if (!oldBuilds.isEmpty()) {
+                log.debug("syncWeaponBuilds: delete old builds of [{}]", weapon.getName());
                 itemBuildRepository.deleteAll(oldBuilds);
             }
             
@@ -120,8 +131,10 @@ public class ItemBuildService extends SyncService {
                 newbuild.setWeapon(weapon);
                 newBuilds.add(newbuild);
             }
+            log.debug("syncWeaponBuilds: saving [{}] new builds of [{}]", newBuilds.size(), weapon.getName());
             itemBuildRepository.saveAll(newBuilds);
         }
+        log.debug("syncWeaponBuilds: saved / updated all [{}] weapons", weaponsDb.size());
     }
     
     private void syncWarframeBuilds(OverframeDTO overframe) {
