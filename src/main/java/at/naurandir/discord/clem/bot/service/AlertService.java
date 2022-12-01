@@ -47,7 +47,7 @@ public class AlertService extends SyncService {
         try {
             doSync();
         } catch (Exception ex) {
-            log.error("sync:_throwed error: ", ex);
+            log.error("sync: throwed error: ", ex);
         }
     }
     
@@ -63,7 +63,7 @@ public class AlertService extends SyncService {
                     .anyMatch(dbAlert -> dbAlert.getExternalId().equals(alert.getId()));
             
             if (isInDatabase) {
-                log.debug("syncAlerts: alert [{}] already exists in database", alert.getId());
+                log.debug("doSync: alert [{}] already exists in database", alert.getId());
                 continue; // nothing to do
             }
             
@@ -74,7 +74,7 @@ public class AlertService extends SyncService {
             }
             
             newAlert = alertRepository.save(newAlert);
-            log.info("syncAlerts: added new alert [{} - {}]", newAlert.getId(), newAlert.getExternalId());
+            log.info("doSync: added new alert [{} - {}]", newAlert.getId(), newAlert.getExternalId());
             
             updatePipelineService.addAlertNotify(newAlert);
         }
@@ -86,7 +86,7 @@ public class AlertService extends SyncService {
                 alert.setEndDate(now);
                 
                 alertRepository.save(alert);
-                log.info("syncAlerts: alert [{}] expired, set end date to now.", alert.getId());
+                log.info("doSync: alert [{}] expired, set end date to now.", alert.getId());
             }
         }
     }

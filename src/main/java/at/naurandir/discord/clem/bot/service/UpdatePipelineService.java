@@ -1,9 +1,9 @@
 package at.naurandir.discord.clem.bot.service;
 
 import at.naurandir.discord.clem.bot.model.alert.Alert;
+import at.naurandir.discord.clem.bot.model.news.News;
 import at.naurandir.discord.clem.bot.model.notify.Notification;
-import at.naurandir.discord.clem.bot.utils.LocalDateTimeUtil;
-import java.time.Duration;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +26,11 @@ public class UpdatePipelineService {
     private static final String ALERT_TEXT =  "*type:* {type}\n"
             + " *enemies:* {enemyType} ({minLevel} - {maxLevel})\n"
             + " *reward:* {reward}\n"
-            + " *expires in:* {days}d {hours}h {minutes}m";
+            + " *expires in:* <t:{timestamp}:R>";
+    
+    private static final String NEWS_TEXT = "*News*\n"
+            + "{message}\n"
+            + "Source: {link}";
     
     private final List<Notification> toNotifyMessages = new ArrayList<>();
     
@@ -50,7 +54,6 @@ public class UpdatePipelineService {
             return; // already finished, nothing to notify
         }
         
-        Duration diffTime = LocalDateTimeUtil.getDiffTime(LocalDateTime.now(), alert.getExpiry());
         Integer minLevel = Objects.requireNonNullElse(alert.getAlertMission().getMinLevelEnemy(), 1);
         Integer maxLevel = Objects.requireNonNullElse(alert.getAlertMission().getMaxLevelEnemy(), 999);
         
@@ -61,12 +64,22 @@ public class UpdatePipelineService {
                           .replace("{enemyType}", alert.getAlertMission().getFaction())
                           .replace("{minLevel}", String.valueOf(minLevel))
                           .replace("{maxLevel}", String.valueOf(maxLevel))
-                          .replace("{days}", String.valueOf(diffTime.toDays()))
-                          .replace("{hours}", String.valueOf(diffTime.toHoursPart()))
-                          .replace("{minutes}", String.valueOf(diffTime.toMinutesPart())), 
+                          .replace("{timestamp}", String.valueOf(Timestamp.valueOf(alert.getExpiry()))), 
                 ALERT_THUMBNAIL);
         
         log.debug("addAlertNotify: generated alert notification [{}]", notification);
+        
+        addNotification(notification);
+    }
+    
+    void addNewsNotify(News news) {
+        Notification notification = new Notification(
+                news.getMessage(), 
+                NEWS_TEXT.replace("{message}", news.getMessage())
+                         .replace("{link}", news.getLink()), 
+                news.getImageLink());
+        
+        log.debug("addNewsNotify: generated news notification [{}]", notification);
         
         addNotification(notification);
     }
