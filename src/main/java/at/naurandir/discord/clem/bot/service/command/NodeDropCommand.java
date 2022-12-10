@@ -16,6 +16,7 @@ import java.util.Objects;
 import java.util.function.Consumer;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
@@ -46,7 +47,7 @@ public class NodeDropCommand implements Command {
     @Override
     public String getDescription() {
         return "Shows all Drops from the Drop Table of a specific Node.\n"
-                + "Usage: *<bot-prefix> node-drop <item>*.";
+                + "Usage: *<bot-prefix> node-drop <node>*.";
     }
 
     @Override
@@ -78,6 +79,10 @@ public class NodeDropCommand implements Command {
         List<Mission> missionsWithNode = new ArrayList<>();
 
         for (Mission mission : allMissions) {
+            if (isEmpty(mission.getNode())) {
+                continue; // special mission without node, not interesting here
+            }
+            
             if (mission.getNode().toLowerCase().contains(node.toLowerCase())) {
                 missionsWithNode.add(mission);
             }
