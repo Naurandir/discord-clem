@@ -33,8 +33,9 @@ public class NodeDropCommand implements Command {
     private static final String DESCRIPTION = "Nodes with given input are shown with all Rewards, if multiple smilar nodes exists note that only first 3 found are shown.\n\n";
     
     private static final String MISSION_MESSAGE = "***{node}***\n";
-    private static final String GENERAL_REWARD_MESSAGE = "*{item}* - {rarity}, {chance}% drop chance\n";
-    private static final String ROTATION_REWARD_MESSAGE = "*{item}* - {rotation}, {rarity}, {chance}% drop chance\n";
+    private static final String GENERAL_REWARD_MESSAGE = "*{item}* - {chance}%\n";
+    private static final String ROTATION_MESSAGE = "\n*{rotation}*\n";
+    private static final String ROTATION_REWARD_MESSAGE = "*{item}* - {chance}%\n";
     
     @Override
     public String getCommandWord() {
@@ -116,32 +117,34 @@ public class NodeDropCommand implements Command {
             for (MissionReward reward : mission.getGeneralRewards()) {
                 rewards.append(GENERAL_REWARD_MESSAGE
                     .replace("{item}", reward.getName())
-                    .replace("{rarity}", reward.getRarity().name())
                     .replace("{chance}", String.valueOf(reward.getChance())));
             }
             
-            for (MissionReward reward : mission.getRotationARewards()) {
-                rewards.append(ROTATION_REWARD_MESSAGE
-                    .replace("{item}", reward.getName())
-                    .replace("{rotation}", "Rotation A")
-                    .replace("{rarity}", reward.getRarity().name())
-                    .replace("{chance}", String.valueOf(reward.getChance())));
+            if (!mission.getRotationARewards().isEmpty()) {
+                rewards.append(ROTATION_MESSAGE.replace("{rotation}", "Rotation A"));
+                for (MissionReward reward : mission.getRotationARewards()) {
+                    rewards.append(ROTATION_REWARD_MESSAGE
+                            .replace("{item}", reward.getName())
+                            .replace("{chance}", String.valueOf(reward.getChance())));
+                }
             }
             
-            for (MissionReward reward : mission.getRotationBRewards()) {
-                rewards.append(ROTATION_REWARD_MESSAGE
-                    .replace("{item}", reward.getName())
-                    .replace("{rotation}", "Rotation B")
-                    .replace("{rarity}", reward.getRarity().name())
-                    .replace("{chance}", String.valueOf(reward.getChance())));
+            if (!mission.getRotationBRewards().isEmpty()) {
+                rewards.append(ROTATION_MESSAGE.replace("{rotation}", "Rotation B"));
+                for (MissionReward reward : mission.getRotationBRewards()) {
+                    rewards.append(ROTATION_REWARD_MESSAGE
+                            .replace("{item}", reward.getName())
+                            .replace("{chance}", String.valueOf(reward.getChance())));
+                }
             }
             
-            for (MissionReward reward : mission.getRotationCRewards()) {
-                rewards.append(ROTATION_REWARD_MESSAGE
-                    .replace("{item}", reward.getName())
-                    .replace("{rotation}", "Rotation C")
-                    .replace("{rarity}", reward.getRarity().name())
-                    .replace("{chance}", String.valueOf(reward.getChance())));
+            if (!mission.getRotationCRewards().isEmpty()) {
+                rewards.append(ROTATION_MESSAGE.replace("{rotation}", "Rotation C"));
+                for (MissionReward reward : mission.getRotationCRewards()) {
+                    rewards.append(ROTATION_REWARD_MESSAGE
+                            .replace("{item}", reward.getName())
+                            .replace("{chance}", String.valueOf(reward.getChance())));
+                }
             }
             
             fields.add(EmbedCreateFields.Field.of(
