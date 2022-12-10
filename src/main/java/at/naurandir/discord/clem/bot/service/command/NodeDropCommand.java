@@ -6,14 +6,11 @@ import at.naurandir.discord.clem.bot.service.MissionService;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.spec.EmbedCreateFields;
 import discord4j.core.spec.EmbedCreateSpec;
-import discord4j.core.spec.legacy.LegacyMessageCreateSpec;
 import discord4j.rest.util.Color;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
-import java.util.function.Consumer;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
@@ -35,7 +32,7 @@ public class NodeDropCommand implements Command {
     private static final String TITLE = "Found Nodes dropping with '{node}'";
     private static final String DESCRIPTION = "Nodes with given input are shown with all Rewards, if multiple smilar nodes exists note that only first 3 found are shown.\n\n";
     
-    private static final String MISSION_MESSAGE = "***{node}*** - {type} {faction} ({minLevelEnemy} - {maxLevelEnemy})\n";
+    private static final String MISSION_MESSAGE = "***{node}***\n";
     private static final String GENERAL_REWARD_MESSAGE = "*{item}* - {rarity}, {chance}% drop chance\n";
     private static final String ROTATION_REWARD_MESSAGE = "*{item}* - {rotation}, {rarity}, {chance}% drop chance\n";
     
@@ -79,11 +76,11 @@ public class NodeDropCommand implements Command {
         List<Mission> missionsWithNode = new ArrayList<>();
 
         for (Mission mission : allMissions) {
-            if (isEmpty(mission.getNode())) {
+            if (isEmpty(mission.getName())) {
                 continue; // special mission without node, not interesting here
             }
             
-            if (mission.getNode().toLowerCase().contains(node.toLowerCase())) {
+            if (mission.getName().toLowerCase().contains(node.toLowerCase())) {
                 missionsWithNode.add(mission);
             }
         }
@@ -147,12 +144,8 @@ public class NodeDropCommand implements Command {
                     .replace("{chance}", String.valueOf(reward.getChance())));
             }
             
-            fields.add(EmbedCreateFields.Field.of(MISSION_MESSAGE
-                    .replace("{node}", mission.getNode())
-                    .replace("{type}", mission.getType())
-                    .replace("{faction}", mission.getFaction())
-                    .replace("minLevelEnemy", String.valueOf(Objects.requireNonNullElseGet(mission.getMinLevelEnemy(), () -> "-")))
-                    .replace("maxLevelEnemy", String.valueOf(Objects.requireNonNullElseGet(mission.getMaxLevelEnemy(), () -> "-"))), 
+            fields.add(EmbedCreateFields.Field.of(
+                    MISSION_MESSAGE.replace("{node}", mission.getName()), 
                     rewards.toString(), 
                     false));
         }
