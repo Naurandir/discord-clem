@@ -12,6 +12,7 @@ import at.naurandir.discord.clem.bot.service.client.dto.overframe.OverframeItemD
 import at.naurandir.discord.clem.bot.service.client.dto.overframe.OverframeItemTierDTO;
 import at.naurandir.discord.clem.bot.service.client.dto.overframe.OverframeItemTierListDTO;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -95,6 +96,9 @@ public class ItemBuildService extends SyncService {
             syncWeaponBuilds(overframe);
             log.debug("doSync: saved [{}] weapons from overframe",
                     overframe.getWeapons().size());
+            
+            removeOldBuilds();
+            log.debug("doSync: finished sync");
         } catch (Exception ex) {
             log.error("sync throwed exception: ", ex);
         }
@@ -115,13 +119,6 @@ public class ItemBuildService extends SyncService {
             if (!isEmpty(overframeItem.getPictureUrl()) && isEmpty(weapon.getWikiaThumbnail())) {
                 log.debug("syncWeaponBuilds: updating thumbnail of [{}]", weapon.getName());
                 weaponService.updateWikiThumbnail(weapon, overframeItem.getPictureUrl());
-            }
-            
-            // remove builds
-            Set<ItemBuild> oldBuilds = itemBuildRepository.findByWeaponAndEndDateIsNull(weapon);
-            if (!oldBuilds.isEmpty()) {
-                log.debug("syncWeaponBuilds: delete old builds of [{}]", weapon.getName());
-                itemBuildRepository.deleteAll(oldBuilds);
             }
             
             // add current builds
@@ -151,12 +148,6 @@ public class ItemBuildService extends SyncService {
             // update thumbnail if missing
             if (!isEmpty(overframeItem.getPictureUrl()) && isEmpty(warframe.getWikiaThumbnail())) {
                 warframeService.updateWikiThumbnail(warframe, overframeItem.getPictureUrl());
-            }
-            
-            // remove builds
-            Set<ItemBuild> oldBuilds = itemBuildRepository.findByWarframeAndEndDateIsNull(warframe);
-            if (!oldBuilds.isEmpty()) {
-                itemBuildRepository.deleteAll(oldBuilds);
             }
             
             // add current builds
@@ -301,6 +292,15 @@ public class ItemBuildService extends SyncService {
         }
 
         return item;
+    }
+    
+    private void removeOldBuilds() {
+        LocalDateTime now = LocalDateTime.now();
+        Set<ItemBuild> oldBuilds = itemBuildRepository.findByModifyDateBefore(now.minusDays(1));
+        oldBuilds.forEach(build -> build.setEndDate(now));
+        
+        itemBuildRepository.saveAll(oldBuilds);
+        log.debug("removeOldBuilds: found [{}] old builds and set end time", oldBuilds.size());
     }
 
     @Override

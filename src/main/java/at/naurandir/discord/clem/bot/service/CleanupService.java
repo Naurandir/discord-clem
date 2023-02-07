@@ -3,8 +3,10 @@ package at.naurandir.discord.clem.bot.service;
 import at.naurandir.discord.clem.bot.model.alert.Alert;
 import at.naurandir.discord.clem.bot.model.channel.InterestingChannel;
 import at.naurandir.discord.clem.bot.model.fissure.VoidFissure;
+import at.naurandir.discord.clem.bot.model.item.ItemBuild;
 import at.naurandir.discord.clem.bot.model.trader.VoidTrader;
 import at.naurandir.discord.clem.bot.repository.AlertRepository;
+import at.naurandir.discord.clem.bot.repository.ItemBuildRepository;
 import at.naurandir.discord.clem.bot.repository.VoidFissureRepository;
 import at.naurandir.discord.clem.bot.repository.VoidTraderItemRepository;
 import at.naurandir.discord.clem.bot.repository.VoidTraderRepository;
@@ -42,12 +44,16 @@ public class CleanupService {
     @Autowired
     private AlertRepository alertRepository;
     
+    @Autowired
+    private ItemBuildRepository itemBuildRepository;
+    
     @Scheduled(cron = "${discord.clem.cleanup}")
     public void cleanup() {
         removeNonExistendStickyPushMessages();
         removeOldAlerts();
         removeOldFissures();
         removeOldVoidTrader();
+        removeOldItemBuilds();
     }
     public void removeNonExistendStickyPushMessages() {
         List<InterestingChannel> channels = interestingChannelService.getAllChannels();
@@ -92,5 +98,12 @@ public class CleanupService {
         List<Alert> alerts = alertRepository.findByEndDateIsNotNull();
         alerts.forEach(alert -> alertRepository.delete(alert));
         log.info("removeOldAlerts: deleted [{}] old fissures.", alerts.size());
+    }
+
+    private void removeOldItemBuilds() {
+        log.info("removeOldItemBuilds: deleting old builds...");
+        List<ItemBuild> builds = itemBuildRepository.findByEndDateIsNotNull();
+        builds.forEach(build -> itemBuildRepository.delete(build));
+        log.info("removeOldItemBuilds: deleted [{}] old builds.", builds.size());
     }
 }
