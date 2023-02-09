@@ -13,6 +13,7 @@ import at.naurandir.discord.clem.bot.repository.VoidTraderRepository;
 import discord4j.common.util.Snowflake;
 import discord4j.rest.http.client.ClientException;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -103,7 +104,9 @@ public class CleanupService {
     private void removeOldItemBuilds() {
         log.info("removeOldItemBuilds: deleting old builds...");
         List<ItemBuild> builds = itemBuildRepository.findByEndDateIsNotNull();
-        builds.forEach(build -> itemBuildRepository.delete(build));
+        List<Long> ids = builds.stream().map(build -> build.getId()).collect(Collectors.toList());
+        itemBuildRepository.deleteAllById(ids);
+        builds.forEach(build -> itemBuildRepository.deleteById(build.getId()));
         log.info("removeOldItemBuilds: deleted [{}] old builds.", builds.size());
     }
 }
