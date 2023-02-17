@@ -66,11 +66,14 @@ public class ChatBotService {
             String prompt = generatePrompt(userMessage, conversation);
             ChatGptRequestDTO body = createRequestBody(prompt);
             ChatGptDTO answerDTO = warframeClient.getDataByPost(url, apiHeaders, body, ChatGptDTO.class);
-            String answer = answerDTO.getChoices().get(0).getText().replace("A: ", "").replace("\n", "");
-            answer = answer.replace("AI: ", "").replace("AI:", "");
+           
+            String answer = answerDTO.getChoices().get(0).getText();
+            answer = answer.replace("AI: ", "").replace("AI:", "")
+                           .replace("A: ", "").replace("A:", "")
+                           .replace("\n", "");
             
             if (answer.contains("?") && answer.indexOf("?") <= 10) {
-                answer = answer.substring(answer.indexOf("?"));
+                answer = answer.substring(answer.indexOf("?") + 1);
             }
             
             addToConversation(answer, ChatMember.AI, conversation);
@@ -103,22 +106,24 @@ public class ChatBotService {
         
         List<ConversationMessage> messagesToHandle = conversation.getMessages().stream()
                     .sorted(Comparator.comparing(ConversationMessage::getStartDate).reversed())
-                    .limit(20L)
+                    .limit(30L)
                     .collect(Collectors.toList());
         
+        int numberOfPrompts = 0;
         for (ConversationMessage conversationMessage : messagesToHandle) {
             String newPrompt = conversationMessage.getGeneratedMessage() + generatedPrompt;
             int newPromptWordCount = StringUtils.countOccurrencesOf(generatedPrompt, " ");
             
             if (newPromptWordCount < maxTokensAllowed) {
                 generatedPrompt = newPrompt;
+                numberOfPrompts++;
             } else {
                 break;
             }
         }
         
         if (log.isDebugEnabled()) {
-            log.debug("generatePrompt: generated prompt without prefix: [{}]", generatedPrompt);
+            log.debug("generatePrompt: generated prompt with [{}] messages without prefix: [{}]", numberOfPrompts, generatedPrompt);
         }
         
         return prefix + generatedPrompt;
@@ -154,10 +159,10 @@ public class ChatBotService {
         }
         
         // remove older messages
-        if (conversation.getMessages().size() > 50) {
+        if (conversation.getMessages().size() > 30) {
             List<ConversationMessage> messagesToKeep = conversation.getMessages().stream()
                     .sorted(Comparator.comparing(ConversationMessage::getStartDate).reversed())
-                    .limit(20L)
+                    .limit(30L)
                     .collect(Collectors.toList());
             conversation.setMessages(messagesToKeep);
         }
