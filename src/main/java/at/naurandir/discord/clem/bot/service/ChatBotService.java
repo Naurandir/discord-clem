@@ -68,7 +68,7 @@ public class ChatBotService {
             ChatGptDTO answerDTO = warframeClient.getDataByPost(url, apiHeaders, body, ChatGptDTO.class);
             String answer = answerDTO.getChoices().get(0).getText().replace("A: ", "").replace("\n", "");
             
-            if (answer.contains("?")) {
+            if (answer.contains("?") && answer.indexOf("?") <= 10) {
                 answer = answer.substring(answer.indexOf("?"));
             }
             
