@@ -68,6 +68,14 @@ public class ChatBotService {
             ChatGptDTO answerDTO = warframeClient.getDataByPost(url, apiHeaders, body, ChatGptDTO.class);
             String answer = answerDTO.getChoices().get(0).getText().replace("A: ", "").replace("\n", "");
             
+            if (answer.contains("?")) {
+                answer = answer.substring(answer.indexOf("?"));
+            }
+            
+            if (answer.startsWith("AI: ")) {
+                answer = answer.replace("AI: ", "");
+            }
+            
             addToConversation(answer, ChatMember.AI, conversation);
             saveConversation(conversation);
             
