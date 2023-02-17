@@ -64,7 +64,7 @@ public class ChatBotService {
             String prompt = generatePrompt(userMessage, conversation);
             ChatGptRequestDTO body = createRequestBody(prompt);
             ChatGptDTO answerDTO = warframeClient.getDataByPost(url, apiHeaders, body, ChatGptDTO.class);
-            String answer = answerDTO.getChoices().get(0).getText().replace("A: ", "");
+            String answer = answerDTO.getChoices().get(0).getText().replace("A: ", "").replace("\n", "");
             
             addToConversation(answer, ChatMember.AI, conversation);
             saveConversation(conversation);

@@ -39,7 +39,7 @@ public class ChatBotCommand implements Command {
     public Mono<Void> handle(MessageCreateEvent event) {
         String message = getMessage(event.getMessage().getContent());
         
-        if (message.length() < 5) {
+        if (message.length() < 2) {
             return event.getMessage().getChannel()
                 .flatMap(channel -> channel.createMessage("The given input [" + message + "] is too short. Please provide a longer text for the chat."))
                 .then();
