@@ -29,7 +29,7 @@ public class ConversationMessage extends DbEntity {
     @JoinColumn(name="conversation_id")
     private Conversation conversation;
     
-    @Column(length = 400, nullable = false)
+    @Column(length = 1200, nullable = false)
     private String message;
     
     @Enumerated(EnumType.STRING)

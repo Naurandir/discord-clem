@@ -38,7 +38,8 @@ public class Conversation extends DbEntity {
     }
     
     public void addMessage(String message, ChatMember chatMember) {
-        ConversationMessage conversationMessage = new ConversationMessage(this, message, chatMember);
+        String dbMessage = message.substring(0, Math.min(message.length(), 1200));
+        ConversationMessage conversationMessage = new ConversationMessage(this, dbMessage, chatMember);
         conversationMessage.setStartDate(LocalDateTime.now());
         conversationMessage.setModifyDate(conversationMessage.getStartDate());
         

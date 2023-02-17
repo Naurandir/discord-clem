@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import javax.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -56,6 +57,7 @@ public class ChatBotService {
     
     private final WarframeClient warframeClient = new WarframeClient();
     
+    @Transactional
     public String chat(String userMessage, Optional<User> user) {
         try {
             Conversation conversation = loadConversation(user);
