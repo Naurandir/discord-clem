@@ -3,14 +3,18 @@ package at.naurandir.discord.clem.bot.service.command;
 import at.naurandir.discord.clem.bot.service.ChatBotService;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import java.util.Arrays;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 /**
  *
  * @author Naurandir
  */
+@Slf4j
+@Component
 public class ChatBotCommand implements Command {
     
     @Autowired

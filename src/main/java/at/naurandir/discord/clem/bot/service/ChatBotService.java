@@ -32,11 +32,14 @@ public class ChatBotService {
     @Value("${discord.clem.chat.temperature}")
     private Double temperature;
     
+    @Value("${discord.clem.chat.prompt.prefix}")
+    private String prefix;
+    
     private final WarframeClient warframeClient = new WarframeClient();
     
     public String chat(String message) {
         try {
-            ChatGptRequestDTO body = createRequestBody(message);
+            ChatGptRequestDTO body = createRequestBody(prefix + message);
             ChatGptDTO answer = warframeClient.getDataByPost(url, apiHeaders, body, ChatGptDTO.class);
             return answer.getChoices().get(0).getText();
         } catch (IOException ex) {
