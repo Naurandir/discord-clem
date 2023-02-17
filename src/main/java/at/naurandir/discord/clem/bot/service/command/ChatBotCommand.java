@@ -45,7 +45,7 @@ public class ChatBotCommand implements Command {
                 .then();
         }
         
-        String response = chatBotService.chat(message, event.getMember());
+        String response = chatBotService.chat(message, event.getMessage().getAuthor());
         
         return event.getMessage().getChannel()
                 .flatMap(channel -> channel.createMessage(response))

@@ -8,6 +8,7 @@ import at.naurandir.discord.clem.bot.service.client.WarframeClient;
 import at.naurandir.discord.clem.bot.service.client.dto.chat.ChatGptDTO;
 import at.naurandir.discord.clem.bot.service.client.dto.chat.ChatGptRequestDTO;
 import discord4j.core.object.entity.Member;
+import discord4j.core.object.entity.User;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -55,7 +56,7 @@ public class ChatBotService {
     
     private final WarframeClient warframeClient = new WarframeClient();
     
-    public String chat(String userMessage, Optional<Member> user) {
+    public String chat(String userMessage, Optional<User> user) {
         try {
             Conversation conversation = loadConversation(user);
             addToConversation(userMessage, ChatMember.HUMAN, conversation);
@@ -116,13 +117,13 @@ public class ChatBotService {
         return prefix + generatedPrompt;
     }
     
-    private Conversation loadConversation(Optional<Member> user) {
+    private Conversation loadConversation(Optional<User> user) {
         if (user.isEmpty()) {
             log.warn("loadConversation: no user found in request, cannot load conversation");
             return null;
         }
         
-        Long userId = user.get().getMemberData().user().id().asLong();
+        Long userId = user.get().getId().asLong();
         Optional<Conversation> conversation = conversationRepository.findByUserIdAndEndDateIsNull(userId);
         if (conversation.isEmpty()) {
             Conversation conv = new Conversation(userId);
