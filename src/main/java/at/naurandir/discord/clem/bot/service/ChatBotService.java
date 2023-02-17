@@ -67,7 +67,7 @@ public class ChatBotService {
             ChatGptRequestDTO body = createRequestBody(prompt);
             ChatGptDTO answerDTO = warframeClient.getDataByPost(url, apiHeaders, body, ChatGptDTO.class);
             String answer = answerDTO.getChoices().get(0).getText().replace("A: ", "").replace("\n", "");
-            answer = answer.replace("AI: ", "");
+            answer = answer.replace("AI: ", "").replace("AI:", "");
             
             if (answer.contains("?") && answer.indexOf("?") <= 10) {
                 answer = answer.substring(answer.indexOf("?"));
@@ -154,7 +154,7 @@ public class ChatBotService {
         }
         
         // remove older messages
-        if (conversation.getMessages().size() > 20) {
+        if (conversation.getMessages().size() > 50) {
             List<ConversationMessage> messagesToKeep = conversation.getMessages().stream()
                     .sorted(Comparator.comparing(ConversationMessage::getStartDate).reversed())
                     .limit(20L)
