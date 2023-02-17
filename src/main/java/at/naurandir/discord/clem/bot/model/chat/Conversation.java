@@ -29,7 +29,7 @@ public class Conversation extends DbEntity {
     @Column
     private Long userId;
     
-    @OneToMany(mappedBy="message", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy="conversation", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<ConversationMessage> messages;
 
     public Conversation(Long userId) {
