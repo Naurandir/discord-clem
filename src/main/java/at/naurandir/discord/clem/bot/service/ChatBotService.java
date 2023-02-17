@@ -26,8 +26,11 @@ public class ChatBotService {
     @Value("${discord.clem.chat.model}")
     private String model;
     
-    @Value("${discord.clem.chat.max-tokens}")
-    private Integer maxTokens;
+    @Value("${discord.clem.chat.tokens.response}")
+    private Integer tokensRepsonse;
+    
+    @Value("${discord.clem.chat.tokens.total}")
+    private Integer tokensTotal;
     
     @Value("${discord.clem.chat.temperature}")
     private Double temperature;
@@ -39,7 +42,12 @@ public class ChatBotService {
     
     public String chat(String message) {
         try {
-            ChatGptRequestDTO body = createRequestBody(prefix + message);
+            String finalMessage = prefix + message;
+            Integer numberOfTokens = finalMessage.split(" ").length;
+            log.debug("chat: having [{}] tokens used, [{}] tokens left for message", 
+                    numberOfTokens, tokensTotal-tokensRepsonse-numberOfTokens);
+            
+            ChatGptRequestDTO body = createRequestBody(finalMessage);
             ChatGptDTO answer = warframeClient.getDataByPost(url, apiHeaders, body, ChatGptDTO.class);
             return answer.getChoices().get(0).getText();
         } catch (IOException ex) {
@@ -53,7 +61,7 @@ public class ChatBotService {
         return ChatGptRequestDTO.builder()
                 .model(model)
                 .prompt(message)
-                .maxTokens(maxTokens)
+                .maxTokens(tokensRepsonse)
                 .temperature(temperature)
                 .build();
     }

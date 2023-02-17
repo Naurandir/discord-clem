@@ -2,6 +2,7 @@ package at.naurandir.discord.clem.bot.service.command;
 
 import at.naurandir.discord.clem.bot.service.ChatBotService;
 import discord4j.core.event.domain.message.MessageCreateEvent;
+import discord4j.core.spec.MessageCreateSpec;
 import java.util.Arrays;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -28,9 +29,8 @@ public class ChatBotCommand implements Command {
     @Override
     public String getDescription() {
                 return "Ask the Bot something Warframe related.\n"
-                + "Note This Version currently does not 'remember' a conversation what means you cannot use context here for older questions. \n"
-                + "Note also that this Version does not convert the Bots formatting into according discord formatting and maybe look weird.\n"
-                + "Also depending on the current Load of the ChatBot the answer can take a bit time. The Bot is using ChatGPT currently.\n"
+                + "Note This Version currently does ***not remember*** a conversation.\n"
+                + "As ChatGPT can be under high load the answer sometimes take longer.\n"
                 + "Usage: *<bot-prefix> chat <your question to the bot>*.\n"
                 + "Example: *!clem chat What do you know about Warframe?*\n";
     }
