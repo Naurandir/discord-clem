@@ -1,13 +1,25 @@
 package at.naurandir.discord.clem.bot.service;
 
+import at.naurandir.discord.clem.bot.model.chat.Conversation;
+import at.naurandir.discord.clem.bot.model.chat.ConversationMessage;
+import at.naurandir.discord.clem.bot.model.chat.ConversationMessage.ChatMember;
+import at.naurandir.discord.clem.bot.repository.ConversationRepository;
 import at.naurandir.discord.clem.bot.service.client.WarframeClient;
 import at.naurandir.discord.clem.bot.service.client.dto.chat.ChatGptDTO;
 import at.naurandir.discord.clem.bot.service.client.dto.chat.ChatGptRequestDTO;
+import discord4j.core.object.entity.Member;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 /**
  *
@@ -38,18 +50,25 @@ public class ChatBotService {
     @Value("${discord.clem.chat.prompt.prefix}")
     private String prefix;
     
+    @Autowired
+    private ConversationRepository conversationRepository;
+    
     private final WarframeClient warframeClient = new WarframeClient();
     
-    public String chat(String message) {
+    public String chat(String userMessage, Optional<Member> user) {
         try {
-            String finalMessage = prefix + message;
-            Integer numberOfTokens = finalMessage.split(" ").length;
-            log.debug("chat: having [{}] tokens used, [{}] tokens left for message", 
-                    numberOfTokens, tokensTotal-tokensRepsonse-numberOfTokens);
+            Conversation conversation = loadConversation(user);
+            addToConversation(userMessage, ChatMember.HUMAN, conversation);
             
-            ChatGptRequestDTO body = createRequestBody(finalMessage);
-            ChatGptDTO answer = warframeClient.getDataByPost(url, apiHeaders, body, ChatGptDTO.class);
-            return answer.getChoices().get(0).getText();
+            String prompt = generatePrompt(userMessage, conversation);
+            ChatGptRequestDTO body = createRequestBody(prompt);
+            ChatGptDTO answerDTO = warframeClient.getDataByPost(url, apiHeaders, body, ChatGptDTO.class);
+            String answer = answerDTO.getChoices().get(0).getText();
+            
+            addToConversation(answer, ChatMember.AI, conversation);
+            saveConversation(conversation);
+            
+            return answer;
         } catch (IOException ex) {
             log.error("chat: could not receive a valid answer from chat bot: ", ex);
             return "I am sorry, something went wrong with calling the chatbot with your request, maybe try later again.\n" +
@@ -64,5 +83,77 @@ public class ChatBotService {
                 .maxTokens(tokensRepsonse)
                 .temperature(temperature)
                 .build();
+    }
+    
+    private String generatePrompt(String userMessage, Conversation conversation) {
+        if (conversation == null) {
+            return prefix + userMessage;
+        }
+        
+        int maxTokensAllowed = tokensTotal - tokensRepsonse - StringUtils.countOccurrencesOf(prefix, " ");        
+        String generatedPrompt = "H: " + userMessage;
+        
+        List<ConversationMessage> messagesToHandle = conversation.getMessages().stream()
+                    .sorted(Comparator.comparing(ConversationMessage::getStartDate).reversed())
+                    .limit(20L)
+                    .collect(Collectors.toList());
+        
+        for (ConversationMessage conversationMessage : messagesToHandle) {
+            String newPrompt = conversationMessage.getGeneratedMessage() + generatedPrompt;
+            int newPromptWordCount = StringUtils.countOccurrencesOf(generatedPrompt, " ");
+            
+            if (newPromptWordCount < maxTokensAllowed) {
+                generatedPrompt = newPrompt;
+            } else {
+                break;
+            }
+        }
+        
+        if (log.isDebugEnabled()) {
+            log.debug("generatePrompt: generated prompt without prefix: [{}]", generatedPrompt);
+        }
+        
+        return prefix + generatedPrompt;
+    }
+    
+    private Conversation loadConversation(Optional<Member> user) {
+        if (user.isEmpty()) {
+            log.warn("loadConversation: no user found in request, cannot load conversation");
+            return null;
+        }
+        
+        Long userId = user.get().getMemberData().user().id().asLong();
+        Optional<Conversation> conversation = conversationRepository.findByUserIdAndEndDateIsNull(userId);
+        if (conversation.isEmpty()) {
+            Conversation conv = new Conversation(userId);
+            return conversationRepository.save(conv);
+        }
+        return conversation.get();
+    }
+    
+    private void addToConversation(String message, ChatMember member, Conversation conversation) {
+        if (conversation == null) {
+            log.warn("addToConversation: no conversation found to save the request [{}], skipping", message);
+            return;
+        }
+        conversation.addMessage(message, member);
+    }
+
+    private void saveConversation(Conversation conversation) {
+        if (conversation == null) {
+            log.warn("saveConversation: no conversation found to save, skipping");
+            return;
+        }
+        
+        // remove older messages
+        if (conversation.getMessages().size() > 20) {
+            List<ConversationMessage> messagesToKeep = conversation.getMessages().stream()
+                    .sorted(Comparator.comparing(ConversationMessage::getStartDate).reversed())
+                    .limit(20L)
+                    .collect(Collectors.toList());
+            conversation.setMessages(messagesToKeep);
+        }
+        
+        conversationRepository.save(conversation);
     }
 }

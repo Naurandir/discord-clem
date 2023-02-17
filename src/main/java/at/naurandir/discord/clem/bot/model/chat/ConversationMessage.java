@@ -8,13 +8,17 @@ import javax.persistence.Enumerated;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
  *
  * @author Naurandir
  */
+@NoArgsConstructor
+@AllArgsConstructor
 @Getter
 @Setter
 @Entity
@@ -29,9 +33,13 @@ public class ConversationMessage extends DbEntity {
     private String message;
     
     @Enumerated(EnumType.STRING)
-    private ChatSender chatSender;
+    private ChatMember chatMember;
     
-    public enum ChatSender {
+    public String getGeneratedMessage() {
+        return chatMember == ChatMember.HUMAN ? "H: " + message : "AI: " + message;
+    }
+    
+    public enum ChatMember {
         HUMAN, AI;
     }
 }
