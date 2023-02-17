@@ -4,16 +4,21 @@ import at.naurandir.discord.clem.bot.model.alert.Alert;
 import at.naurandir.discord.clem.bot.model.channel.InterestingChannel;
 import at.naurandir.discord.clem.bot.model.fissure.VoidFissure;
 import at.naurandir.discord.clem.bot.model.item.ItemBuild;
+import at.naurandir.discord.clem.bot.model.item.Warframe;
+import at.naurandir.discord.clem.bot.model.item.Weapon;
 import at.naurandir.discord.clem.bot.model.trader.VoidTrader;
 import at.naurandir.discord.clem.bot.repository.AlertRepository;
 import at.naurandir.discord.clem.bot.repository.ItemBuildRepository;
 import at.naurandir.discord.clem.bot.repository.VoidFissureRepository;
 import at.naurandir.discord.clem.bot.repository.VoidTraderItemRepository;
 import at.naurandir.discord.clem.bot.repository.VoidTraderRepository;
+import at.naurandir.discord.clem.bot.repository.WarframeRepository;
+import at.naurandir.discord.clem.bot.repository.WeaponRepository;
 import discord4j.common.util.Snowflake;
 import discord4j.rest.http.client.ClientException;
 import java.util.List;
 import java.util.stream.Collectors;
+import javax.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -48,6 +53,13 @@ public class CleanupService {
     @Autowired
     private ItemBuildRepository itemBuildRepository;
     
+    @Autowired
+    private WeaponRepository weaponRepository;
+    
+    @Autowired
+    private WarframeRepository warframeRepository;
+    
+    @Transactional
     @Scheduled(cron = "${discord.clem.cleanup}")
     public void cleanup() {
         removeNonExistendStickyPushMessages();
@@ -103,10 +115,31 @@ public class CleanupService {
 
     private void removeOldItemBuilds() {
         log.info("removeOldItemBuilds: deleting old builds...");
-        List<ItemBuild> builds = itemBuildRepository.findByEndDateIsNotNull();
-        List<Long> ids = builds.stream().map(build -> build.getId()).collect(Collectors.toList());
-        itemBuildRepository.deleteAllById(ids);
-        builds.forEach(build -> itemBuildRepository.deleteById(build.getId()));
-        log.info("removeOldItemBuilds: deleted [{}] old builds.", builds.size());
+        List<Warframe> warframes = warframeRepository.findByEndDateIsNull();
+        List<Weapon> weapons = weaponRepository.findByEndDateIsNull();
+        
+        List<ItemBuild> oldItemBuilds = warframes.stream()
+                .flatMap(warframe -> warframe.getBuilds().stream())
+                .filter(build -> build.getEndDate() != null)
+                .collect(Collectors.toList());
+        oldItemBuilds.addAll(weapons.stream()
+                .flatMap(weapon -> weapon.getBuilds().stream())
+                .filter(build -> build.getEndDate() != null)
+                .collect(Collectors.toList()));
+                
+        warframes.forEach(warframe -> warframe.setBuilds(
+                warframe.getBuilds().stream()
+                        .filter(build -> build.getEndDate() == null)
+                        .collect(Collectors.toSet())));
+        warframeRepository.saveAll(warframes);
+        
+        weapons.forEach(weapon -> weapon.setBuilds(
+                weapon.getBuilds().stream()
+                        .filter(build -> build.getEndDate() == null)
+                        .collect(Collectors.toSet())));
+        weaponRepository.saveAll(weapons);
+        
+        itemBuildRepository.deleteAll(oldItemBuilds);
+        log.info("removeOldItemBuilds: deleted [{}] old builds.", oldItemBuilds.size());
     }
 }
