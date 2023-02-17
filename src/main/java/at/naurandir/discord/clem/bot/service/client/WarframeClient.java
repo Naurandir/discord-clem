@@ -10,6 +10,8 @@ import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
@@ -64,6 +66,32 @@ public class WarframeClient {
                 
                 watch.stop();
                 log.debug("getData: needed [{}]ms for getting [{}]", watch.getTotalTimeMillis(), clazz);
+                
+                return gson.fromJson(jsonString, clazz);
+            }
+        }
+    }
+    
+    public <T, R> T getDataByPost(String url, Map<String, String> headers, R body, Class<T> clazz) throws IOException {
+        try (CloseableHttpClient httpClient = getClient()) {
+            HttpPost httpPost = new HttpPost(url);
+            for (Map.Entry<String, String> header : headers.entrySet()) {
+                httpPost.addHeader(header.getKey(), header.getValue());
+            }
+            
+            String stringBody = gson.toJson(body);
+            StringEntity entity = new StringEntity(stringBody);
+            httpPost.setEntity(entity);
+            
+            StopWatch watch = new StopWatch();
+            watch.start();
+            
+            try (CloseableHttpResponse response = httpClient.execute(httpPost)) {
+                log.info("getDataByPost: received http status [{}] for url [{}]", response.getStatusLine(), url);
+                String jsonString = getHttpContent(response);
+                
+                watch.stop();
+                log.debug("getDataByPost: needed [{}]ms for getting [{}]", watch.getTotalTimeMillis(), clazz);
                 
                 return gson.fromJson(jsonString, clazz);
             }

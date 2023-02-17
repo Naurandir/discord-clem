@@ -85,7 +85,7 @@ public class RelicDropCommand implements Command {
     }
     
     private String getItem(String content) {
-        String[] splitted = content.split(" "); // 'prefix prime-farm <item>'
+        String[] splitted = content.split(" "); // 'prefix relic-drop <item>'
         String[] words = Arrays.copyOfRange(splitted, 2, splitted.length);
         return StringUtils.join(words, " ").trim();
     }
