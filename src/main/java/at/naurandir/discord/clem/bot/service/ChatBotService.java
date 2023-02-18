@@ -7,10 +7,8 @@ import at.naurandir.discord.clem.bot.repository.ConversationRepository;
 import at.naurandir.discord.clem.bot.service.client.WarframeClient;
 import at.naurandir.discord.clem.bot.service.client.dto.chat.ChatGptDTO;
 import at.naurandir.discord.clem.bot.service.client.dto.chat.ChatGptRequestDTO;
-import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.User;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -94,7 +92,8 @@ public class ChatBotService {
             return ; // no conversation to clear
         }
         
-        conversation.setMessages(new ArrayList<>());
+        List<ConversationMessage> messages = List.copyOf(conversation.getMessages());
+        messages.forEach(message -> conversation.getMessages().remove(message));
         saveConversation(conversation);
     }
 
