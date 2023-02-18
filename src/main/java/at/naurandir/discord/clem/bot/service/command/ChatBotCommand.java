@@ -1,8 +1,12 @@
 package at.naurandir.discord.clem.bot.service.command;
 
 import at.naurandir.discord.clem.bot.service.ChatBotService;
+import discord4j.common.util.Snowflake;
 import discord4j.core.event.domain.message.MessageCreateEvent;
+import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.channel.MessageChannel;
 import discord4j.core.spec.MessageCreateSpec;
+import discord4j.core.spec.MessageEditSpec;
 import java.util.Arrays;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -53,10 +57,13 @@ public class ChatBotCommand implements Command {
                 .then();
         }
         
+        MessageChannel channel = event.getMessage().getChannel().block();
+        Message processingMessage = channel.createMessage(":knot: processing...").block();
+        
         String response = chatBotService.chat(message, event.getMessage().getAuthor());
         
-        return event.getMessage().getChannel()
-                .flatMap(channel -> channel.createMessage(response))
+        return processingMessage
+                .edit(MessageEditSpec.builder().contentOrNull(response).build())
                 .then();
     }
 
