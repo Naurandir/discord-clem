@@ -86,15 +86,13 @@ public class ChatBotService {
     }
     
     @Transactional
-    public void clearConversation(Optional<User> user) {
+    public void deleteConversation(Optional<User> user) {
         Conversation conversation = loadConversation(user);
         if (conversation == null) {
             return ; // no conversation to clear
         }
         
-        List<ConversationMessage> messages = List.copyOf(conversation.getMessages());
-        messages.forEach(message -> conversation.getMessages().remove(message));
-        saveConversation(conversation);
+        conversationRepository.delete(conversation);
     }
 
     private ChatGptRequestDTO createRequestBody(String message) {

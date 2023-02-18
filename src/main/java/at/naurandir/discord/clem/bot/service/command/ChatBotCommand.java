@@ -47,7 +47,7 @@ public class ChatBotCommand implements Command {
         }
         
         if (message.equals("clear")) {
-            chatBotService.clearConversation(event.getMessage().getAuthor());
+            chatBotService.deleteConversation(event.getMessage().getAuthor());
             return event.getMessage().getChannel()
                 .flatMap(channel -> channel.createMessage("The conversation with you has been cleared. I wont remember anything and we can start with a new conversation."))
                 .then();
