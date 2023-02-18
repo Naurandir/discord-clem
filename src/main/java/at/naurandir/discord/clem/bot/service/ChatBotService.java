@@ -50,6 +50,9 @@ public class ChatBotService {
     @Value("${discord.clem.chat.prompt.prefix}")
     private String prefix;
     
+    private final List<String> toReplaceAnswerParts = List.of(
+            "AI: ", "AI:", "A: ", "A:", "A ", "AI ");
+    
     @Autowired
     private ConversationRepository conversationRepository;
     
@@ -71,12 +74,14 @@ public class ChatBotService {
             }
            
             String answer = answerDTO.getChoices().get(0).getText();
-            answer = answer.replace("AI: ", "").replace("AI:", "")
-                           .replace("A: ", "").replace("A:", "")
-                           .replace("\n", "");
-            
             if (answer.contains("?") && answer.indexOf("?") <= 10) {
                 answer = answer.substring(answer.indexOf("?") + 1);
+            }
+            
+            for (String toReplace : toReplaceAnswerParts) {
+                if (answer.startsWith(toReplace)) {
+                    answer = answer.replace(toReplace, "");
+                }
             }
             
             addToConversation(answer, ChatMember.AI, conversation);
