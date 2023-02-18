@@ -18,6 +18,7 @@ import javax.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -49,7 +50,6 @@ public class BotService {
         TimeZone.setDefault(TimeZone.getTimeZone("GMT"));// set time zone UTC
         
         initBot();
-        initPushes();
     }
     
     private void initBot() {
@@ -61,9 +61,6 @@ public class BotService {
         
         client.on(MessageCreateEvent.class, this::handleMessage).subscribe();
         client.on(MessageDeleteEvent.class, this::handleMessage).subscribe();
-    }
-    
-    private void initPushes() {
         pushes.forEach(push -> push.init(client));
     }
     
@@ -72,6 +69,14 @@ public class BotService {
         log.info("destroy: destroying bot...");
         client.logout();
         log.info("destroy: destroying bot done");
+    }
+    
+    @Scheduled(cron = "${discord.clem.bot.cron}")
+    public void refresh() {
+        log.info("refresh: refresh bot...");
+        client.logout();
+        initBot();
+        log.info("refresh: refresh bot done");
     }
     
     private Mono<Void> handleMessage(MessageCreateEvent event) {
