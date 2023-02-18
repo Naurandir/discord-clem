@@ -64,6 +64,11 @@ public class ChatBotService {
             String prompt = generatePrompt(userMessage, conversation);
             ChatGptRequestDTO body = createRequestBody(prompt);
             ChatGptDTO answerDTO = warframeClient.getDataByPost(url, apiHeaders, body, ChatGptDTO.class);
+            
+            if (answerDTO == null || answerDTO.getChoices().isEmpty()) {
+                log.error("chat: did not receive a valid answer, answer was: [{}]", answerDTO);
+                throw new IOException("It seems that a problem occured and the chatbot did not respond with a valid answer.");
+            }
            
             String answer = answerDTO.getChoices().get(0).getText();
             answer = answer.replace("AI: ", "").replace("AI:", "")
@@ -80,7 +85,7 @@ public class ChatBotService {
             return answer;
         } catch (IOException ex) {
             log.error("chat: could not receive a valid answer from chat bot: ", ex);
-            return "I am sorry, something went wrong with calling the chatbot with your request, maybe try later again.\n" +
+            return "I am sorry, something went wrong with calling the chatbot with your request, maybe try later again or clear your conversation.\n" +
                     "The error was: " + ex.getMessage();
         }
     }
