@@ -94,7 +94,7 @@ public class ChatBotService {
             return ; // no conversation to clear
         }
         
-        conversation.getMessages().clear();
+        conversation.setMessages(new ArrayList<>());
         saveConversation(conversation);
     }
 
