@@ -65,7 +65,7 @@ public class ChatBotService {
             ChatGptRequestDTO body = createRequestBody(prompt);
             ChatGptDTO answerDTO = warframeClient.getDataByPost(url, apiHeaders, body, ChatGptDTO.class);
             
-            if (answerDTO == null || answerDTO.getChoices().isEmpty()) {
+            if (answerDTO == null || answerDTO.getChoices() == null || answerDTO.getChoices().isEmpty()) {
                 log.error("chat: did not receive a valid answer, answer was: [{}]", answerDTO);
                 throw new IOException("It seems that a problem occured and the chatbot did not respond with a valid answer.");
             }
