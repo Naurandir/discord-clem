@@ -29,10 +29,11 @@ public class ChatBotCommand implements Command {
     @Override
     public String getDescription() {
                 return "Ask the Bot something Warframe related.\n"
-                + "Note This Version currently does ***not remember*** a conversation.\n"
+                + "Note this version ***remembers*** the context of a conversation for around 20 questions.\n"
                 + "As ChatGPT can be under high load the answer sometimes take longer.\n"
                 + "Usage: *<bot-prefix> chat <your question to the bot>*.\n"
-                + "Example: *!clem chat What do you know about Warframe?*\n";
+                + "Example: *!clem chat What do you know about Warframe?*\n"
+                + "To clear a user conversation use *!clem chat clear*";
     }
 
     @Override
@@ -41,14 +42,21 @@ public class ChatBotCommand implements Command {
         
         if (message.length() < 2) {
             return event.getMessage().getChannel()
-                .flatMap(channel -> channel.createMessage("The given input [" + message + "] is too short. Please provide a longer text for the chat."))
+                .map(channel -> channel.createMessage("The given input [" + message + "] is too short. Please provide a longer text for the chat."))
+                .then();
+        }
+        
+        if (message.equals("clear")) {
+            chatBotService.clearConversation(event.getMessage().getAuthor());
+            return event.getMessage().getChannel()
+                .map(channel -> channel.createMessage("The conversation with you has been cleared. I wont remember anything and we can start with a new conversation."))
                 .then();
         }
         
         String response = chatBotService.chat(message, event.getMessage().getAuthor());
         
         return event.getMessage().getChannel()
-                .flatMap(channel -> channel.createMessage(response))
+                .map(channel -> channel.createMessage(response))
                 .then();
     }
 

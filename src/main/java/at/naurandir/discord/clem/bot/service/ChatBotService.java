@@ -86,6 +86,17 @@ public class ChatBotService {
                     "The error was: " + ex.getMessage();
         }
     }
+    
+    @Transactional
+    public void clearConversation(Optional<User> user) {
+        Conversation conversation = loadConversation(user);
+        if (conversation == null) {
+            return ; // no conversation to clear
+        }
+        
+        conversation.getMessages().clear();
+        saveConversation(conversation);
+    }
 
     private ChatGptRequestDTO createRequestBody(String message) {
         return ChatGptRequestDTO.builder()
