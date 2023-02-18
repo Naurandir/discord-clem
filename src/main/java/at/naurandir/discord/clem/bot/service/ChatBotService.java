@@ -91,7 +91,7 @@ public class ChatBotService {
         if (conversation == null) {
             return ; // no conversation to clear
         }
-        
+        log.debug("deleteConversation: deleting conversation [{}]", conversation.getId());
         conversationRepository.delete(conversation);
     }
 

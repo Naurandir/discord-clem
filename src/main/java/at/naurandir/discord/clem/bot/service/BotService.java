@@ -71,14 +71,6 @@ public class BotService {
         log.info("destroy: destroying bot done");
     }
     
-    @Scheduled(cron = "${discord.clem.bot.cron}")
-    public void refresh() {
-        log.info("refresh: refresh bot...");
-        client.logout();
-        initBot();
-        log.info("refresh: refresh bot done");
-    }
-    
     private Mono<Void> handleMessage(MessageCreateEvent event) {
         if (log.isDebugEnabled()) {
             log.debug("handleMessage: received message create event [{} - {}]", 
