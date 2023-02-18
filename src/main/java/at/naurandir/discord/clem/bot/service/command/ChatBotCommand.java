@@ -42,21 +42,21 @@ public class ChatBotCommand implements Command {
         
         if (message.length() < 2) {
             return event.getMessage().getChannel()
-                .map(channel -> channel.createMessage("The given input [" + message + "] is too short. Please provide a longer text for the chat."))
+                .flatMap(channel -> channel.createMessage("The given input [" + message + "] is too short. Please provide a longer text for the chat."))
                 .then();
         }
         
         if (message.equals("clear")) {
             chatBotService.clearConversation(event.getMessage().getAuthor());
             return event.getMessage().getChannel()
-                .map(channel -> channel.createMessage("The conversation with you has been cleared. I wont remember anything and we can start with a new conversation."))
+                .flatMap(channel -> channel.createMessage("The conversation with you has been cleared. I wont remember anything and we can start with a new conversation."))
                 .then();
         }
         
         String response = chatBotService.chat(message, event.getMessage().getAuthor());
         
         return event.getMessage().getChannel()
-                .map(channel -> channel.createMessage(response))
+                .flatMap(channel -> channel.createMessage(response))
                 .then();
     }
 
