@@ -33,11 +33,11 @@ public class ChatBotCommand implements Command {
     @Override
     public String getDescription() {
                 return "Ask the Bot something Warframe related.\n"
-                + "Note this version ***remembers*** the context of a conversation for around 15 questions.\n"
-                + "Usage: *<bot-prefix> chat <your question to the bot>*.\n"
-                + "Example: *!clem chat What do you know about Warframe?*\n"
-                + "- To clear a user conversation use *!clem chat clear*\n"
-                + "- To talk offtopic use *!clem chat offtopic <your question to the bot>*";
+                + "Note this version ***remembers*** (max 15 questions).\n"
+                + "Usage: *<bot-prefix> chat <question>*.\n"
+                + "Example: *!clem chat What is Warframe?*\n"
+                + "To clear a user conversation use *!clem chat clear*\n"
+                + "To talk offtopic use *!clem chat offtopic <question>*";
     }
 
     @Override

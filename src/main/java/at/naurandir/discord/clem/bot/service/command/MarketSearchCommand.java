@@ -45,7 +45,7 @@ public class MarketSearchCommand implements Command {
     @Override
     public String getDescription() {
         return "Shows current prices of an item on the warframe market.\n"
-                + "Note it shows maximum up to 5 different items with similar name and max 5 current lowest prices. \n"
+                + "Note it shows maximum up to 5 different items and max 5 current lowest prices. \n"
                 + "Usage: *<bot-prefix> market-search <item>*.";
     }
 

@@ -73,8 +73,8 @@ public class MarketLichSearchCommand implements Command {
 
     @Override
     public String getDescription() {
-        return "Shows current auctions of a lich on the warframe market.\n"
-                + "Note it shows only max 5 different items with similar name and max 5 current auctions. \n"
+        return "Shows current auctions of lichs on warframe market.\n"
+                + "Note it shows only max 5 different items and max 5 current auctions. \n"
                 + "Usage: *<bot-prefix> market-lich-search <optional --element> <item>*.\n"
                 + "Example: *!clem market-lich-search --heat Nukor*\n"
                 + "Valid elements: impact :hammer:, heat :fire:, cold :snowflake:, electricity :zap:, toxin :skull_crossbones:, magnetic :magnet:, radiation :radioactive:";

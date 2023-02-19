@@ -45,8 +45,8 @@ public class BuildSearchCommand implements Command {
 
     @Override
     public String getDescription() {
-        return "Shows current top build for given warframe / weapon from overframe.\n"
-                + "Note it shows only max 5 different items with similar name and best 5 builds of them. \n"
+        return "Shows top build for given warframe / weapon from overframe.\n"
+                + "Note it shows only max 5 different items and best 5 builds of them. \n"
                 + "Usage: *<bot-prefix> build-search <item>*.";
     }
 
