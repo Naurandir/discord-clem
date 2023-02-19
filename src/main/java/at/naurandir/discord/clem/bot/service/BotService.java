@@ -110,9 +110,9 @@ public class BotService {
         if (event.getMember().isPresent() && event.getMember().get().isBot()) {
             return Flux.empty().then();
         }
-        
+               
         return Flux.fromIterable(commands)
-                .filter(command -> isCommandWordUsage(event, command) || isBotMentionedUsage(event))
+                .filter(command -> isCommandWordUsage(event, command) || isBotMentionedUsage(event, command))
                 .next()
                 .flatMap(command -> command.handle(event));
     }
@@ -121,8 +121,9 @@ public class BotService {
         return event.getMessage().getContent().startsWith(prefix + " " + command.getCommandWord());
     }
     
-    private boolean isBotMentionedUsage(MessageCreateEvent event) {
-        return event.getMessage().getContent().startsWith("<@" + client.getSelfId().asString() +">");
+    private boolean isBotMentionedUsage(MessageCreateEvent event, Command command) {
+        String mentionedCommand = "<@" + client.getSelfId().asString() +"> " + command.getCommandWord();
+        return event.getMessage().getContent().startsWith(mentionedCommand);
     }
     
     private boolean isOwnBot(MessageCreateEvent event) {

@@ -50,7 +50,7 @@ public class ChatBotService {
     @Value("${discord.clem.chat.prompt.prefix}")
     private String prefix;
     
-    private final List<String> toReplaceAnswerParts = List.of("?", "AI:", "A:", "A", "AI");
+    private final List<String> toReplaceAnswerParts = List.of("?", "AI:", "A:", "A", "AI", ":");
     
     @Autowired
     private ConversationRepository conversationRepository;
