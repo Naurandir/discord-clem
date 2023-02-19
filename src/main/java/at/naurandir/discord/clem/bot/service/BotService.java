@@ -7,7 +7,6 @@ import discord4j.core.DiscordClient;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.event.domain.message.MessageDeleteEvent;
-import discord4j.core.event.domain.message.MessageEvent;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.presence.ClientActivity;
 import discord4j.core.object.presence.ClientPresence;
@@ -18,7 +17,6 @@ import javax.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -114,11 +112,17 @@ public class BotService {
         }
         
         return Flux.fromIterable(commands)
-                .filter(command -> event.getMember().isEmpty() || !event.getMember().get().isBot())
-                .filter(command -> event.getMessage().getContent().startsWith(
-                        prefix + " " + command.getCommandWord()))
+                .filter(command -> isCommandWordUsage(event, command) || isBotMentionedUsage(event))
                 .next()
                 .flatMap(command -> command.handle(event));
+    }
+
+    private boolean isCommandWordUsage(MessageCreateEvent event, Command command) {
+        return event.getMessage().getContent().startsWith(prefix + " " + command.getCommandWord());
+    }
+    
+    private boolean isBotMentionedUsage(MessageCreateEvent event) {
+        return event.getMessage().getContent().startsWith("<@" + client.getSelfId().asString() +">");
     }
     
     private boolean isOwnBot(MessageCreateEvent event) {
