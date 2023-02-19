@@ -50,8 +50,7 @@ public class ChatBotService {
     @Value("${discord.clem.chat.prompt.prefix}")
     private String prefix;
     
-    private final List<String> toReplaceAnswerParts = List.of(
-            "AI: ", "AI:", "A: ", "A:", "A ", "AI ");
+    private final List<String> toReplaceAnswerParts = List.of("AI:", "A:", "A", "AI", "?");
     
     @Autowired
     private ConversationRepository conversationRepository;
@@ -73,14 +72,10 @@ public class ChatBotService {
                 throw new IOException("It seems that a problem occured and the chatbot did not respond with a valid answer.");
             }
            
-            String answer = answerDTO.getChoices().get(0).getText();
-            if (answer.contains("?") && answer.indexOf("?") <= 10) {
-                answer = answer.substring(answer.indexOf("?") + 1);
-            }
-            
+            String answer = answerDTO.getChoices().get(0).getText();            
             for (String toReplace : toReplaceAnswerParts) {
-                if (answer.startsWith(toReplace)) {
-                    answer = answer.replace(toReplace, "");
+                if (answer.startsWith(toReplace) || answer.indexOf(toReplace) <= 5) {
+                    answer = answer.substring(answer.indexOf(toReplace) + 1);
                 }
             }
             
@@ -114,8 +109,10 @@ public class ChatBotService {
                 .build();
     }
     
-    private String generatePrompt(String userMessage, Conversation conversation) {
-        if (conversation == null) {
+    private String generatePrompt(String userMessage, Conversation conversation) {        
+        if (conversation == null && userMessage.startsWith("offtopic")) {
+            return userMessage;
+        } else if (conversation == null) {
             return prefix + userMessage;
         }
         
@@ -144,6 +141,9 @@ public class ChatBotService {
             log.debug("generatePrompt: generated prompt with [{}] messages without prefix: [{}]", numberOfPrompts, generatedPrompt);
         }
         
+        if (userMessage.startsWith("offtopic")) {
+            return generatedPrompt;
+        }
         return prefix + generatedPrompt;
     }
     
