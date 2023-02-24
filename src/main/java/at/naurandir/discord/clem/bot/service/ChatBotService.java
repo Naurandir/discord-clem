@@ -50,7 +50,7 @@ public class ChatBotService {
     @Value("${discord.clem.chat.prompt.prefix}")
     private String prefix;
     
-    private final List<String> toReplaceAnswerParts = List.of("?", "AI:", "A:", "A", "AI", ":");
+    private final List<String> toReplaceAnswerParts = List.of("?", "AI:", "A:", "A", "AI", ":", "\n");
     
     @Autowired
     private ConversationRepository conversationRepository;
@@ -58,12 +58,13 @@ public class ChatBotService {
     private final WarframeClient warframeClient = new WarframeClient();
     
     @Transactional
-    public String chat(String userMessage, Optional<User> user) {
+    public String chat(String userMessage, Optional<User> user, Boolean isOffTopic) {
         try {
+            String finalUserMessage = replaceBadRequestCharacters(userMessage);
             Conversation conversation = loadConversation(user);
-            addToConversation(userMessage, ChatMember.HUMAN, conversation);
+            addToConversation(finalUserMessage, ChatMember.HUMAN, conversation);
             
-            String prompt = generatePrompt(userMessage, conversation);
+            String prompt = generatePrompt(finalUserMessage, conversation, isOffTopic);
             ChatGptRequestDTO body = createRequestBody(prompt);
             ChatGptDTO answerDTO = warframeClient.getDataByPost(url, apiHeaders, body, ChatGptDTO.class);
             
@@ -79,7 +80,7 @@ public class ChatBotService {
                 }
             }
             
-            addToConversation(answer, ChatMember.AI, conversation);
+            addToConversation(replaceBadRequestCharacters(answer), ChatMember.AI, conversation);
             saveConversation(conversation);
             
             return answer;
@@ -88,16 +89,6 @@ public class ChatBotService {
             return "I am sorry, something went wrong with calling the chatbot with your request, maybe try later again or clear your conversation.\n" +
                     "The error was: " + ex.getMessage();
         }
-    }
-    
-    @Transactional
-    public void deleteConversation(Optional<User> user) {
-        Conversation conversation = loadConversation(user);
-        if (conversation == null) {
-            return ; // no conversation to clear
-        }
-        log.debug("deleteConversation: deleting conversation [{}]", conversation.getId());
-        conversationRepository.delete(conversation);
     }
 
     private ChatGptRequestDTO createRequestBody(String message) {
@@ -109,15 +100,15 @@ public class ChatBotService {
                 .build();
     }
     
-    private String generatePrompt(String userMessage, Conversation conversation) {        
-        if (conversation == null && userMessage.startsWith("offtopic")) {
+    private String generatePrompt(String userMessage, Conversation conversation, boolean isOffTopic) { 
+        if (conversation == null && isOffTopic) {
             return userMessage;
         } else if (conversation == null) {
             return prefix + userMessage;
         }
         
         int maxTokensAllowed = tokensTotal - tokensRepsonse - StringUtils.countOccurrencesOf(prefix, " ");        
-        String generatedPrompt = "H: " + userMessage;
+        String generatedPrompt = "";
         
         List<ConversationMessage> messagesToHandle = conversation.getMessages().stream()
                     .sorted(Comparator.comparing(ConversationMessage::getStartDate).reversed())
@@ -141,7 +132,7 @@ public class ChatBotService {
             log.debug("generatePrompt: generated prompt with [{}] messages without prefix: [{}]", numberOfPrompts, generatedPrompt);
         }
         
-        if (userMessage.startsWith("offtopic")) {
+        if (isOffTopic) {
             return generatedPrompt;
         }
         return prefix + generatedPrompt;
@@ -186,5 +177,21 @@ public class ChatBotService {
         }
         
         conversationRepository.save(conversation);
+    }
+    
+    private String replaceBadRequestCharacters(String message) {
+        return message.replace("ä", "ae").replace("ü", "ue").replace("ö", "oe")
+                      .replace("Ä", "Ae").replace("Ü", "Ue").replace("Ö", "Oe")
+                      .replace("ß", "ss");
+    }
+    
+    @Transactional
+    public void deleteConversation(Optional<User> user) {
+        Conversation conversation = loadConversation(user);
+        if (conversation == null) {
+            return ; // no conversation to clear
+        }
+        log.debug("deleteConversation: deleting conversation [{}]", conversation.getId());
+        conversationRepository.delete(conversation);
     }
 }

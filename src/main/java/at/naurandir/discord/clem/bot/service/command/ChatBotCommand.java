@@ -57,10 +57,17 @@ public class ChatBotCommand implements Command {
                 .then();
         }
         
+        String finalMessage = message;
+        boolean isOfftopic = false;
+        if (finalMessage.startsWith("offtopic")) {
+            isOfftopic = true;
+            finalMessage = finalMessage.replace("offtopic", "");
+        }
+        
         MessageChannel channel = event.getMessage().getChannel().block();
         Message processingMessage = channel.createMessage(":knot: processing...").block();
         
-        String response = chatBotService.chat(message, event.getMessage().getAuthor());
+        String response = chatBotService.chat(finalMessage, event.getMessage().getAuthor(), isOfftopic);
         
         return processingMessage
                 .edit(MessageEditSpec.builder().contentOrNull(response).build())
