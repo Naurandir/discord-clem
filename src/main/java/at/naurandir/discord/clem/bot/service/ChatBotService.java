@@ -5,10 +5,15 @@ import at.naurandir.discord.clem.bot.model.chat.ConversationMessage;
 import at.naurandir.discord.clem.bot.model.chat.ConversationMessage.ChatMember;
 import at.naurandir.discord.clem.bot.repository.ConversationRepository;
 import at.naurandir.discord.clem.bot.service.client.WarframeClient;
-import at.naurandir.discord.clem.bot.service.client.dto.chat.ChatGptDTO;
-import at.naurandir.discord.clem.bot.service.client.dto.chat.ChatGptRequestDTO;
+import at.naurandir.discord.clem.bot.service.client.dto.chat.ChatGptChatMessageRequestDTO;
+import at.naurandir.discord.clem.bot.service.client.dto.chat.ChatGptChatMessageRequestDTO.ChatGptRole;
+import at.naurandir.discord.clem.bot.service.client.dto.chat.ChatGptChatRequestDTO;
+import at.naurandir.discord.clem.bot.service.client.dto.chat.ChatGptChatResponseDTO;
+import at.naurandir.discord.clem.bot.service.client.dto.chat.ChatGptCompletionResponseDTO;
+import at.naurandir.discord.clem.bot.service.client.dto.chat.ChatGptCompletionRequestDTO;
 import discord4j.core.object.entity.User;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -50,6 +55,9 @@ public class ChatBotService {
     @Value("${discord.clem.chat.prompt.prefix}")
     private String prefix;
     
+    @Value("${discord.clem.chat.type:turbo}")
+    private String chatType;
+    
     private final List<String> toReplaceAnswerParts = List.of("?", "AI:", "A:", "A", "AI", ":", "\n");
     
     @Autowired
@@ -60,41 +68,86 @@ public class ChatBotService {
     @Transactional
     public String chat(String userMessage, Optional<User> user, Boolean isOffTopic) {
         try {
-            String finalUserMessage = replaceBadRequestCharacters(userMessage);
-            Conversation conversation = loadConversation(user);
-            addToConversation(finalUserMessage, ChatMember.HUMAN, conversation);
-            
-            String prompt = generatePrompt(finalUserMessage, conversation, isOffTopic);
-            ChatGptRequestDTO body = createRequestBody(prompt);
-            ChatGptDTO answerDTO = warframeClient.getDataByPost(url, apiHeaders, body, ChatGptDTO.class);
-            
-            if (answerDTO == null || answerDTO.getChoices() == null || answerDTO.getChoices().isEmpty()) {
-                log.error("chat: did not receive a valid answer, answer was: [{}]", answerDTO);
-                throw new IOException("It seems that a problem occured and the chatbot did not respond with a valid answer.");
+            if (chatType.equals("turbo")) {
+                return chatTurbo(userMessage, user, isOffTopic);
+            } else {
+                return chatCompletion(userMessage, user, isOffTopic);
             }
-           
-            String answer = answerDTO.getChoices().get(0).getText();            
-            for (String toReplace : toReplaceAnswerParts) {
-                if (answer.startsWith(toReplace) || answer.indexOf(toReplace) <= 5) {
-                    answer = answer.substring(answer.indexOf(toReplace) + 1);
-                }
-            }
-            
-            addToConversation(replaceBadRequestCharacters(answer), ChatMember.AI, conversation);
-            saveConversation(conversation);
-            
-            return answer;
         } catch (IOException ex) {
             log.error("chat: could not receive a valid answer from chat bot: ", ex);
             return "I am sorry, something went wrong with calling the chatbot with your request, maybe try later again or clear your conversation.\n" +
                     "The error was: " + ex.getMessage();
         }
     }
+    
+    private String chatTurbo(String userMessage, Optional<User> user, Boolean isOffTopic) throws IOException {
+        String finalUserMessage = replaceBadRequestCharacters(userMessage);
+        Conversation conversation = loadConversation(user);
+        addToConversation(finalUserMessage, ChatMember.HUMAN, conversation);
+        
+        List<ChatGptChatMessageRequestDTO> messages = generateChatMessages(finalUserMessage, conversation, isOffTopic);
+        ChatGptChatRequestDTO body = createRequestBody(messages);
+        
+        ChatGptChatResponseDTO answerDTO = warframeClient.getDataByPost(url, apiHeaders, body, ChatGptChatResponseDTO.class);
+        
+        if (answerDTO == null || answerDTO.getChoices() == null || answerDTO.getChoices().isEmpty()) {
+            log.error("chatTurbo: did not receive a valid answer, answer was: [{}]", answerDTO);
+            throw new IOException("It seems that a problem occured and the chatbot did not respond with a valid answer.");
+        }
+        
+        String answer = answerDTO.getChoices().get(0).getMessage().getContent();
+        for (String toReplace : toReplaceAnswerParts) {
+            if (answer.startsWith(toReplace) || answer.indexOf(toReplace) <= 5) {
+                answer = answer.substring(answer.indexOf(toReplace) + 1);
+            }
+        }
+        
+        addToConversation(replaceBadRequestCharacters(answer), ChatMember.AI, conversation);
+        saveConversation(conversation);
+        
+        return answer;
+    }
 
-    private ChatGptRequestDTO createRequestBody(String message) {
-        return ChatGptRequestDTO.builder()
+    private String chatCompletion(String userMessage, Optional<User> user, Boolean isOffTopic) throws IOException {
+        String finalUserMessage = replaceBadRequestCharacters(userMessage);
+        Conversation conversation = loadConversation(user);
+        addToConversation(finalUserMessage, ChatMember.HUMAN, conversation);
+        
+        String prompt = generatePrompt(finalUserMessage, conversation, isOffTopic);
+        ChatGptCompletionRequestDTO body = createRequestBody(prompt);
+        ChatGptCompletionResponseDTO answerDTO = warframeClient.getDataByPost(url, apiHeaders, body, ChatGptCompletionResponseDTO.class);
+        
+        if (answerDTO == null || answerDTO.getChoices() == null || answerDTO.getChoices().isEmpty()) {
+            log.error("chatCompletion: did not receive a valid answer, answer was: [{}]", answerDTO);
+            throw new IOException("It seems that a problem occured and the chatbot did not respond with a valid answer.");
+        }
+        
+        String answer = answerDTO.getChoices().get(0).getText();
+        for (String toReplace : toReplaceAnswerParts) {
+            if (answer.startsWith(toReplace) || answer.indexOf(toReplace) <= 5) {
+                answer = answer.substring(answer.indexOf(toReplace) + 1);
+            }
+        }
+        
+        addToConversation(replaceBadRequestCharacters(answer), ChatMember.AI, conversation);
+        saveConversation(conversation);
+        
+        return answer;
+    }
+
+    private ChatGptCompletionRequestDTO createRequestBody(String message) {
+        return ChatGptCompletionRequestDTO.builder()
                 .model(model)
                 .prompt(message)
+                .maxTokens(tokensRepsonse)
+                .temperature(temperature)
+                .build();
+    }
+    
+    private ChatGptChatRequestDTO createRequestBody(List<ChatGptChatMessageRequestDTO> messages) {
+        return ChatGptChatRequestDTO.builder()
+                .model(model)
+                .messages(messages)
                 .maxTokens(tokensRepsonse)
                 .temperature(temperature)
                 .build();
@@ -136,6 +189,42 @@ public class ChatBotService {
             return generatedPrompt;
         }
         return prefix + generatedPrompt;
+    }
+    
+    private List<ChatGptChatMessageRequestDTO> generateChatMessages(String userMessage, Conversation conversation, boolean isOffTopic) {
+        List<ChatGptChatMessageRequestDTO> messages = new ArrayList<>();
+        ChatGptChatMessageRequestDTO systemMessage = new ChatGptChatMessageRequestDTO(ChatGptRole.system, prefix);
+        
+        if (!isOffTopic) {
+            messages.add(systemMessage);
+        }
+        
+        if (conversation == null) {
+            messages.add(new ChatGptChatMessageRequestDTO(ChatGptRole.user, userMessage));
+            return messages;
+        }
+        
+        int maxTokensAllowed = tokensTotal - tokensRepsonse - StringUtils.countOccurrencesOf(prefix, " ");
+        int currentTokens = 0;
+        
+        List<ConversationMessage> messagesToHandle = conversation.getMessages().stream()
+                    .sorted(Comparator.comparing(ConversationMessage::getStartDate).reversed())
+                    .limit(30L)
+                    .collect(Collectors.toList());
+        
+        for (ConversationMessage conversationMessage : messagesToHandle) {
+            int tokenCount = StringUtils.countOccurrencesOf(conversationMessage.getMessage(), " ");
+            
+            if (currentTokens + tokenCount > maxTokensAllowed) {
+                break;
+            }
+            
+            messages.add(new ChatGptChatMessageRequestDTO(
+                    conversationMessage.getChatMember() == ChatMember.HUMAN ? ChatGptRole.user : ChatGptRole.assistant, 
+                    conversationMessage.getMessage()));
+        }
+        
+        return messages;
     }
     
     private Conversation loadConversation(Optional<User> user) {

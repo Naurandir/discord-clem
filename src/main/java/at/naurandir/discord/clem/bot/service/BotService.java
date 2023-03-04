@@ -1,4 +1,3 @@
-
 package at.naurandir.discord.clem.bot.service;
 
 import at.naurandir.discord.clem.bot.service.command.Command;
