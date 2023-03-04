@@ -209,7 +209,8 @@ public class ChatBotService {
         
         List<ConversationMessage> messagesToHandle = conversation.getMessages().stream()
                     .sorted(Comparator.comparing(ConversationMessage::getStartDate).reversed())
-                    .limit(30L)
+                    .limit(30L) // get last 30 messages max
+                    .sorted(Comparator.comparing(ConversationMessage::getStartDate)) // sort natural again
                     .collect(Collectors.toList());
         
         for (ConversationMessage conversationMessage : messagesToHandle) {
