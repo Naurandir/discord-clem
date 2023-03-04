@@ -95,13 +95,7 @@ public class ChatBotService {
             throw new IOException("It seems that a problem occured and the chatbot did not respond with a valid answer.");
         }
         
-        String answer = answerDTO.getChoices().get(0).getMessage().getContent();
-        for (String toReplace : toReplaceAnswerParts) {
-            if (answer.startsWith(toReplace) || answer.indexOf(toReplace) <= 5) {
-                answer = answer.substring(answer.indexOf(toReplace) + 1);
-            }
-        }
-        
+        String answer = answerDTO.getChoices().get(0).getMessage().getContent();        
         addToConversation(replaceBadRequestCharacters(answer), ChatMember.AI, conversation);
         saveConversation(conversation);
         
