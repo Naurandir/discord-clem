@@ -219,9 +219,15 @@ public class ChatBotService {
                 break;
             }
             
+            currentTokens = currentTokens + tokenCount;
+            
             messages.add(new ChatGptChatMessageRequestDTO(
                     conversationMessage.getChatMember() == ChatMember.HUMAN ? ChatGptRole.user : ChatGptRole.assistant, 
                     conversationMessage.getMessage()));
+        }
+        
+        if (log.isDebugEnabled()) {
+            log.debug("generateChatMessages: generated messages with [{}] messages: [{}]", messages.size(), messages);
         }
         
         return messages;
