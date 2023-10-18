@@ -3,6 +3,8 @@ package at.naurandir.discord.clem.bot.service.command;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.util.Color;
+
+import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
@@ -41,7 +43,7 @@ public class HelpCommand implements Command {
         
         return event.getMessage().getChannel()
                 .flatMap(channel -> channel.createMessage(generateEmbed(description.toString())))
-                .then();
+                .timeout(Duration.ofSeconds(60)).then();
     }
     
     private EmbedCreateSpec generateEmbed(String description) {         

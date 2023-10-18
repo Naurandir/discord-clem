@@ -10,6 +10,8 @@ import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.event.domain.message.MessageDeleteEvent;
 import discord4j.discordjson.json.MessageData;
 import discord4j.rest.entity.RestMessage;
+
+import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
@@ -57,7 +59,7 @@ public abstract class Push {
         }
         
         interestingChannelService.addStickyMessageIdToChannel(messageId, interestingChannel.get());
-        event.getMessage().pin().subscribe();
+        event.getMessage().pin().timeout(Duration.ofSeconds(60)).subscribe();
     }
     
     public void handleDeleteOwnEvent(MessageDeleteEvent event) {

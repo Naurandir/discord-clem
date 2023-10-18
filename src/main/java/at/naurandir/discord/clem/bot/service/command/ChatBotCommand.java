@@ -1,17 +1,18 @@
 package at.naurandir.discord.clem.bot.service.command;
 
-import at.naurandir.discord.clem.bot.service.ChatBotService;
-import discord4j.common.util.Snowflake;
-import discord4j.core.event.domain.message.MessageCreateEvent;
-import discord4j.core.object.entity.Message;
-import discord4j.core.object.entity.channel.MessageChannel;
-import discord4j.core.spec.MessageCreateSpec;
-import discord4j.core.spec.MessageEditSpec;
+import java.time.Duration;
 import java.util.Arrays;
-import lombok.extern.slf4j.Slf4j;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import at.naurandir.discord.clem.bot.service.ChatBotService;
+import discord4j.core.event.domain.message.MessageCreateEvent;
+import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.channel.MessageChannel;
+import discord4j.core.spec.MessageEditSpec;
+import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
 
 /**
@@ -47,6 +48,7 @@ public class ChatBotCommand implements Command {
         if (message.length() < 2) {
             return event.getMessage().getChannel()
                 .flatMap(channel -> channel.createMessage("The given input [" + message + "] is too short. Please provide a longer text for the chat."))
+                .timeout(Duration.ofSeconds(60))
                 .then();
         }
         
@@ -54,6 +56,7 @@ public class ChatBotCommand implements Command {
             chatBotService.deleteConversation(event.getMessage().getAuthor());
             return event.getMessage().getChannel()
                 .flatMap(channel -> channel.createMessage("The conversation with you has been cleared. I wont remember anything and we can start with a new conversation."))
+                .timeout(Duration.ofSeconds(60))
                 .then();
         }
         
@@ -71,6 +74,7 @@ public class ChatBotCommand implements Command {
         
         return processingMessage
                 .edit(MessageEditSpec.builder().contentOrNull(response).build())
+                .timeout(Duration.ofSeconds(60))
                 .then();
     }
 

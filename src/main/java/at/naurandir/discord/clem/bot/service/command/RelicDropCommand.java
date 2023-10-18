@@ -9,6 +9,8 @@ import at.naurandir.discord.clem.bot.service.RelicService;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.util.Color;
+
+import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -63,7 +65,7 @@ public class RelicDropCommand implements Command {
         if (item.length() < 3) {
             return event.getMessage().getChannel()
                 .flatMap(channel -> channel.createMessage("The given input [" + item + "] is too short. Please provide a longer name to search"))
-                .then();
+                .timeout(Duration.ofSeconds(60)).then();
         }
         
         List<Relic> relics = relicService.getRelics();
@@ -81,7 +83,7 @@ public class RelicDropCommand implements Command {
         return event.getMessage().getChannel()
                 .flatMap(channel -> channel.createMessage(generateEmbedRelics(item, relicMessages), 
                                                           generateEmbedMissions(item, missionMessages)))
-                .then();
+                .timeout(Duration.ofSeconds(60)).then();
     }
     
     private String getItem(String content) {

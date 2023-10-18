@@ -9,6 +9,7 @@ import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.util.Color;
 import java.io.IOException;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -55,7 +56,7 @@ public class MarketSearchCommand implements Command {
         if (item.length() < 3) {
             return event.getMessage().getChannel()
                 .flatMap(channel -> channel.createMessage("The given input [" + item + "] is too short. Please provide a longer name to search"))
-                .then();
+                .timeout(Duration.ofSeconds(60)).then();
         }
         
         List<MarketItem> foundMarketItems = getMarketItems(item);
@@ -64,7 +65,7 @@ public class MarketSearchCommand implements Command {
         EmbedCreateSpec[] embeddedMessages = getEmbeddedResult(foundSellOrders);
         return event.getMessage().getChannel()
                 .flatMap(channel -> channel.createMessage(embeddedMessages))
-                .then();
+                .timeout(Duration.ofSeconds(60)).then();
     }
     
     private String getItem(String content) {

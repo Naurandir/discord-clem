@@ -9,6 +9,8 @@ import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.util.Color;
 import discord4j.rest.util.Permission;
 import discord4j.rest.util.PermissionSet;
+
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.Optional;
@@ -111,7 +113,7 @@ public class InterestingChannelCommand implements Command {
         
         return event.getMessage().getChannel()
                 .flatMap(ch -> ch.createMessage(embed))
-                .then();
+                .timeout(Duration.ofSeconds(60)).then();
     }
     
     private Mono<Void> handleWrongUsage(MessageCreateEvent event) {
@@ -125,7 +127,7 @@ public class InterestingChannelCommand implements Command {
         
         return event.getMessage().getChannel()
                 .flatMap(ch -> ch.createMessage(embed))
-                .then();
+                .timeout(Duration.ofSeconds(60)).then();
     }
 
     private Mono<Void> handleRegister(MessageCreateEvent event, PushType pushType, Member member) {
@@ -145,7 +147,7 @@ public class InterestingChannelCommand implements Command {
         
         return event.getMessage().getChannel()
                 .flatMap(ch -> ch.createMessage(embed))
-                .then();
+                .timeout(Duration.ofSeconds(60)).then();
     }
 
     private Mono<Void> handleUnregister(MessageCreateEvent event, PushType pushType) {
@@ -155,7 +157,7 @@ public class InterestingChannelCommand implements Command {
         
         if (channelOpt.isEmpty()) {
             log.info("handleUnregister: no channel found for [{}] with push type [{}], ignoring request.");
-            return Flux.empty().then();
+            return Flux.empty().timeout(Duration.ofSeconds(60)).then();
         }
         
         InterestingChannel channel = channelOpt.get();
@@ -172,7 +174,7 @@ public class InterestingChannelCommand implements Command {
         
         return event.getMessage().getChannel()
                 .flatMap(ch -> ch.createMessage(embed))
-                .then();
+                .timeout(Duration.ofSeconds(60)).then();
     }
     
     @Getter

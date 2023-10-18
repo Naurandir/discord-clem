@@ -7,6 +7,8 @@ import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.spec.EmbedCreateFields;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.util.Color;
+
+import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -55,7 +57,7 @@ public class NodeDropCommand implements Command {
         if (node.length() < 3) {
             return event.getMessage().getChannel()
                 .flatMap(channel -> channel.createMessage("The given input [" + node + "] is too short. Please provide a longer name to search"))
-                .then();
+                .timeout(Duration.ofSeconds(60)).then();
         }
         
         List<Mission> missionsWithNode = getMissionsWithNode(node);
@@ -63,7 +65,7 @@ public class NodeDropCommand implements Command {
         
         return event.getMessage().getChannel()
                 .flatMap(channel -> channel.createMessage(generateEmbed(node, missionsWithNode)))
-                .then();
+                .timeout(Duration.ofSeconds(60)).then();
     }
     
     private String getNode(String content) {

@@ -6,6 +6,8 @@ import at.naurandir.discord.clem.bot.service.WeaponService;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.util.Color;
+
+import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -56,7 +58,7 @@ public class BuildSearchCommand implements Command {
         if (item.length() < 3) {
             return event.getMessage().getChannel()
                 .flatMap(channel -> channel.createMessage("The given input [" + item + "] is too short. Please provide a longer name to search"))
-                .then();
+                .timeout(Duration.ofSeconds(60)).then();
         }
         
         List<Item> foundItems = getBuildItems(item);
@@ -65,13 +67,13 @@ public class BuildSearchCommand implements Command {
         if (foundItems.isEmpty()) {
             return event.getMessage().getChannel()
                 .flatMap(channel -> channel.createMessage(createErrorResponse(TITLE_NOT_FOUND, DESCRIPTION_NOT_FOUND)))
-                .then();
+                .timeout(Duration.ofSeconds(60)).then();
         }
         
         EmbedCreateSpec[] embeddedMessages = getEmbeddedResult(foundItems);
         return event.getMessage().getChannel()
                 .flatMap(channel -> channel.createMessage(embeddedMessages))
-                .then();
+                .timeout(Duration.ofSeconds(60)).then();
     }
     
     private String getItem(String content) {

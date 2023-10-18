@@ -9,6 +9,8 @@ import discord4j.core.event.domain.message.MessageDeleteEvent;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.presence.ClientActivity;
 import discord4j.core.object.presence.ClientPresence;
+
+import java.time.Duration;
 import java.util.List;
 import java.util.TimeZone;
 import javax.annotation.PostConstruct;
@@ -56,8 +58,8 @@ public class BotService {
                 .login()
                 .block();
         
-        client.on(MessageCreateEvent.class, this::handleMessage).subscribe();
-        client.on(MessageDeleteEvent.class, this::handleMessage).subscribe();
+        client.on(MessageCreateEvent.class, this::handleMessage).timeout(Duration.ofSeconds(60)).subscribe();
+        client.on(MessageDeleteEvent.class, this::handleMessage).timeout(Duration.ofSeconds(60)).subscribe();
         pushes.forEach(push -> push.init(client));
     }
     
@@ -77,7 +79,7 @@ public class BotService {
         if (isOwnBot(event) && isPinnedMessage(event)) {
             event.getMessage()
                     .delete("not required message, like pin status message, can be deleted")
-                    .subscribe();
+                    .timeout(Duration.ofSeconds(60)).subscribe();
             return Flux.empty().then();
         } else if (isOwnBot(event)) {
             pushes.forEach(push -> push.handleOwnEvent(event));

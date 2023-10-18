@@ -6,6 +6,8 @@ import at.naurandir.discord.clem.bot.service.MissionService;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.util.Color;
+
+import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -50,7 +52,7 @@ public class MissionDropCommand implements Command {
         if (item.length() < 3) {
             return event.getMessage().getChannel()
                 .flatMap(channel -> channel.createMessage("The given input [" + item + "] is too short. Please provide a longer name to search"))
-                .then();
+                .timeout(Duration.ofSeconds(60)).then();
         }
         
         List<Mission> missionsWithItem = getMissionsWithItem(item);
@@ -58,7 +60,7 @@ public class MissionDropCommand implements Command {
         
         return event.getMessage().getChannel()
                 .flatMap(channel -> channel.createMessage(generateEmbed(item, missionsWithItem)))
-                .then();
+                .timeout(Duration.ofSeconds(60)).then();
     }
     
     private String getItem(String content) {

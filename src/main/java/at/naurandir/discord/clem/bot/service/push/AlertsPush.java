@@ -46,7 +46,7 @@ public class AlertsPush extends Push {
 
         getClient().rest().getChannelById(channelId)
                     .createMessage(embed.asRequest())
-                    .subscribe();
+                    .timeout(Duration.ofSeconds(60)).subscribe();
     }
 
     @Override
@@ -55,7 +55,7 @@ public class AlertsPush extends Push {
                 .embedOrNull(generateEmbed(alertService.getActiveAlerts()).asRequest())
                 .build();
         
-        message.edit(editRequest).subscribe();
+        message.edit(editRequest).timeout(Duration.ofSeconds(60)).subscribe();
     }
 
     @Override

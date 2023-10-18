@@ -44,7 +44,7 @@ public class VoidTraderPush extends Push {
 
         getClient().rest().getChannelById(channelId)
                     .createMessage(embed.asRequest())
-                    .subscribe();
+                    .timeout(Duration.ofSeconds(60)).subscribe();
     }
 
     @Override
@@ -52,7 +52,7 @@ public class VoidTraderPush extends Push {
         MessageEditRequest editRequest = MessageEditRequest.builder()
                 .embedOrNull(generateEmbed(voidTraderService.getVoidTrader()).asRequest())
                 .build();
-        message.edit(editRequest).subscribe();
+        message.edit(editRequest).timeout(Duration.ofSeconds(60)).subscribe();
     }
 
     @Override

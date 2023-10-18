@@ -8,6 +8,7 @@ import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.util.Color;
 import java.io.IOException;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -86,14 +87,14 @@ public class MarketLichSearchCommand implements Command {
         if (selectedElement.isPresent() && selectedElement.get().equals(INVALID_ELEMENT)) {
             return event.getMessage().getChannel()
                 .flatMap(channel -> channel.createMessage(createErrorResponse(TITLE_ELEMENT_INVALID, DESCRIPTION_ELEMENT_INVALID)))
-                .then();
+                .timeout(Duration.ofSeconds(60)).then();
         }
         
         String item = getItem(event.getMessage().getContent(), selectedElement);
         if (item.length() < 3) {
             return event.getMessage().getChannel()
                 .flatMap(channel -> channel.createMessage(createErrorResponse(TITLE_TOO_SHORT, DESCRIPTION_TOO_SHORT)))
-                .then();
+                .timeout(Duration.ofSeconds(60)).then();
         }
         
         List<MarketLichWeapon> foundLichWeapons = getLichWeapons(item);
@@ -102,7 +103,7 @@ public class MarketLichSearchCommand implements Command {
         if (foundLichWeapons.isEmpty()) {
             return event.getMessage().getChannel()
                 .flatMap(channel -> channel.createMessage(createErrorResponse(TITLE_NOT_FOUND, DESCRIPTION_NOT_FOUND)))
-                .then();
+                .timeout(Duration.ofSeconds(60)).then();
         }
         
         Map<MarketLichWeapon, List<MarketLichAuctionDTO>> foundLichAuctions = getAuctions(foundLichWeapons, selectedElement);
@@ -110,7 +111,7 @@ public class MarketLichSearchCommand implements Command {
         EmbedCreateSpec[] embeddedMessages = getEmbeddedResult(foundLichAuctions);
         return event.getMessage().getChannel()
                 .flatMap(channel -> channel.createMessage(embeddedMessages))
-                .then();
+                .timeout(Duration.ofSeconds(60)).then();
     }
     
     private Optional<String> getPossibleElement(String content) {
