@@ -58,8 +58,8 @@ public class BotService {
                 .login()
                 .block();
         
-        client.on(MessageCreateEvent.class, this::handleMessage).timeout(Duration.ofSeconds(60)).subscribe();
-        client.on(MessageDeleteEvent.class, this::handleMessage).timeout(Duration.ofSeconds(60)).subscribe();
+        client.on(MessageCreateEvent.class, this::handleMessage).subscribe();
+        client.on(MessageDeleteEvent.class, this::handleMessage).subscribe();
         pushes.forEach(push -> push.init(client));
     }
     
@@ -79,7 +79,7 @@ public class BotService {
         if (isOwnBot(event) && isPinnedMessage(event)) {
             event.getMessage()
                     .delete("not required message, like pin status message, can be deleted")
-                    .timeout(Duration.ofSeconds(60)).subscribe();
+                    .subscribe();
             return Flux.empty().then();
         } else if (isOwnBot(event)) {
             pushes.forEach(push -> push.handleOwnEvent(event));

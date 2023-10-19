@@ -57,7 +57,7 @@ public class NodeDropCommand implements Command {
         if (node.length() < 3) {
             return event.getMessage().getChannel()
                 .flatMap(channel -> channel.createMessage("The given input [" + node + "] is too short. Please provide a longer name to search"))
-                .timeout(Duration.ofSeconds(60)).then();
+                .then();
         }
         
         List<Mission> missionsWithNode = getMissionsWithNode(node);
@@ -65,7 +65,7 @@ public class NodeDropCommand implements Command {
         
         return event.getMessage().getChannel()
                 .flatMap(channel -> channel.createMessage(generateEmbed(node, missionsWithNode)))
-                .timeout(Duration.ofSeconds(60)).then();
+                .then();
     }
     
     private String getNode(String content) {

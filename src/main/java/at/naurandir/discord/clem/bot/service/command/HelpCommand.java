@@ -43,7 +43,7 @@ public class HelpCommand implements Command {
         
         return event.getMessage().getChannel()
                 .flatMap(channel -> channel.createMessage(generateEmbed(description.toString())))
-                .timeout(Duration.ofSeconds(60)).then();
+                .then();
     }
     
     private EmbedCreateSpec generateEmbed(String description) {         

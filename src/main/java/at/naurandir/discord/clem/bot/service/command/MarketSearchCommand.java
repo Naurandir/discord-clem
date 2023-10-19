@@ -56,7 +56,7 @@ public class MarketSearchCommand implements Command {
         if (item.length() < 3) {
             return event.getMessage().getChannel()
                 .flatMap(channel -> channel.createMessage("The given input [" + item + "] is too short. Please provide a longer name to search"))
-                .timeout(Duration.ofSeconds(60)).then();
+                .then();
         }
         
         List<MarketItem> foundMarketItems = getMarketItems(item);
@@ -65,7 +65,7 @@ public class MarketSearchCommand implements Command {
         EmbedCreateSpec[] embeddedMessages = getEmbeddedResult(foundSellOrders);
         return event.getMessage().getChannel()
                 .flatMap(channel -> channel.createMessage(embeddedMessages))
-                .timeout(Duration.ofSeconds(60)).then();
+                .then();
     }
     
     private String getItem(String content) {

@@ -87,14 +87,14 @@ public class MarketLichSearchCommand implements Command {
         if (selectedElement.isPresent() && selectedElement.get().equals(INVALID_ELEMENT)) {
             return event.getMessage().getChannel()
                 .flatMap(channel -> channel.createMessage(createErrorResponse(TITLE_ELEMENT_INVALID, DESCRIPTION_ELEMENT_INVALID)))
-                .timeout(Duration.ofSeconds(60)).then();
+                .then();
         }
         
         String item = getItem(event.getMessage().getContent(), selectedElement);
         if (item.length() < 3) {
             return event.getMessage().getChannel()
                 .flatMap(channel -> channel.createMessage(createErrorResponse(TITLE_TOO_SHORT, DESCRIPTION_TOO_SHORT)))
-                .timeout(Duration.ofSeconds(60)).then();
+                .then();
         }
         
         List<MarketLichWeapon> foundLichWeapons = getLichWeapons(item);
@@ -103,7 +103,7 @@ public class MarketLichSearchCommand implements Command {
         if (foundLichWeapons.isEmpty()) {
             return event.getMessage().getChannel()
                 .flatMap(channel -> channel.createMessage(createErrorResponse(TITLE_NOT_FOUND, DESCRIPTION_NOT_FOUND)))
-                .timeout(Duration.ofSeconds(60)).then();
+                .then();
         }
         
         Map<MarketLichWeapon, List<MarketLichAuctionDTO>> foundLichAuctions = getAuctions(foundLichWeapons, selectedElement);
@@ -111,7 +111,7 @@ public class MarketLichSearchCommand implements Command {
         EmbedCreateSpec[] embeddedMessages = getEmbeddedResult(foundLichAuctions);
         return event.getMessage().getChannel()
                 .flatMap(channel -> channel.createMessage(embeddedMessages))
-                .timeout(Duration.ofSeconds(60)).then();
+                .then();
     }
     
     private Optional<String> getPossibleElement(String content) {

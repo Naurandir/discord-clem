@@ -52,7 +52,7 @@ public class MissionDropCommand implements Command {
         if (item.length() < 3) {
             return event.getMessage().getChannel()
                 .flatMap(channel -> channel.createMessage("The given input [" + item + "] is too short. Please provide a longer name to search"))
-                .timeout(Duration.ofSeconds(60)).then();
+                .then();
         }
         
         List<Mission> missionsWithItem = getMissionsWithItem(item);
@@ -60,7 +60,7 @@ public class MissionDropCommand implements Command {
         
         return event.getMessage().getChannel()
                 .flatMap(channel -> channel.createMessage(generateEmbed(item, missionsWithItem)))
-                .timeout(Duration.ofSeconds(60)).then();
+                .then();
     }
     
     private String getItem(String content) {

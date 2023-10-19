@@ -113,7 +113,7 @@ public class InterestingChannelCommand implements Command {
         
         return event.getMessage().getChannel()
                 .flatMap(ch -> ch.createMessage(embed))
-                .timeout(Duration.ofSeconds(60)).then();
+                .then();
     }
     
     private Mono<Void> handleWrongUsage(MessageCreateEvent event) {
@@ -127,7 +127,7 @@ public class InterestingChannelCommand implements Command {
         
         return event.getMessage().getChannel()
                 .flatMap(ch -> ch.createMessage(embed))
-                .timeout(Duration.ofSeconds(60)).then();
+                .then();
     }
 
     private Mono<Void> handleRegister(MessageCreateEvent event, PushType pushType, Member member) {
@@ -147,7 +147,7 @@ public class InterestingChannelCommand implements Command {
         
         return event.getMessage().getChannel()
                 .flatMap(ch -> ch.createMessage(embed))
-                .timeout(Duration.ofSeconds(60)).then();
+                .then();
     }
 
     private Mono<Void> handleUnregister(MessageCreateEvent event, PushType pushType) {
@@ -157,7 +157,7 @@ public class InterestingChannelCommand implements Command {
         
         if (channelOpt.isEmpty()) {
             log.info("handleUnregister: no channel found for [{}] with push type [{}], ignoring request.");
-            return Flux.empty().timeout(Duration.ofSeconds(60)).then();
+            return Flux.empty().then();
         }
         
         InterestingChannel channel = channelOpt.get();
@@ -174,7 +174,7 @@ public class InterestingChannelCommand implements Command {
         
         return event.getMessage().getChannel()
                 .flatMap(ch -> ch.createMessage(embed))
-                .timeout(Duration.ofSeconds(60)).then();
+                .then();
     }
     
     @Getter

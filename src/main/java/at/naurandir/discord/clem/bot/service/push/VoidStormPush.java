@@ -43,7 +43,7 @@ public class VoidStormPush extends Push {
 
         getClient().rest().getChannelById(channelId)
                     .createMessage(embed.asRequest())
-                    .timeout(Duration.ofSeconds(60)).subscribe();
+                    .subscribe();
     }
 
     @Override
@@ -52,7 +52,7 @@ public class VoidStormPush extends Push {
                 .embedOrNull(generateEmbed(voidFissureService.getStormVoidFissures()).asRequest())
                 .build();
 
-        message.edit(editRequest).timeout(Duration.ofSeconds(60)).subscribe();
+        message.edit(editRequest).subscribe();
     }
 
     @Override

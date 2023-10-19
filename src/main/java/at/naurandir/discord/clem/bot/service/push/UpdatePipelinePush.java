@@ -45,7 +45,7 @@ public class UpdatePipelinePush extends Push {
                 
                 getClient().rest().getChannelById(channelId)
                     .createMessage(embed.asRequest())
-                    .timeout(Duration.ofSeconds(60)).subscribe();
+                    .subscribe();
             } catch (Exception ex) {
                 log.warn("doNewPush: error for notification [{}]: ", notification.getUuid(), ex);
             }

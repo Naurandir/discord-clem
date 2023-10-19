@@ -65,7 +65,7 @@ public class RelicDropCommand implements Command {
         if (item.length() < 3) {
             return event.getMessage().getChannel()
                 .flatMap(channel -> channel.createMessage("The given input [" + item + "] is too short. Please provide a longer name to search"))
-                .timeout(Duration.ofSeconds(60)).then();
+                .then();
         }
         
         List<Relic> relics = relicService.getRelics();
@@ -83,7 +83,7 @@ public class RelicDropCommand implements Command {
         return event.getMessage().getChannel()
                 .flatMap(channel -> channel.createMessage(generateEmbedRelics(item, relicMessages), 
                                                           generateEmbedMissions(item, missionMessages)))
-                .timeout(Duration.ofSeconds(60)).then();
+                .then();
     }
     
     private String getItem(String content) {

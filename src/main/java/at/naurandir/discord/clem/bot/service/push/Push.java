@@ -59,7 +59,7 @@ public abstract class Push {
         }
         
         interestingChannelService.addStickyMessageIdToChannel(messageId, interestingChannel.get());
-        event.getMessage().pin().timeout(Duration.ofSeconds(60)).subscribe();
+        event.getMessage().pin().subscribe();
     }
     
     public void handleDeleteOwnEvent(MessageDeleteEvent event) {
