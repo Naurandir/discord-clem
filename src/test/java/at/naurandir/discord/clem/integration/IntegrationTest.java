@@ -51,31 +51,31 @@ public class IntegrationTest {
     
     @Test
     @Order(1)
-    public void testWarframeService() throws IOException {
+    void testWarframeService() throws IOException {
         warframeService.sync(); // update
     }
     
     @Test
     @Order(2)
-    public void testWeaponService() throws IOException {
+    void testWeaponService() throws IOException {
         weaponService.sync(); // update
     }
     
     @Test
     @Order(3)
-    public void testBuildService() throws IOException {
+    void testBuildService() throws IOException {
         itemBuildService.sync(); // update
     }
     
     @Test
     @Order(4)
-    public void testMissionService() throws IOException {
+    void testMissionService() throws IOException {
         missionService.sync(); // update
     }
     
     @Test
     @Order(5)
-    public void testMarketService() throws IOException {
+    void testMarketService() throws IOException {
         marketService.sync(); // add
         marketService.sync(); // update
     }

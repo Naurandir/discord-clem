@@ -7,6 +7,8 @@ import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.spec.EmbedCreateFields;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.util.Color;
+
+import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
