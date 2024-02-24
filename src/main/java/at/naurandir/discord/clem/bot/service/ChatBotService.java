@@ -88,7 +88,13 @@ public class ChatBotService {
         List<ChatGptChatMessageRequestDTO> messages = generateChatMessages(finalUserMessage, conversation, isOffTopic);
         ChatGptChatRequestDTO body = createRequestBody(messages);
         
-        ChatGptChatResponseDTO answerDTO = warframeClient.getDataByPost(url, apiHeaders, body, ChatGptChatResponseDTO.class);
+        ChatGptChatResponseDTO answerDTO = null;
+                
+        try {
+            answerDTO = warframeClient.getDataByPost(url, apiHeaders, body, ChatGptChatResponseDTO.class);
+        } catch (Exception ex) {
+            log.error("chatTurbo: calling chat gpt ended in error:", ex);
+        }
         
         if (answerDTO == null || answerDTO.getChoices() == null || answerDTO.getChoices().isEmpty()) {
             log.error("chatTurbo: did not receive a valid answer, answer was: [{}]", answerDTO);
