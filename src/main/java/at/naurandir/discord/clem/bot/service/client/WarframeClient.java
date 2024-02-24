@@ -63,6 +63,9 @@ public class WarframeClient {
             try (CloseableHttpResponse response = httpClient.execute(httpGet)) {
                 log.info("getData: received http status [{}] for url [{}]", response.getStatusLine(), url);
                 String jsonString = getHttpContent(response);
+                if (log.isDebugEnabled()) {
+                    log.debug("getData: received payload: [{}]", jsonString);
+                }
                 
                 watch.stop();
                 log.debug("getData: needed [{}]ms for getting [{}]", watch.getTotalTimeMillis(), clazz);
